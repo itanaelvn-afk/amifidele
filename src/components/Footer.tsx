@@ -1,6 +1,7 @@
 "use client";
 
-import { PawPrint, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import { SiFacebook, SiInstagram, SiX, SiYoutube } from "@icons-pack/react-simple-icons";
+import { PawPrint, Mail, Phone, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -11,7 +12,7 @@ export function Footer() {
   return (
     <footer className="bg-card border-t border-border mt-auto">
       {/* Newsletter Section */}
-      <div className="bg-gradient-to-br from-primary/10 via-accent/20 to-secondary/10 border-b border-border">
+      <div className="bg-linear-to-br from-primary/10 via-accent/20 to-secondary/10 border-b border-border">
         <div className="container mx-auto px-4 py-12">
           <div className="max-w-2xl mx-auto text-center">
             <h3 className="mb-2">📧 Restez informé</h3>
@@ -24,7 +25,7 @@ export function Footer() {
                 placeholder="Votre adresse email"
                 className="bg-background"
               />
-              <Button>S'inscrire</Button>
+              <Button>S&apos;inscrire</Button>
             </div>
           </div>
         </div>
@@ -52,28 +53,28 @@ export function Footer() {
                 className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Facebook"
               >
-                <Facebook className="w-5 h-5" />
+                <SiFacebook className="w-5 h-5" />
               </a>
               <a 
                 href="#" 
                 className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Twitter"
               >
-                <Twitter className="w-5 h-5" />
+                <SiX className="w-5 h-5" />
               </a>
               <a 
                 href="#" 
                 className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="Instagram"
               >
-                <Instagram className="w-5 h-5" />
+                <SiInstagram className="w-5 h-5" />
               </a>
               <a 
                 href="#" 
                 className="p-2 rounded-full bg-muted hover:bg-primary hover:text-primary-foreground transition-colors"
                 aria-label="YouTube"
               >
-                <Youtube className="w-5 h-5" />
+                <SiYoutube className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -126,7 +127,7 @@ export function Footer() {
               </li>
               <li>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                  Guide d'utilisation
+                  Guide d&apos;utilisation
                 </a>
               </li>
               <li>
@@ -227,7 +228,7 @@ export function Footer() {
               Politique de confidentialité
             </a>
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-              Conditions d'utilisation
+              Conditions d&apos;utilisation
             </a>
             <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
               Gestion des cookies

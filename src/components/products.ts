@@ -1,8 +1,8 @@
-import { Product } from "@/components/ProductCard";
+import { DisplayProduct } from "@/lib/types";
 
-export const mockProducts: Product[] = [
+export const mockProducts: DisplayProduct[] = [
   {
-    id: 1,
+    id: "1",
     name: "Croquettes Premium pour Chiens Adultes",
     category: "Alimentation",
     price: 45.99,
@@ -18,7 +18,7 @@ export const mockProducts: Product[] = [
     brand: "xxxxxx"
   },
   {
-    id: 2,
+    id: "2",
     name: "Gamelle Anti-Glouton pour Chats",
     category: "Accessoires",
     price: 18.50,
@@ -34,7 +34,7 @@ export const mockProducts: Product[] = [
     brand: "xxxxxxx"
   },
   {
-    id: 3,
+    id: "3",
     name: "Kit de Jouets Interactifs pour Chiens",
     category: "Jouets",
     price: 32.99,
@@ -50,7 +50,7 @@ export const mockProducts: Product[] = [
     brand: "xxxxxxx"
   },
   {
-    id: 4,
+    id: "4",
     name: "Lit Orthopédique Moelleux",
     category: "Repos",
     price: 79.99,
@@ -66,7 +66,7 @@ export const mockProducts: Product[] = [
     brand: "xxxxxxx"
   },
   {
-    id: 5,
+    id: "5",
     name: "Arbre à Chat Multi-Niveaux",
     category: "Jouets",
     price: 89.99,
@@ -82,7 +82,7 @@ export const mockProducts: Product[] = [
     brand: "xxxxxxx"
   },
   {
-    id: 6,
+    id: "6",
     name: "Laisse et Harnais Réfléchissants",
     category: "Accessoires",
     price: 24.99,

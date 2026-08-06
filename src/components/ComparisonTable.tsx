@@ -1,7 +1,7 @@
 "use client";
 
-import { X } from "lucide-react";
-import { Product } from "@/components/ProductCard";
+import { X, ExternalLink, ShoppingCart } from "lucide-react";
+import { DisplayProduct } from "@/lib/types";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,10 +12,10 @@ import {
 } from "@/components/ui/dialog";
 
 interface ComparisonTableProps {
-  products: Product[];
+  products: DisplayProduct[];
   isOpen: boolean;
   onClose: () => void;
-  onRemoveProduct: (id: number) => void;
+  onRemoveProduct: (id: string) => void;
 }
 
 export function ComparisonTable({
@@ -26,98 +26,145 @@ export function ComparisonTable({
 }: ComparisonTableProps) {
   if (products.length === 0) return null;
 
+  // Trouver le meilleur prix pour chaque produit
+  const getBestPrice = (product: DisplayProduct) => {
+    return product.price;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Comparaison de produits</DialogTitle>
+      <DialogContent className="!max-w-[98vw] !w-[98vw] !sm:max-w-[98vw] max-h-[95vh] overflow-y-auto comparison-scrollbar p-8">
+        <DialogHeader className="mb-6">
+          <DialogTitle className="text-2xl font-bold">Comparaison de produits</DialogTitle>
+          <p className="text-muted-foreground mt-1">
+            Comparez {products.length} produit{products.length > 1 ? 's' : ''} côte à côte
+          </p>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {products.map((product) => (
-            <div
-              key={product.id}
-              className="border border-border rounded-lg p-4 relative bg-card"
-            >
-              <button
-                onClick={() => onRemoveProduct(product.id)}
-                className="absolute top-2 right-2 p-1 rounded-full bg-muted hover:bg-accent transition-colors"
-                aria-label="Retirer de la comparaison"
+        <div className={`grid gap-8 mt-6 ${
+          products.length === 1 
+            ? 'grid-cols-1 max-w-md mx-auto' 
+            : products.length === 2 
+            ? 'grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto' 
+            : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+        }`}>
+          {products.map((product) => {
+            const bestPrice = getBestPrice(product);
+            return (
+              <div
+                key={product.id}
+                className="border-2 border-border rounded-xl p-6 relative bg-card hover:shadow-lg transition-all min-w-0"
               >
-                <X className="w-4 h-4" />
-              </button>
+                <button
+                  onClick={() => onRemoveProduct(product.id)}
+                  className="absolute top-4 right-4 p-2 rounded-full bg-muted hover:bg-destructive hover:text-destructive-foreground transition-colors z-10 shadow-md"
+                  aria-label="Retirer de la comparaison"
+                >
+                  <X className="w-5 h-5" />
+                </button>
 
-              <ImageWithFallback
-                src={product.image}
-                alt={product.name}
-                className="w-full h-48 object-cover rounded-lg mb-4"
-              />
-
-              <div className="space-y-3">
-                <div>
-                  <p className="text-muted-foreground">
-                    {product.brand}
-                  </p>
-                  <h4 className="mb-1">{product.name}</h4>
-                  <p className="text-primary">
-                    {product.price.toFixed(2)}€
-                  </p>
+                <div className="mb-6">
+                  <ImageWithFallback
+                    src={product.image}
+                    alt={product.name}
+                    className="w-full h-56 object-cover rounded-xl"
+                  />
                 </div>
 
-                <div>
-                  <div className="flex items-center gap-1 mb-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <span
-                        key={i}
-                        className={
-                          i < Math.floor(product.rating)
-                            ? "text-primary"
-                            : "text-muted"
-                        }
-                      >
-                        ★
-                      </span>
-                    ))}
-                    <span className="ml-2 text-muted-foreground">
-                      ({product.rating})
-                    </span>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      {product.brand}
+                    </p>
+                    <h4 className="text-lg font-bold mb-3 line-clamp-3 min-h-[4.5rem]">{product.name}</h4>
+                    <div className="mb-3">
+                      <p className="text-primary text-2xl font-bold">
+                        {bestPrice.toFixed(2)}€
+                      </p>
+                    </div>
+                    {product.merchantName && (
+                      <p className="text-sm text-muted-foreground">
+                        Disponible chez <span className="font-semibold text-foreground">{product.merchantName}</span>
+                      </p>
+                    )}
                   </div>
-                </div>
 
-                <div>
-                  <p className="mb-2">
-                    Catégorie: {product.category}
-                  </p>
-                  <p className="text-muted-foreground mb-2">
-                    {product.description}
-                  </p>
-                </div>
+                  {product.rating && (
+                    <div className="pb-4 border-b border-border">
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <span
+                            key={i}
+                            className={`text-lg ${
+                              i < Math.floor(product.rating!)
+                                ? "text-primary"
+                                : "text-muted"
+                            }`}
+                          >
+                            ★
+                          </span>
+                        ))}
+                        <span className="ml-3 text-muted-foreground font-medium">
+                          {product.rating.toFixed(1)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
-                <div>
-                  <p className="mb-2">Caractéristiques:</p>
-                  <ul className="space-y-1">
-                    {product.features.map((feature, idx) => (
-                      <li
-                        key={idx}
-                        className="flex items-start gap-2"
-                      >
-                        <span className="text-primary mt-1">
-                          ✓
-                        </span>
-                        <span className="text-muted-foreground">
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="space-y-3 pb-4 border-b border-border">
+                    <div>
+                      <p className="text-sm font-semibold text-muted-foreground mb-1">Catégorie</p>
+                      <p className="text-foreground">{product.category}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-muted-foreground mb-2">Description</p>
+                      <p className="text-muted-foreground text-sm leading-relaxed line-clamp-4">
+                        {product.description}
+                      </p>
+                    </div>
+                  </div>
+
+                  {product.features && product.features.length > 0 && (
+                    <div className="pb-4 border-b border-border">
+                      <p className="text-sm font-semibold text-muted-foreground mb-3">Caractéristiques</p>
+                      <ul className="space-y-2">
+                        {product.features.map((feature, idx) => (
+                          <li
+                            key={idx}
+                            className="flex items-start gap-3"
+                          >
+                            <span className="text-primary mt-0.5 text-lg font-bold flex-shrink-0">
+                              ✓
+                            </span>
+                            <span className="text-foreground text-sm">
+                              {feature}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {product.bestAffiliateLink && (
+                    <Button
+                      size="lg"
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold mt-4"
+                      onClick={() => window.open(product.bestAffiliateLink, '_blank', 'noopener,noreferrer')}
+                    >
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Acheter maintenant
+                    </Button>
+                  )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        <div className="flex justify-end mt-6">
-          <Button onClick={onClose}>Fermer</Button>
+        <div className="flex justify-end mt-8 pt-6 border-t border-border">
+          <Button size="lg" variant="outline" onClick={onClose}>
+            Fermer
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

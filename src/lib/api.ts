@@ -1,0 +1,512 @@
+/**
+ * Service API pour récupérer les produits depuis l'API api-amifidele
+ */
+
+import { getAuthHeaders } from './auth';
+import { API_CONFIG } from './api-config';
+import { Product, PaginatedProductsResponse } from './types';
+
+// Configuration de l'API - à adapter selon votre environnement
+// Par défaut, utilise localhost:4000 pour le développement local
+const API_BASE_URL = API_CONFIG.baseURL;
+
+// Utiliser directement le type Product du dashboard
+export type ApiProduct = Product;
+
+export interface ApiResponse<T> {
+  data?: T;
+  products?: T[];
+  success?: boolean;
+  message?: string;
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+  // Adaptez selon la structure de votre API
+  [key: string]: unknown;
+}
+
+export interface ProductFilters {
+  categoryName?: string;
+  categoryId?: string;
+  brandName?: string;
+  brandId?: string;
+  merchantId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  search?: string;
+  inStock?: boolean;
+  isForSale?: boolean;
+  isVisible?: boolean;
+}
+
+/**
+ * Récupère tous les produits depuis l'API avec pagination et filtres
+ */
+export async function fetchProducts(page: number = 1, limit: number = 20, filters?: ProductFilters): Promise<PaginatedProductsResponse> {
+  try {
+    const params = new URLSearchParams();
+    params.append('page', page.toString());
+    params.append('limit', limit.toString());
+    
+    if (filters) {
+      if (filters.categoryName) params.append('categoryName', filters.categoryName);
+      if (filters.categoryId) params.append('categoryId', filters.categoryId);
+      if (filters.brandName) params.append('brandName', filters.brandName);
+      if (filters.brandId) params.append('brandId', filters.brandId);
+      if (filters.merchantId) params.append('merchantId', filters.merchantId);
+      
+      // Gestion des prix avec vérification stricte
+      if (filters.minPrice !== undefined && filters.minPrice !== null) {
+        const minPrice = typeof filters.minPrice === 'number' ? filters.minPrice : Number(filters.minPrice);
+        if (!isNaN(minPrice) && minPrice >= 0) {
+          params.append('minPrice', minPrice.toString());
+        }
+      }
+      if (filters.maxPrice !== undefined && filters.maxPrice !== null) {
+        const maxPrice = typeof filters.maxPrice === 'number' ? filters.maxPrice : Number(filters.maxPrice);
+        if (!isNaN(maxPrice) && maxPrice > 0) {
+          params.append('maxPrice', maxPrice.toString());
+        }
+      }
+      
+      if (filters.search) params.append('search', filters.search);
+      
+      // Debug: log des filtres envoyés
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Filtres envoyés à l\'API:', {
+          minPrice: filters.minPrice,
+          maxPrice: filters.maxPrice,
+          categoryName: filters.categoryName,
+          categoryId: filters.categoryId,
+          merchantId: filters.merchantId,
+          search: filters.search
+        });
+      }
+      if (filters.inStock !== undefined) params.append('inStock', filters.inStock.toString());
+      if (filters.isForSale !== undefined) params.append('isForSale', filters.isForSale.toString());
+      if (filters.isVisible !== undefined) params.append('isVisible', filters.isVisible.toString());
+    }
+
+    const response = await fetch(`${API_BASE_URL}/products?${params.toString()}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      // Ajoutez cache pour améliorer les performances
+      next: { revalidate: API_CONFIG.cacheRevalidate },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
+    }
+
+    const data: PaginatedProductsResponse | ApiResponse<ApiProduct> | ApiProduct[] = await response.json();
+
+    // Gérer différentes structures de réponse
+    if ('products' in data && 'page' in data && 'total' in data) {
+      // Réponse paginée complète
+      return data as PaginatedProductsResponse;
+    } else if (Array.isArray(data)) {
+      // Tableau simple - créer une réponse paginée
+      return {
+        page: 1,
+        limit: data.length,
+        total: data.length,
+        totalPages: 1,
+        products: data,
+      };
+    } else if ('products' in data && Array.isArray(data.products)) {
+      // Réponse avec produits mais sans metadata complète
+      return {
+        page: data.page || 1,
+        limit: data.limit || data.products.length,
+        total: data.total || data.products.length,
+        totalPages: data.totalPages || 1,
+        products: data.products,
+      };
+    } else if ('data' in data && data.data && Array.isArray(data.data)) {
+      return {
+        page: data.page || 1,
+        limit: data.limit || data.data.length,
+        total: data.total || data.data.length,
+        totalPages: data.totalPages || 1,
+        products: data.data,
+      };
+    } else {
+      throw new Error('Format de réponse API inattendu');
+    }
+  } catch (error) {
+    console.error('Erreur lors de la récupération des produits:', error);
+    // Retourner une réponse paginée vide en cas d'erreur
+    return {
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      products: [],
+    };
+  }
+}
+
+/**
+ * Récupère un produit spécifique par son ID
+ */
+export async function fetchProductById(id: number | string): Promise<ApiProduct | null> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      next: { revalidate: API_CONFIG.cacheRevalidate },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
+    }
+
+    const data: ApiResponse<ApiProduct> | ApiProduct = await response.json();
+
+    if (Array.isArray(data)) {
+      return data[0] || null;
+    } else if ('data' in data && data.data) {
+      return data.data as ApiProduct;
+    } else if ('id' in data) {
+      return data as ApiProduct;
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`Erreur lors de la récupération du produit ${id}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Récupère les produits par catégorie avec pagination
+ */
+export async function fetchProductsByCategory(category: string, page: number = 1, limit: number = 20): Promise<PaginatedProductsResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products?category=${encodeURIComponent(category)}&page=${page}&limit=${limit}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      next: { revalidate: API_CONFIG.cacheRevalidate },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
+    }
+
+    const data: PaginatedProductsResponse | ApiResponse<ApiProduct> | ApiProduct[] = await response.json();
+
+    if ('products' in data && 'page' in data && 'total' in data) {
+      return data as PaginatedProductsResponse;
+    } else if (Array.isArray(data)) {
+      return {
+        page: 1,
+        limit: data.length,
+        total: data.length,
+        totalPages: 1,
+        products: data,
+      };
+    } else if ('products' in data && Array.isArray(data.products)) {
+      return {
+        page: data.page || 1,
+        limit: data.limit || data.products.length,
+        total: data.total || data.products.length,
+        totalPages: data.totalPages || 1,
+        products: data.products,
+      };
+    } else if ('data' in data && data.data && Array.isArray(data.data)) {
+      return {
+        page: data.page || 1,
+        limit: data.limit || data.data.length,
+        total: data.total || data.data.length,
+        totalPages: data.totalPages || 1,
+        products: data.data,
+      };
+    }
+
+    return {
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      products: [],
+    };
+  } catch (error) {
+    console.error(`Erreur lors de la récupération des produits pour la catégorie ${category}:`, error);
+    return {
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      products: [],
+    };
+  }
+}
+
+/**
+ * Recherche des produits par terme de recherche avec pagination
+ */
+export async function searchProducts(query: string, page: number = 1, limit: number = 20): Promise<PaginatedProductsResponse> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      next: { revalidate: API_CONFIG.cacheRevalidate },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
+    }
+
+    const data: PaginatedProductsResponse | ApiResponse<ApiProduct> | ApiProduct[] = await response.json();
+
+    if ('products' in data && 'page' in data && 'total' in data) {
+      return data as PaginatedProductsResponse;
+    } else if (Array.isArray(data)) {
+      return {
+        page: 1,
+        limit: data.length,
+        total: data.length,
+        totalPages: 1,
+        products: data,
+      };
+    } else if ('products' in data && Array.isArray(data.products)) {
+      return {
+        page: data.page || 1,
+        limit: data.limit || data.products.length,
+        total: data.total || data.products.length,
+        totalPages: data.totalPages || 1,
+        products: data.products,
+      };
+    } else if ('data' in data && data.data && Array.isArray(data.data)) {
+      return {
+        page: data.page || 1,
+        limit: data.limit || data.data.length,
+        total: data.total || data.data.length,
+        totalPages: data.totalPages || 1,
+        products: data.data,
+      };
+    }
+
+    return {
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      products: [],
+    };
+  } catch (error) {
+    console.error(`Erreur lors de la recherche de produits:`, error);
+    return {
+      page: 1,
+      limit: 20,
+      total: 0,
+      totalPages: 0,
+      products: [],
+    };
+  }
+}
+
+export interface Advertiser {
+  merchantId: number;
+  merchantName: string;
+}
+
+export interface Category {
+  id?: number;
+  name: string;
+  mCat?: string;
+}
+
+export interface Brand {
+  id?: number;
+  name: string;
+  brandName?: string;
+}
+
+type ApiCategoryRecord = Category & {
+  _id?: string | number;
+  categoryName?: string;
+};
+
+type ApiBrandRecord = Brand & {
+  brandId?: number;
+  awBrandId?: number;
+};
+
+/**
+ * Récupère la liste des annonceurs/marchands
+ */
+export async function fetchAdvertisers(): Promise<Advertiser[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/advertisers`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      next: { revalidate: API_CONFIG.cacheRevalidate },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
+    }
+
+    const data: Advertiser[] | ApiResponse<Advertiser> = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data;
+    } else if ('data' in data && Array.isArray(data.data)) {
+      return data.data;
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des annonceurs:', error);
+    return [];
+  }
+}
+
+/**
+ * Récupère la liste des catégories
+ */
+export async function fetchCategories(): Promise<Category[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/categories`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      next: { revalidate: API_CONFIG.cacheRevalidate },
+    });
+
+    if (!response.ok) {
+      // Si l'endpoint n'existe pas, extraire depuis les produits
+      return await loadCategoriesFromProducts();
+    }
+
+    const data: Category[] | ApiResponse<Category> | { categories: Category[] } = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data.map(cat => ({
+        id: cat.id,
+        name: cat.mCat || cat.name,
+        mCat: cat.mCat || cat.name,
+      })).sort((a, b) => a.name.localeCompare(b.name));
+    } else if ('categories' in data && Array.isArray(data.categories)) {
+      return (data.categories as ApiCategoryRecord[]).map((cat) => ({
+        id: typeof cat.id === 'number' ? cat.id : typeof cat._id === 'number' ? cat._id : undefined,
+        name: cat.mCat || cat.name || cat.categoryName || '',
+        mCat: cat.mCat || cat.name || cat.categoryName || '',
+      })).sort((a, b) => a.name.localeCompare(b.name));
+    } else if ('data' in data && Array.isArray(data.data)) {
+      return (data.data as ApiCategoryRecord[]).map((cat) => ({
+        id: typeof cat.id === 'number' ? cat.id : typeof cat._id === 'number' ? cat._id : undefined,
+        name: cat.mCat || cat.name || cat.categoryName || '',
+        mCat: cat.mCat || cat.name || cat.categoryName || '',
+      })).sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des catégories:', error);
+    return await loadCategoriesFromProducts();
+  }
+}
+
+/**
+ * Récupère la liste des marques
+ */
+export async function fetchBrands(): Promise<Brand[]> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/brands`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+      next: { revalidate: API_CONFIG.cacheRevalidate },
+    });
+
+    if (!response.ok) {
+      // Si l'endpoint n'existe pas, extraire depuis les produits
+      return await loadBrandsFromProducts();
+    }
+
+    const data: Brand[] | ApiResponse<Brand> = await response.json();
+    
+    if (Array.isArray(data)) {
+      return data
+        .map(brand => ({
+          id: brand.id,
+          name: brand.name || brand.brandName || '',
+          brandName: brand.brandName || brand.name || '',
+        }))
+        .filter(brand => brand.name)
+        .sort((a, b) => a.name.localeCompare(b.name));
+    } else if ('data' in data && Array.isArray(data.data)) {
+      return (data.data as ApiBrandRecord[])
+        .map((brand) => ({
+          id: brand.id || brand.brandId || brand.awBrandId,
+          name: brand.name || brand.brandName || '',
+          brandName: brand.brandName || brand.name || '',
+        }))
+        .filter(brand => brand.name)
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+    
+    return [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des marques:', error);
+    return await loadBrandsFromProducts();
+  }
+}
+
+/**
+ * Charge les catégories depuis les produits (fallback)
+ */
+async function loadCategoriesFromProducts(): Promise<Category[]> {
+  try {
+    const response = await fetchProducts(1, 1000);
+    const categoryMap = new Map<string, Category>();
+    
+    response.products.forEach((product: ApiProduct) => {
+      if (product.cat?.mCat) {
+        const key = product.cat.mCat;
+        if (!categoryMap.has(key)) {
+          categoryMap.set(key, {
+            id: product.cat?.awCatId,
+            name: product.cat.mCat,
+            mCat: product.cat.mCat,
+          });
+        }
+      }
+    });
+    
+    return Array.from(categoryMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  } catch (error) {
+    console.error('Erreur lors du chargement des catégories depuis les produits:', error);
+    return [];
+  }
+}
+
+/**
+ * Charge les marques depuis les produits (fallback)
+ */
+async function loadBrandsFromProducts(): Promise<Brand[]> {
+  try {
+    const response = await fetchProducts(1, 1000);
+    const brandMap = new Map<string, Brand>();
+    
+    response.products.forEach((product: ApiProduct) => {
+      if (product.brand?.brandName) {
+        const key = product.brand.brandName;
+        if (!brandMap.has(key)) {
+          brandMap.set(key, {
+            id: product.brand?.awBrandId,
+            name: product.brand.brandName,
+            brandName: product.brand.brandName,
+          });
+        }
+      }
+    });
+    
+    return Array.from(brandMap.values()).sort((a, b) => a.name.localeCompare(b.name));
+  } catch (error) {
+    console.error('Erreur lors du chargement des marques depuis les produits:', error);
+    return [];
+  }
+}
+

@@ -1,36 +1,183 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AmiFidele - Comparateur de produits pour animaux de compagnie
 
-## Getting Started
+Site web de comparatif de produits destiné aux propriétaires d'animaux de compagnie, avec intégration de liens affiliés et de produits provenant de l'API api-amifidele.
 
-First, run the development server:
+## 🚀 Fonctionnalités
+
+- **Comparaison de produits** : Comparez facilement les produits pour vos animaux
+- **Intégration API** : Récupération dynamique des produits depuis l'API api-amifidele
+- **Liens affiliés** : Gestion automatique des liens affiliés vers les revendeurs
+- **Interface moderne** : Design attractif et responsive optimisé pour les propriétaires d'animaux
+- **Recherche et filtres** : Recherchez et filtrez les produits par catégorie
+- **Produits recommandés** : Mise en avant des meilleurs produits selon les notes
+
+## 📋 Prérequis
+
+- Node.js 18+ 
+- npm, yarn, pnpm ou bun
+
+## 🛠️ Installation
+
+1. Clonez le repository :
+```bash
+git clone <votre-repo>
+cd Amifidele
+```
+
+2. Installez les dépendances :
+```bash
+npm install
+# ou
+yarn install
+# ou
+pnpm install
+```
+
+3. Configurez les variables d'environnement :
+```bash
+cp .env.local.example .env.local
+```
+
+4. Éditez `.env.local` et configurez l'URL et le token de votre API :
+```env
+# Pour le développement local (l'API tourne sur le port 4000 par défaut)
+NEXT_PUBLIC_API_URL=http://localhost:4000/api
+
+# Token d'authentification pour l'API (obligatoire)
+# Ce token doit correspondre à la variable API_TOKEN_AUTH de votre API
+NEXT_PUBLIC_API_KEY=votre_token_ici
+
+# Pour la production
+# NEXT_PUBLIC_API_URL=https://api-amifidele.com/api
+# NEXT_PUBLIC_API_KEY=votre_token_production
+```
+
+> ⚠️ **Important** : Le token doit correspondre à la variable `API_TOKEN_AUTH` configurée dans votre API (`../api-amifidele/.env`)
+
+## 🎯 Configuration de l'API
+
+Le site est configuré pour fonctionner avec l'API `api-amifidele`. 
+
+### Structure attendue de l'API
+
+L'API doit retourner des produits au format suivant :
+
+```json
+{
+  "id": 1,
+  "name": "Nom du produit",
+  "category": "Alimentation",
+  "price": 45.99,
+  "rating": 4.8,
+  "image": "https://...",
+  "description": "Description du produit",
+  "features": ["Caractéristique 1", "Caractéristique 2"],
+  "brand": "Marque",
+  "affiliateLinks": [
+    {
+      "retailer": "Zooplus",
+      "url": "https://...",
+      "price": 45.99
+    }
+  ]
+}
+```
+
+### Endpoints attendus
+
+- `GET /api/products` - Liste tous les produits
+- `GET /api/products/:id` - Récupère un produit par ID
+- `GET /api/products?category=:category` - Filtre par catégorie
+- `GET /api/products/search?q=:query` - Recherche de produits
+
+Si votre API a une structure différente, vous pouvez adapter les fonctions dans `src/lib/api.ts`.
+
+## 🚀 Démarrage
+
+### Option 1 : Lancer le site web uniquement
 
 ```bash
 npm run dev
-# or
+# ou
 yarn dev
-# or
+# ou
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Option 2 : Lancer le site web ET l'API en même temps (recommandé)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run dev:all
+# ou
+yarn dev:all
+# ou
+pnpm dev:all
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Cette commande lance automatiquement :
+- Le site web Next.js sur [http://localhost:3000](http://localhost:3000)
+- L'API sur le port 4000 (configuré dans `../api-amifidele/src/server.js`)
 
-## Learn More
+Les deux services démarrent en parallèle avec des logs colorés pour les distinguer :
+- **WEB** (bleu) : Logs du site web Next.js
+- **API** (vert) : Logs de l'API
 
-To learn more about Next.js, take a look at the following resources:
+> 💡 **Astuce** : Assurez-vous que votre fichier `.env.local` contient `NEXT_PUBLIC_API_URL=http://localhost:4000/api` pour que le site web puisse communiquer avec l'API locale.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Autres commandes disponibles
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run dev:api` - Lance uniquement l'API
+- `npm run dev:all:script` - Alternative utilisant un script Node.js personnalisé
 
-## Deploy on Vercel
+## 📁 Structure du projet
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+src/
+├── app/              # Pages Next.js
+├── components/        # Composants React
+│   ├── ui/           # Composants UI réutilisables
+│   └── ...
+├── lib/              # Utilitaires et services
+│   ├── api.ts        # Service API
+│   └── utils/        # Utilitaires
+└── hooks/            # Hooks React personnalisés
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🎨 Personnalisation
+
+### Couleurs et thème
+
+Les couleurs sont définies dans `src/app/globals.css`. Vous pouvez modifier les variables CSS pour personnaliser le thème.
+
+### Produits mockés
+
+En cas d'erreur de connexion à l'API, le site utilise automatiquement des produits mockés définis dans `src/components/products.ts`.
+
+## 📦 Build pour production
+
+```bash
+npm run build
+npm start
+```
+
+## 🔧 Technologies utilisées
+
+- **Next.js 16** - Framework React
+- **TypeScript** - Typage statique
+- **Tailwind CSS** - Styles
+- **Lucide React** - Icônes
+- **Radix UI** - Composants UI accessibles
+
+## 📝 Notes
+
+- Les liens affiliés s'ouvrent dans un nouvel onglet avec `noopener,noreferrer` pour la sécurité
+- Le site utilise le cache Next.js pour optimiser les performances
+- En cas d'erreur API, les produits mockés sont affichés automatiquement
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! N'hésitez pas à ouvrir une issue ou une pull request.
+
+## 📄 Licence
+
+[Votre licence ici]
