@@ -1,27 +1,16 @@
 "use client";
 
-import { Heart, Check } from "lucide-react";
+import { Heart, Check, ShoppingCart } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-
-export interface Product {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  rating: number;
-  image: string;
-  description: string;
-  features: string[];
-  brand: string;
-}
+import { DisplayProduct } from "@/lib/types";
 
 interface ProductCardProps {
-  product: Product;
+  product: DisplayProduct;
   isSelected: boolean;
-  onToggleSelect: (id: number) => void;
+  onToggleSelect: (id: string) => void;
 }
 
 export function ProductCard({ product, isSelected, onToggleSelect }: ProductCardProps) {
@@ -39,7 +28,7 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
         >
           <Heart className="w-5 h-5 text-primary" />
         </button>
-        {product.rating >= 4.5 && (
+        {product.rating && product.rating >= 4.5 && (
           <Badge className="absolute top-4 left-4 bg-primary">
             ⭐ Recommandé
           </Badge>
@@ -56,35 +45,55 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
           </div>
         </div>
         
-        <div className="flex items-center gap-1 mb-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <span key={i} className={i < Math.floor(product.rating) ? "text-primary" : "text-muted"}>
-              ★
+        {product.rating && (
+          <div className="flex items-center gap-1 mb-3">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} className={i < Math.floor(product.rating!) ? "text-primary" : "text-muted"}>
+                ★
+              </span>
+            ))}
+            <span className="ml-2 text-muted-foreground">
+              ({product.rating})
             </span>
-          ))}
-          <span className="ml-2 text-muted-foreground">
-            ({product.rating})
-          </span>
-        </div>
+          </div>
+        )}
 
         <p className="text-muted-foreground mb-4 line-clamp-2">
           {product.description}
         </p>
 
-        <Button
-          variant={isSelected ? "default" : "outline"}
-          className="w-full"
-          onClick={() => onToggleSelect(product.id)}
-        >
-          {isSelected ? (
-            <>
-              <Check className="w-4 h-4 mr-2" />
-              Sélectionné
-            </>
-          ) : (
-            "Comparer"
+        <div className="flex gap-2">
+          <Button
+            variant={isSelected ? "default" : "outline"}
+            className="flex-1"
+            onClick={() => onToggleSelect(product.id)}
+          >
+            {isSelected ? (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Sélectionné
+              </>
+            ) : (
+              "Comparer"
+            )}
+          </Button>
+          {product.bestAffiliateLink && (
+            <Button
+              variant="default"
+              className="bg-primary hover:bg-primary/90"
+              onClick={() => window.open(product.bestAffiliateLink, '_blank', 'noopener,noreferrer')}
+            >
+              <ShoppingCart className="w-4 h-4 mr-2" />
+              Acheter
+            </Button>
           )}
-        </Button>
+        </div>
+        
+        {product.merchantName && (
+          <p className="text-xs text-muted-foreground mt-2 text-center">
+            Disponible chez {product.merchantName}
+          </p>
+        )}
       </CardContent>
     </Card>
   );

@@ -4,12 +4,13 @@ import { useState } from "react";
 import { Header } from "@/components/Header";
 import { HomePage } from "@/components/HomePage";
 import { ComparisonPage } from "@/components/ComparisonPage";
-import { mockProducts } from "@/components/products";
+import { useProducts } from "@/hooks/useProducts";
 
 type Page = "home" | "comparison";
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
+  const { products, loading, error } = useProducts();
 
   return (
     <div className="min-h-screen">
@@ -21,11 +22,13 @@ export default function Home() {
       
       {currentPage === "home" ? (
         <HomePage 
-          products={mockProducts} 
+          products={products}
+          loading={loading}
+          error={error}
           onNavigateToComparison={() => setCurrentPage("comparison")}
         />
       ) : (
-        <ComparisonPage products={mockProducts} />
+        <ComparisonPage />
       )}
     </div>
   );

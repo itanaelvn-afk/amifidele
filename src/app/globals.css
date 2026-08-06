@@ -189,3 +189,32 @@
 html {
   font-size: var(--font-size);
 }
+
+/* Barre de défilement verticale personnalisée pour la modal de comparaison */
+.comparison-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--muted);
+}
+
+.comparison-scrollbar::-webkit-scrollbar {
+  width: 12px;
+}
+
+.comparison-scrollbar::-webkit-scrollbar-track {
+  background: var(--muted);
+  border-radius: 10px;
+  margin: 8px 0;
+}
+
+.comparison-scrollbar::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--primary), var(--accent));
+  border-radius: 10px;
+  border: 2px solid var(--muted);
+  transition: all 0.3s ease;
+}
+
+.comparison-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--primary), var(--primary));
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 8px rgba(255, 138, 101, 0.4);
+}

@@ -5,12 +5,14 @@ import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Product } from "@/components/ProductCard";
+import { DisplayProduct } from "@/lib/types";
 import { Footer } from "@/components/Footer";
 
 interface HomePageProps {
   onNavigateToComparison: () => void;
-  products: Product[];
+  products: DisplayProduct[];
+  loading?: boolean;
+  error?: string | null;
 }
 
 const retailers = [
@@ -45,17 +47,17 @@ const features = [
   }
 ];
 
-export function HomePage({ onNavigateToComparison, products }: HomePageProps) {
-  const featuredProducts = products.filter(p => p.rating >= 4.7).slice(0, 3);
-  const foodProducts = products.filter(p => p.category === "Alimentation");
-  const toyProducts = products.filter(p => p.category === "Jouets");
-  const accessoryProducts = products.filter(p => p.category === "Accessoires");
+export function HomePage({ onNavigateToComparison, products, loading, error }: HomePageProps) {
+  const featuredProducts = products.filter((p) => (p.rating ?? 0) >= 4.7).slice(0, 3);
+  const foodProducts = products.filter(p => p.category === "Alimentation" || p.category === "alimentation");
+  const toyProducts = products.filter(p => p.category === "Jouets" || p.category === "jouets");
+  // const accessoryProducts = products.filter(p => p.category === "Accessoires");
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-accent/30 to-secondary/20" />
+        <div className="absolute inset-0 bg-linear-to-br from-primary/20 via-accent/30 to-secondary/20" />
         <div className="container mx-auto px-4 py-20 relative">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
@@ -126,30 +128,51 @@ export function HomePage({ onNavigateToComparison, products }: HomePageProps) {
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </div>
-          <div className="grid md:grid-cols-3 gap-6">
-            {featuredProducts.map((product) => (
-              <Card key={product.id} className="overflow-hidden group hover:shadow-lg transition-all">
-                <div className="relative overflow-hidden">
-                  <ImageWithFallback
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <Badge className="absolute top-4 left-4 bg-primary">
-                    ⭐ {product.rating}
-                  </Badge>
+          {loading && (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Chargement des produits...</p>
+            </div>
+          )}
+          {error && (
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
+              <p className="text-destructive">⚠️ {error}</p>
+              <p className="text-muted-foreground text-sm mt-2">
+                Impossible de charger les produits depuis l&apos;API. Veuillez vérifier votre connexion et réessayer.
+              </p>
+            </div>
+          )}
+          {!loading && (
+            <div className="grid md:grid-cols-3 gap-6">
+              {featuredProducts.length > 0 ? (
+                featuredProducts.map((product) => (
+                  <Card key={product.id} className="overflow-hidden group hover:shadow-lg transition-all">
+                    <div className="relative overflow-hidden">
+                      <ImageWithFallback
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <Badge className="absolute top-4 left-4 bg-primary">
+                        ⭐ {product.rating}
+                      </Badge>
+                    </div>
+                    <CardContent className="p-6">
+                      <p className="text-muted-foreground mb-1">{product.brand}</p>
+                      <h4 className="mb-2">{product.name}</h4>
+                      <p className="text-primary mb-4">À partir de {product.price.toFixed(2)}€</p>
+                      <Button variant="outline" className="w-full" onClick={onNavigateToComparison}>
+                        Comparer les prix
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-3 text-center py-12">
+                  <p className="text-muted-foreground">Aucun produit recommandé pour le moment</p>
                 </div>
-                <CardContent className="p-6">
-                  <p className="text-muted-foreground mb-1">{product.brand}</p>
-                  <h4 className="mb-2">{product.name}</h4>
-                  <p className="text-primary mb-4">À partir de {product.price.toFixed(2)}€</p>
-                  <Button variant="outline" className="w-full" onClick={onNavigateToComparison}>
-                    Comparer les prix
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
@@ -169,7 +192,7 @@ export function HomePage({ onNavigateToComparison, products }: HomePageProps) {
                 alt="Alimentation pour chiens"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-8">
                 <div className="text-white">
                   <h3 className="mb-2 text-white">Pour chiens</h3>
                   <p className="text-white/90 mb-4">
@@ -236,7 +259,7 @@ export function HomePage({ onNavigateToComparison, products }: HomePageProps) {
                 alt="Jouets pour chats"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-8">
+              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-8">
                 <div className="text-white">
                   <h3 className="mb-2 text-white">Pour chats</h3>
                   <p className="text-white/90 mb-4">
@@ -281,14 +304,14 @@ export function HomePage({ onNavigateToComparison, products }: HomePageProps) {
           </div>
           <div className="text-center mt-8">
             <p className="text-muted-foreground">
-              Et bien d'autres revendeurs pour vous offrir les meilleurs prix
+              Et bien d&apos;autres revendeurs pour vous offrir les meilleurs prix
             </p>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-primary/20 via-accent/30 to-secondary/20">
+      <section className="py-20 bg-linear-to-br from-primary/20 via-accent/30 to-secondary/20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="mb-4">Prêt à trouver le meilleur pour votre animal ?</h2>
           <p className="text-muted-foreground text-xl mb-8 max-w-2xl mx-auto">
