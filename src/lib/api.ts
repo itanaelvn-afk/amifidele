@@ -37,7 +37,15 @@ export interface ProductFilters {
   search?: string;
   inStock?: boolean;
   isForSale?: boolean;
+  /** Toujours forcé à true sur le site public — ne pas exposer les produits masqués. */
   isVisible?: boolean;
+}
+
+/** Visibilité forcée pour toutes les lectures publiques du site. */
+const PUBLIC_VISIBILITY = true as const;
+
+function appendPublicVisibility(params: URLSearchParams): void {
+  params.set('isVisible', String(PUBLIC_VISIBILITY));
 }
 
 /**
@@ -85,8 +93,10 @@ export async function fetchProducts(page: number = 1, limit: number = 20, filter
       }
       if (filters.inStock !== undefined) params.append('inStock', filters.inStock.toString());
       if (filters.isForSale !== undefined) params.append('isForSale', filters.isForSale.toString());
-      if (filters.isVisible !== undefined) params.append('isVisible', filters.isVisible.toString());
     }
+
+    // Toujours filtrer les produits masqués côté site public (indépendamment des filtres UI)
+    appendPublicVisibility(params);
 
     const response = await fetch(`${API_BASE_URL}/products?${params.toString()}`, {
       method: 'GET',
@@ -152,11 +162,18 @@ export async function fetchProducts(page: number = 1, limit: number = 20, filter
  */
 export async function fetchProductById(id: number | string): Promise<ApiProduct | null> {
   try {
-    const response = await fetch(`${API_BASE_URL}/products/${id}`, {
+    const params = new URLSearchParams();
+    appendPublicVisibility(params);
+
+    const response = await fetch(`${API_BASE_URL}/products/${id}?${params.toString()}`, {
       method: 'GET',
       headers: getAuthHeaders(),
       next: { revalidate: API_CONFIG.cacheRevalidate },
     });
+
+    if (response.status === 404) {
+      return null;
+    }
 
     if (!response.ok) {
       throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
@@ -168,8 +185,13 @@ export async function fetchProductById(id: number | string): Promise<ApiProduct 
       return data[0] || null;
     } else if ('data' in data && data.data) {
       return data.data as ApiProduct;
-    } else if ('id' in data) {
-      return data as ApiProduct;
+    } else if ('id' in data || '_id' in data) {
+      const product = data as ApiProduct;
+      // Filet de sécurité si l'API renvoie encore un produit masqué
+      if (product.isVisible === false) {
+        return null;
+      }
+      return product;
     }
 
     return null;
@@ -184,7 +206,13 @@ export async function fetchProductById(id: number | string): Promise<ApiProduct 
  */
 export async function fetchProductsByCategory(category: string, page: number = 1, limit: number = 20): Promise<PaginatedProductsResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/products?category=${encodeURIComponent(category)}&page=${page}&limit=${limit}`, {
+    const params = new URLSearchParams();
+    params.set('categoryName', category);
+    params.set('page', page.toString());
+    params.set('limit', limit.toString());
+    appendPublicVisibility(params);
+
+    const response = await fetch(`${API_BASE_URL}/products?${params.toString()}`, {
       method: 'GET',
       headers: getAuthHeaders(),
       next: { revalidate: API_CONFIG.cacheRevalidate },
@@ -248,7 +276,13 @@ export async function fetchProductsByCategory(category: string, page: number = 1
  */
 export async function searchProducts(query: string, page: number = 1, limit: number = 20): Promise<PaginatedProductsResponse> {
   try {
-    const response = await fetch(`${API_BASE_URL}/products/search?q=${encodeURIComponent(query)}&page=${page}&limit=${limit}`, {
+    const params = new URLSearchParams();
+    params.set('q', query);
+    params.set('page', page.toString());
+    params.set('limit', limit.toString());
+    appendPublicVisibility(params);
+
+    const response = await fetch(`${API_BASE_URL}/products/search?${params.toString()}`, {
       method: 'GET',
       headers: getAuthHeaders(),
       next: { revalidate: API_CONFIG.cacheRevalidate },
