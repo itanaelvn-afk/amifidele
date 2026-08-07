@@ -459,12 +459,21 @@ export async function fetchBrands(): Promise<Brand[]> {
       return await loadBrandsFromProducts();
     }
 
-    const data: Brand[] | ApiResponse<Brand> = await response.json();
+    const data: Brand[] | ApiResponse<Brand> | { brands: Brand[] } = await response.json();
     
     if (Array.isArray(data)) {
       return data
         .map(brand => ({
           id: brand.id,
+          name: brand.name || brand.brandName || '',
+          brandName: brand.brandName || brand.name || '',
+        }))
+        .filter(brand => brand.name)
+        .sort((a, b) => a.name.localeCompare(b.name));
+    } else if ('brands' in data && Array.isArray(data.brands)) {
+      return (data.brands as ApiBrandRecord[])
+        .map((brand) => ({
+          id: brand.id || brand.brandId || brand.awBrandId,
           name: brand.name || brand.brandName || '',
           brandName: brand.brandName || brand.name || '',
         }))

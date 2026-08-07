@@ -8,14 +8,17 @@ export interface Product {
   /** Visibilité publique — false = masqué (ex. feed Awin obsolète). */
   isVisible?: boolean;
 
+  /** ObjectId vers la collection brands */
+  brandId?: string;
+
   merchant: {
     merchantId: number;
     merchantName: string;
   };
 
-  brand: {
-    awBrandId: number;
-    brandName: string;
+  brand?: {
+    awBrandId?: number;
+    brandName?: string;
   };
 
   cat: {

@@ -22,8 +22,8 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct): DisplayPr
   // Extraire la catégorie
   const category = apiProduct.cat?.mCat || apiProduct.mainCategory?.mCat || apiProduct.mainCategory?.name || 'Autre';
   
-  // Extraire la marque
-  const brand = apiProduct.brand?.brandName || 'Marque inconnue';
+  // Extraire la marque (résolue côté API via brandId)
+  const brand = apiProduct.brand?.brandName?.trim() || 'Marque inconnue';
   
   // Extraire le lien affilié
   const affiliateLink = apiProduct.uri?.awTrack || apiProduct.uri?.mLink || '';
