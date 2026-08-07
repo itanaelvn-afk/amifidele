@@ -5,6 +5,9 @@
 export interface Product {
   _id: string;
 
+  /** Visibilité publique — false = masqué (ex. feed Awin obsolète). */
+  isVisible?: boolean;
+
   merchant: {
     merchantId: number;
     merchantName: string;
