@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { SiFacebook, SiInstagram, SiX, SiYoutube } from "@icons-pack/react-simple-icons";
 import { PawPrint, Mail, Phone, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -221,18 +222,30 @@ export function Footer() {
             © {currentYear} AmiFidele. Tous droits réservés.
           </p>
           <div className="flex flex-wrap gap-6 justify-center">
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            <Link
+              href="/mentions-legales"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
               Mentions légales
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link
+              href="/confidentialite"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
               Politique de confidentialité
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link
+              href="/cgu"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
               Conditions d&apos;utilisation
-            </a>
-            <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link
+              href="/cookies"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
               Gestion des cookies
-            </a>
+            </Link>
           </div>
         </div>
       </div>
