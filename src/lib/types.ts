@@ -21,32 +21,16 @@ export interface Product {
     brandName?: string;
   };
 
-  cat: {
-    awCat: string;
-    awCatId: number;
-    mCat: string;
-    merchantProductCategoryPath: string;
-    merchantProductSecondCategory: string;
-    merchantProductThirdCategory: string;
-  };
+  /** Taxonomie V1 — slug (`chien/nourriture`) */
+  categoryId?: string;
 
-  // Références aux catégories (IDs numériques/String)
-  mainCategoryId?: string;
-  subCategoryId?: string;
-
-  // Catégories enrichies (ajoutées par l'API via enrichProductsWithCategories)
-  mainCategory?: {
+  /** Enrichi par l'API */
+  category?: {
     _id?: string;
-    id?: number;
-    mCat?: string;
+    slug?: string;
     name?: string;
-    [key: string]: unknown;
-  };
-  subCategory?: {
-    _id?: string;
-    id?: number;
-    mCat?: string;
-    name?: string;
+    parentId?: string | null;
+    path?: string[];
     [key: string]: unknown;
   };
 

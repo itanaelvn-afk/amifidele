@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { fetchProducts, fetchProductsByCategory, searchProducts, ProductFilters } from '@/lib/api';
 import { mapApiProductsToDisplayProducts } from '@/lib/utils/api-utils';
 import { DisplayProduct } from '@/lib/types';
@@ -22,12 +22,16 @@ export function useProducts() {
     total: 0,
     totalPages: 0,
   });
+  const requestIdRef = useRef(0);
 
-  const loadProducts = async (page: number = 1, limit: number = 20, filters?: ProductFilters) => {
+  const loadProducts = useCallback(async (page: number = 1, limit: number = 20, filters?: ProductFilters) => {
+    const requestId = ++requestIdRef.current;
     try {
       setLoading(true);
       setError(null);
       const response = await fetchProducts(page, limit, filters);
+      // Ignore les réponses obsolètes (frappe / filtres plus récents)
+      if (requestId !== requestIdRef.current) return;
       const mappedProducts = mapApiProductsToDisplayProducts(response.products);
       setProducts(mappedProducts);
       setPagination({
@@ -37,26 +41,23 @@ export function useProducts() {
         totalPages: response.totalPages,
       });
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       console.error('Erreur lors du chargement des produits:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement des produits');
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
-  };
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      void loadProducts(1);
-    }, 0);
-
-    return () => clearTimeout(timer);
   }, []);
 
   const loadProductsByCategory = async (category: string, page: number = 1, limit: number = 20) => {
+    const requestId = ++requestIdRef.current;
     try {
       setLoading(true);
       setError(null);
       const response = await fetchProductsByCategory(category, page, limit);
+      if (requestId !== requestIdRef.current) return;
       const mappedProducts = mapApiProductsToDisplayProducts(response.products);
       setProducts(mappedProducts);
       setPagination({
@@ -66,18 +67,23 @@ export function useProducts() {
         totalPages: response.totalPages,
       });
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       console.error('Erreur lors du chargement des produits par catégorie:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors du chargement des produits');
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
   };
 
   const search = async (query: string, page: number = 1, limit: number = 20) => {
+    const requestId = ++requestIdRef.current;
     try {
       setLoading(true);
       setError(null);
       const response = await searchProducts(query, page, limit);
+      if (requestId !== requestIdRef.current) return;
       const mappedProducts = mapApiProductsToDisplayProducts(response.products);
       setProducts(mappedProducts);
       setPagination({
@@ -87,10 +93,13 @@ export function useProducts() {
         totalPages: response.totalPages,
       });
     } catch (err) {
+      if (requestId !== requestIdRef.current) return;
       console.error('Erreur lors de la recherche:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors de la recherche');
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -105,4 +114,3 @@ export function useProducts() {
     refetch: () => loadProducts(pagination.page, pagination.limit),
   };
 }
-

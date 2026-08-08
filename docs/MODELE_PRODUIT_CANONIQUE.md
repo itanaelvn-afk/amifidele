@@ -290,7 +290,8 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 - [x] VET → `*/sante`
 - [x] Édition via Dashboard (pas uniquement doc) — US créée
 - [ ] Support wildcard préfixe en runtime (optionnel Phase 1.1)
-- [ ] Seed + UI livrés
+- [x] Seed taxo V1 + mappings MaxiZoo (`api-amifidele`: `npm run seed:taxonomy`, 08/08/2026)
+- [ ] UI Dashboard CRUD mappings
 
 ---
 
@@ -318,10 +319,11 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 ## 8. Prochaines étapes
 
 1. ~~Valider ce doc + table `category_mappings`~~ ✅
-2. Livrer US Dashboard/API : CRUD mappings + file non mappés.
-3. Seed MaxiZoo §5.4 + adapter AwinFetcher (contrat canonique + resolve catégorie).
-4. Migrer / normaliser les products MaxiZoo encore en dump plat.
-5. Adapter API + site au contrat.
+2. ~~Seed MaxiZoo §5.4 + taxo V1~~ ✅ (`npm run seed:taxonomy`)
+3. ~~Adapter AwinFetcher (contrat canonique + resolve catégorie)~~ ✅ code — reste run import live
+4. Livrer US Dashboard/API : CRUD mappings + file non mappés.
+5. Migrer / normaliser les products MaxiZoo encore en dump plat (one-shot).
+6. Adapter API + site au contrat.
 
 ---
 
@@ -329,6 +331,7 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
+| 2026-08-08 15:00 | Seed taxo V1 (20) + 138 mappings ; AwinFetcher écriture canonique + resolve catégories |
 | 2026-08-07 20:54 | Validation rapprochement MaxiZoo. Ops mappings = Mongo + Dashboard + file `autre`. US backlog créée. |
 | 2026-08-07 20:41 | `_id` = `{feedId}_{productId}` + `source`. Ajout `unitPrice` / `packSize`. Abandon `awin:…:…`. |
 | 2026-08-07 20:07 | Création doc + analyse CSV (première proposition). |

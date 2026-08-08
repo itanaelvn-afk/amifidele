@@ -17,6 +17,7 @@ import { ProductFilters } from "@/lib/api";
 export function ComparisonPage() {
   const [filters, setFilters] = useState<ProductFilters>({});
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,18 +25,22 @@ export function ComparisonPage() {
 
   const { products, loading, error, pagination, loadProducts } = useProducts();
 
-  // Charger les produits selon les filtres
+  // Debounce la recherche pour éviter une requête à chaque frappe
   useEffect(() => {
-    const loadData = async () => {
-      const filtersToApply: ProductFilters = { ...filters };
-      if (searchQuery.trim()) {
-        filtersToApply.search = searchQuery.trim();
-      }
-      await loadProducts(currentPage, limit, filtersToApply);
-    };
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, filters, searchQuery]);
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery.trim());
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Charger les produits selon les filtres + recherche stabilisée
+  useEffect(() => {
+    const filtersToApply: ProductFilters = { ...filters };
+    if (debouncedSearch) {
+      filtersToApply.search = debouncedSearch;
+    }
+    void loadProducts(currentPage, limit, filtersToApply);
+  }, [currentPage, filters, debouncedSearch, loadProducts]);
 
   const toggleProductSelection = (id: string) => {
     setSelectedProducts((prev) => {

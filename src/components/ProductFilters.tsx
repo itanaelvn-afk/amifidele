@@ -69,6 +69,24 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
     return false;
   })();
 
+  const rootCategories = categories
+    .filter((c) => !c.parentId)
+    .sort((a, b) => a.name.localeCompare(b.name, "fr"));
+  const childrenByParent = new Map<string, Category[]>();
+  for (const cat of categories) {
+    if (!cat.parentId) continue;
+    const key = String(cat.parentId);
+    const list = childrenByParent.get(key) || [];
+    list.push(cat);
+    childrenByParent.set(key, list);
+  }
+  for (const list of childrenByParent.values()) {
+    list.sort((a, b) => a.name.localeCompare(b.name, "fr"));
+  }
+
+  const categoryDisplayLabel = (cat: Category | undefined, fallback: string) =>
+    cat?.label || cat?.name || fallback;
+
   return (
     <Card className="p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
@@ -112,7 +130,11 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
             )}
             {filters.categoryId && (
               <Badge variant="default" className="gap-2">
-                Catégorie: {categories.find(c => c.id?.toString() === filters.categoryId)?.name || filters.categoryId}
+                Catégorie:{" "}
+                {categoryDisplayLabel(
+                  categories.find((c) => c.id?.toString() === filters.categoryId),
+                  filters.categoryId
+                )}
                 <button
                   onClick={() => handleFilterChange("categoryId", undefined)}
                   className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
@@ -217,14 +239,49 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
               className="w-full border rounded-md p-2 text-sm bg-background"
             >
               <option value="">Toutes les catégories</option>
-              {categories.map((cat) => (
-                <option
-                  key={cat.id ? `id:${cat.id}` : cat.name}
-                  value={cat.id ? `id:${cat.id}` : cat.name}
-                >
-                  {cat.name}
-                </option>
-              ))}
+              {rootCategories.map((root) => {
+                const children = childrenByParent.get(String(root.id)) || [];
+                if (children.length === 0) {
+                  return (
+                    <option
+                      key={root.id ? `id:${root.id}` : root.name}
+                      value={root.id ? `id:${root.id}` : root.name}
+                    >
+                      {root.name}
+                    </option>
+                  );
+                }
+                return (
+                  <optgroup key={root.id} label={root.name}>
+                    <option value={root.id ? `id:${root.id}` : root.name}>
+                      Tout {root.name.toLowerCase()}
+                    </option>
+                    {children.map((cat) => (
+                      <option
+                        key={cat.id ? `id:${cat.id}` : cat.name}
+                        value={cat.id ? `id:${cat.id}` : cat.name}
+                      >
+                        {cat.name}
+                      </option>
+                    ))}
+                  </optgroup>
+                );
+              })}
+              {/* Orphelins éventuels (sans parent connu) */}
+              {categories
+                .filter(
+                  (c) =>
+                    c.parentId &&
+                    !rootCategories.some((r) => r.id === c.parentId)
+                )
+                .map((cat) => (
+                  <option
+                    key={cat.id ? `id:${cat.id}` : cat.name}
+                    value={cat.id ? `id:${cat.id}` : cat.name}
+                  >
+                    {cat.label || cat.name}
+                  </option>
+                ))}
             </select>
           )}
         </div>

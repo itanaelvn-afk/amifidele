@@ -19,8 +19,11 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct): DisplayPr
   const name = apiProduct.text?.name || '';
   const description = apiProduct.text?.desc || '';
   
-  // Extraire la catégorie
-  const category = apiProduct.cat?.mCat || apiProduct.mainCategory?.mCat || apiProduct.mainCategory?.name || 'Autre';
+  // Extraire la catégorie (taxo V1)
+  const category =
+    apiProduct.category?.name ||
+    apiProduct.categoryId ||
+    'Autre';
   
   // Extraire la marque (résolue côté API via brandId)
   const brand = apiProduct.brand?.brandName?.trim() || 'Marque inconnue';
