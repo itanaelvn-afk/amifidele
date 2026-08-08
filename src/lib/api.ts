@@ -146,14 +146,9 @@ export async function fetchProducts(page: number = 1, limit: number = 20, filter
     }
   } catch (error) {
     console.error('Erreur lors de la récupération des produits:', error);
-    // Retourner une réponse paginée vide en cas d'erreur
-    return {
-      page: 1,
-      limit: 20,
-      total: 0,
-      totalPages: 0,
-      products: [],
-    };
+    throw error instanceof Error
+      ? error
+      : new Error('Erreur lors de la récupération des produits');
   }
 }
 
@@ -347,9 +342,15 @@ export interface Advertiser {
 }
 
 export interface Category {
-  id?: number;
+  id?: string;
+  slug?: string;
   name: string;
-  mCat?: string;
+  /** Libellé affichage : "Chien › Nourriture" pour les enfants */
+  label?: string;
+  parentId?: string | null;
+  parentName?: string | null;
+  path?: string[];
+  level?: number;
 }
 
 export interface Brand {
@@ -361,7 +362,25 @@ export interface Brand {
 type ApiCategoryRecord = Category & {
   _id?: string | number;
   categoryName?: string;
+  mCat?: string;
+  label?: string;
+  parentName?: string | null;
 };
+
+function mapApiCategory(cat: ApiCategoryRecord): Category {
+  const slug = String(cat.slug || cat._id || cat.id || "");
+  const name = cat.name || cat.categoryName || cat.mCat || slug;
+  return {
+    id: slug || undefined,
+    slug: slug || undefined,
+    name,
+    label: cat.label || name,
+    parentId: cat.parentId ?? null,
+    parentName: cat.parentName ?? null,
+    path: cat.path,
+    level: cat.level
+  };
+}
 
 type ApiBrandRecord = Brand & {
   brandId?: number;
@@ -416,24 +435,24 @@ export async function fetchCategories(): Promise<Category[]> {
 
     const data: Category[] | ApiResponse<Category> | { categories: Category[] } = await response.json();
     
+    const byLabel = (a: Category, b: Category) =>
+      (a.label || a.name).localeCompare(b.label || b.name, "fr");
+
     if (Array.isArray(data)) {
-      return data.map(cat => ({
-        id: cat.id,
-        name: cat.mCat || cat.name,
-        mCat: cat.mCat || cat.name,
-      })).sort((a, b) => a.name.localeCompare(b.name));
+      return data
+        .map(mapApiCategory)
+        .filter((c) => c.name)
+        .sort(byLabel);
     } else if ('categories' in data && Array.isArray(data.categories)) {
-      return (data.categories as ApiCategoryRecord[]).map((cat) => ({
-        id: typeof cat.id === 'number' ? cat.id : typeof cat._id === 'number' ? cat._id : undefined,
-        name: cat.mCat || cat.name || cat.categoryName || '',
-        mCat: cat.mCat || cat.name || cat.categoryName || '',
-      })).sort((a, b) => a.name.localeCompare(b.name));
+      return (data.categories as ApiCategoryRecord[])
+        .map(mapApiCategory)
+        .filter((c) => c.name)
+        .sort(byLabel);
     } else if ('data' in data && Array.isArray(data.data)) {
-      return (data.data as ApiCategoryRecord[]).map((cat) => ({
-        id: typeof cat.id === 'number' ? cat.id : typeof cat._id === 'number' ? cat._id : undefined,
-        name: cat.mCat || cat.name || cat.categoryName || '',
-        mCat: cat.mCat || cat.name || cat.categoryName || '',
-      })).sort((a, b) => a.name.localeCompare(b.name));
+      return (data.data as ApiCategoryRecord[])
+        .map(mapApiCategory)
+        .filter((c) => c.name)
+        .sort(byLabel);
     }
     
     return [];
@@ -506,13 +525,15 @@ async function loadCategoriesFromProducts(): Promise<Category[]> {
     const categoryMap = new Map<string, Category>();
     
     response.products.forEach((product: ApiProduct) => {
-      if (product.cat?.mCat) {
-        const key = product.cat.mCat;
+      const slug = product.categoryId || product.category?.slug || product.category?._id;
+      const name = product.category?.name || slug;
+      if (slug && name) {
+        const key = String(slug);
         if (!categoryMap.has(key)) {
           categoryMap.set(key, {
-            id: product.cat?.awCatId,
-            name: product.cat.mCat,
-            mCat: product.cat.mCat,
+            id: key,
+            slug: key,
+            name: String(name),
           });
         }
       }
