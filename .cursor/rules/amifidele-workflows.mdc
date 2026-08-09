@@ -1,0 +1,59 @@
+---
+description: Commandes et workflows validés (Notion backlog, git/branches PowerShell)
+alwaysApply: true
+---
+
+# Workflows AmiFidele (commandes qui marchent)
+
+Répondre en **français**. Commits en **français**. Ne pas committer sans demande explicite.
+
+## Notion — backlog & tâches prioritaires
+
+MCP : serveur `user-Notion`. Toujours `GetMcpTools` avant un appel si le schéma n’est pas connu.
+
+| Ressource | ID / URL |
+|---|---|
+| Page backlog | `28f361f8-1bbe-8072-bd8a-c59163577d89` |
+| Base Backlog | `28f361f8-1bbe-8124-b0f9-fd65d1fbe33f` |
+| Data source | `collection://28f361f8-1bbe-814a-bd1c-000b160ef6b1` |
+| Vue **Actif** | `?v=3b4361f8-1bbe-8194-80ef-000ca5aa009d` |
+| Vue **Par priorité** | `?v=3b4361f8-1bbe-817e-98a1-000c72e35c63` |
+| Template « Nouvelle tâche » | `28f361f8-1bbe-81cf-a89f-e5ef3fcea211` |
+| Achèvement « To-Do » | `https://app.notion.com/p/28f361f81bbe81e1ac28c1ffcd97679e` |
+
+**Priorités** : `notion-fetch` sur la base → `notion-query-data-sources` en mode `view` sur **Actif** (tri Importance puis Date). Filtrer mentalement `Importance = Elevé` + `In progress` / dates proches.
+
+**Créer une US** : `notion-create-pages` avec `parent.type = data_source_id` et `data_source_id = 28f361f8-1bbe-814a-bd1c-000b160ef6b1`. Propriétés : `Name`, `Importance`, `Statut`, `Type`, `Projet` (array), `To-Do Achèvement` (array d’URL), `date:Date:start` (ISO), `date:Date:is_datetime` = **nombre** `0` (pas `"0"`).
+
+**Mettre à jour** : `notion-update-page` (`replace_content` / `update_content` / `insert_content`).
+
+## Git — branches & commits (PowerShell)
+
+Bash heredoc **ne marche pas** sous PowerShell. Utiliser :
+
+```powershell
+git checkout -b feature/nom-de-la-branche
+git add chemin/fichier.tsx
+git commit -m "Titre du commit en français.`n`nCorps optionnel : pourquoi du changement."
+git status
+```
+
+Convention branches : `feature/…`, `fix/…`. Message = pourquoi, 1–2 phrases FR. Push / PR seulement si demandé.
+
+## Git — push & PR (PowerShell, validé)
+
+```powershell
+git push -u origin HEAD
+
+$body = @"
+## Summary
+- Point 1
+- Point 2
+
+## Test plan
+- [ ] Vérifier X
+"@
+gh pr create --title "Titre FR de la PR" --body $body
+```
+
+Éviter `cat <<'EOF'` (bash) : échoue sous PowerShell. Préférer here-string `@"..."@` pour le corps de PR et `` `n `` dans `-m` pour les commits multilignes.
