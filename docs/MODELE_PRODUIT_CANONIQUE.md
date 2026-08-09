@@ -323,8 +323,10 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 2. ~~Seed MaxiZoo §5.4 + taxo V1~~ ✅ (`npm run seed:taxonomy`)
 3. ~~Adapter AwinFetcher (contrat canonique + resolve catégorie)~~ ✅ code — reste run import live
 4. ~~Livrer US Dashboard/API : CRUD mappings + file non mappés~~ ✅ (09/08/2026)
-5. Migrer / normaliser les products MaxiZoo encore en dump plat (one-shot).
-6. Adapter API + site au contrat.
+5. ~~Migrer products (purge dump plat)~~ **annulée** — MEP/dev = vider `products` + reimport AwinFetcher
+6. **Prochaine** — Adapter API + projections listing
+7. Adapter le site au contrat
+8. Ops : colonnes Awin minimales dans le download (mapping canonique uniquement)
 
 ---
 
@@ -332,6 +334,7 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
+| 2026-08-09 20:15 | US migration products annulée (reimport). AwinFetcher : download limité aux colonnes canoniques. |
 | 2026-08-09 17:30 | `manualOverrides` : éditions Dashboard protégées contre l’upsert AwinFetcher (categoryId, isVisible, name, description, brandId) |
 | 2026-08-09 13:15 | `category_unmatched.productIds` + reprocess immédiat à l’assignation Dashboard (1 correction → N produits) |
 | 2026-08-09 11:30 | API CRUD `category-mappings` + file unmatched ; UI Dashboard `/admin/category-mappings` |
