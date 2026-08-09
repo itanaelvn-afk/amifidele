@@ -13,60 +13,62 @@ export default function CookiesPage() {
     <LegalPageShell title="Gestion des cookies">
       <LegalSection title="1. Qu'est-ce qu'un cookie ?">
         <p>
-          Un cookie est un petit fichier déposé sur votre terminal lors de la visite d&apos;un
-          site. Il permet de mémoriser des informations relatives à votre navigation.
+          Un cookie est un petit fichier déposé sur votre terminal lors de la
+          visite d&apos;un site. Il permet de mémoriser des informations
+          relatives à votre navigation.
         </p>
       </LegalSection>
 
-      <LegalSection title="2. Cookies utilisés sur AmiFidele">
-        <p>Selon la configuration du Site, nous pouvons utiliser :</p>
-        <ul className="list-disc pl-5 space-y-1">
-          <li>
-            <strong>Cookies nécessaires</strong> : fonctionnement technique (session, sécurité,
-            préférences essentielles).
-          </li>
-          <li>
-            <strong>Cookies de mesure d&apos;audience</strong> : statistiques de fréquentation
-            (déposés uniquement avec votre consentement lorsqu&apos;il est requis).
-          </li>
-          <li>
-            <strong>Cookies liés à l&apos;affiliation</strong> : lors d&apos;un clic vers un
-            marchand, le réseau d&apos;affiliation (ex. Awin) peut déposer ses propres cookies
-            pour attribuer une commission.
-          </li>
-        </ul>
+      <LegalSection title="2. Situation actuelle (V1)">
         <p>
-          La liste exacte des cookies sera mise à jour lorsque les outils d&apos;analytics /
-          bannière de consentement seront en place.
+          En l&apos;état, AmiFidele{" "}
+          <strong>
+            ne dépose pas volontairement de cookies analytics ni publicitaires
+          </strong>{" "}
+          sur le Site. Aucune bannière de consentement n&apos;est encore
+          déployée, faute de traceurs non essentiels côté AmiFidele.
+        </p>
+        <p>
+          Des cookies techniques strictement nécessaires au fonctionnement
+          (ex. sécurité, préférences essentielles) pourront être utilisés si le
+          framework ou l&apos;hébergeur le requiert.
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Gestion de vos choix">
+      <LegalSection title="3. Affiliation (sites tiers)">
+        <p>
+          Lors d&apos;un clic vers un marchand, le réseau d&apos;affiliation
+          (ex. Awin) et/ou le marchand peuvent déposer leurs propres cookies
+          pour attribuer une commission. Ces dépôts relèvent de leurs sites /
+          politiques, pas d&apos;un bandeau cookie AmiFidele.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="4. Évolutions prévues">
+        <p>
+          Si des cookies de mesure d&apos;audience ou marketing sont ajoutés
+          plus tard, cette page sera mise à jour (liste des cookies, finalités,
+          durées) et un mécanisme de consentement sera mis en place lorsque la
+          réglementation l&apos;exige.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="5. Gestion de vos choix">
         <p>Vous pouvez à tout moment :</p>
         <ul className="list-disc pl-5 space-y-1">
-          <li>paramétrer votre navigateur pour refuser ou supprimer les cookies ;</li>
           <li>
-            utiliser, lorsqu&apos;elle sera disponible, la bannière / le panneau de préférences
-            cookies du Site.
+            paramétrer votre navigateur pour refuser ou supprimer les cookies ;
+          </li>
+          <li>
+            utiliser, lorsqu&apos;elle sera disponible, la bannière / le panneau
+            de préférences cookies du Site.
           </li>
         </ul>
-        <p>
-          Le refus de certains cookies peut limiter certaines fonctionnalités (ex. mesure
-          d&apos;audience), sans empêcher la consultation des offres.
-        </p>
       </LegalSection>
 
-      <LegalSection title="4. Durée">
+      <LegalSection title="6. En savoir plus">
         <p>
-          Les cookies ont une durée de vie limitée (session ou durée déterminée, en général
-          inférieure à 13 mois pour les cookies de mesure d&apos;audience soumis à
-          consentement).
-        </p>
-      </LegalSection>
-
-      <LegalSection title="5. En savoir plus">
-        <p>
-          Pour la protection de vos données personnelles, voir la{" "}
+          Pour la protection des données personnelles, voir la{" "}
           <Link className="text-primary hover:underline" href="/confidentialite">
             Politique de confidentialité
           </Link>

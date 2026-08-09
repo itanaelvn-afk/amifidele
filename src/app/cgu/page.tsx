@@ -69,7 +69,9 @@ export default function CguPage() {
 
       <LegalSection title="8. Données personnelles">
         <p>
-          Le traitement des données personnelles est décrit dans la{" "}
+          En V1, AmiFidele ne collecte pas volontairement de données
+          personnelles des visiteurs. Le détail (et les évolutions futures) est
+          décrit dans la{" "}
           <Link className="text-primary hover:underline" href="/confidentialite">
             Politique de confidentialité
           </Link>

@@ -11,10 +11,25 @@ export const metadata: Metadata = {
 export default function ConfidentialitePage() {
   return (
     <LegalPageShell title="Politique de confidentialité">
-      <LegalSection title="1. Responsable du traitement">
+      <LegalSection title="1. Périmètre actuel (V1)">
         <p>
-          Le responsable du traitement des données collectées via le Site est l&apos;éditeur
-          AmiFidele : <em>[À compléter — identité / coordonnées]</em>, contact{" "}
+          En l&apos;état actuel du Site, AmiFidele{" "}
+          <strong>ne collecte pas volontairement de données personnelles</strong>{" "}
+          des visiteurs : pas de compte utilisateur, pas de formulaire de
+          contact actif, pas de newsletter branchée, pas d&apos;outil
+          d&apos;analytics déployé.
+        </p>
+        <p>
+          Cette politique décrit ce qui s&apos;applique aujourd&apos;hui et ce
+          qui sera mis à jour si une collecte est introduite plus tard.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="2. Responsable du traitement">
+        <p>
+          Lorsqu&apos;un traitement de données personnelles sera mis en place,
+          le responsable du traitement sera l&apos;éditeur du Site AmiFidele :{" "}
+          <em>[À compléter — identité / coordonnées]</em>, contact{" "}
           <a className="text-primary hover:underline" href="mailto:contact@amifidele.fr">
             contact@amifidele.fr
           </a>
@@ -22,59 +37,50 @@ export default function ConfidentialitePage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="2. Données collectées">
-        <p>Selon votre usage du Site, nous pouvons traiter :</p>
-        <ul className="list-disc pl-5 space-y-1">
-          <li>données de navigation (pages vues, appareil, logs techniques) ;</li>
-          <li>adresse e-mail si vous vous inscrivez à une newsletter ;</li>
-          <li>messages envoyés via un formulaire de contact (lorsqu&apos;il sera disponible) ;</li>
-          <li>cookies et traceurs (voir la page Gestion des cookies).</li>
-        </ul>
+      <LegalSection title="3. Données susceptibles d’être traitées">
         <p>
-          AmiFidele ne traite pas les données de paiement : les achats se font chez les
-          marchands partenaires.
+          <strong>Aujourd&apos;hui</strong>, seuls des éléments techniques
+          liés au fonctionnement du Site ou de l&apos;infrastructure peuvent
+          apparaître de façon accessoire (ex. logs serveur de l&apos;hébergeur :
+          adresse IP, horodatage, user-agent), selon la configuration de
+          l&apos;hébergement.
+        </p>
+        <p>
+          <strong>Pas traités pour le moment</strong> : adresse e-mail
+          newsletter, messages de formulaire de contact, profils utilisateurs,
+          cookies analytics ou publicitaires déposés par AmiFidele.
+        </p>
+        <p>
+          AmiFidele ne traite pas les données de paiement : les achats se font
+          chez les marchands partenaires.
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Finalités">
-        <ul className="list-disc pl-5 space-y-1">
-          <li>fournir et améliorer le service de comparaison ;</li>
-          <li>mesurer l&apos;audience et la performance du Site (si consentement requis) ;</li>
-          <li>répondre à vos demandes de contact ;</li>
-          <li>envoyer des communications si vous y avez consenti ;</li>
-          <li>prévenir la fraude et assurer la sécurité du Site.</li>
-        </ul>
-      </LegalSection>
-
-      <LegalSection title="4. Bases légales">
+      <LegalSection title="4. Affiliation et sites tiers">
         <p>
-          Selon les cas : intérêt légitime (fonctionnement du Site), consentement (cookies non
-          essentiels, newsletter), ou exécution de mesures précontractuelles / obligation légale.
+          Lorsque vous cliquez vers un marchand via un lien d&apos;affiliation
+          (ex. réseau Awin), vous quittez le Site. Le marchand et/ou le réseau
+          d&apos;affiliation peuvent alors traiter des données et déposer des
+          cookies selon leurs propres politiques, hors du contrôle direct
+          d&apos;AmiFidele.
         </p>
       </LegalSection>
 
-      <LegalSection title="5. Destinataires">
+      <LegalSection title="5. Finalités (si collecte ultérieure)">
         <p>
-          Les données peuvent être accessibles à l&apos;éditeur, à ses prestataires techniques
-          (hébergement, analytics) et, le cas échéant, aux autorités lorsque la loi l&apos;exige.
-          Les clics vers un marchand peuvent être tracés par le réseau d&apos;affiliation (ex.
-          Awin) selon leurs politiques.
+          Si AmiFidele introduit une collecte (contact, newsletter, mesure
+          d&apos;audience, etc.), les finalités, bases légales, destinataires et
+          durées de conservation seront précisées ici avant mise en service, et
+          le consentement sera recueilli lorsque la loi l&apos;exige.
         </p>
       </LegalSection>
 
-      <LegalSection title="6. Durées de conservation">
+      <LegalSection title="6. Vos droits">
         <p>
-          Les données sont conservées le temps nécessaire aux finalités ci-dessus, puis
-          archivées ou supprimées. Les logs techniques sont en général conservés pour une durée
-          limitée (ex. quelques mois), sauf obligation légale contraire.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="7. Vos droits">
-        <p>
-          Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification,
-          d&apos;effacement, de limitation, d&apos;opposition et de portabilité, ainsi que du
-          droit d&apos;introduire une réclamation auprès de la CNIL (
+          Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de
+          rectification, d&apos;effacement, de limitation, d&apos;opposition et
+          de portabilité, ainsi que du droit d&apos;introduire une réclamation
+          auprès de la CNIL (
           <a
             className="text-primary hover:underline"
             href="https://www.cnil.fr"
@@ -83,10 +89,10 @@ export default function ConfidentialitePage() {
           >
             cnil.fr
           </a>
-          ).
+          ), dès lors qu&apos;un traitement vous concernant existe.
         </p>
         <p>
-          Pour exercer vos droits :{" "}
+          Pour toute demande :{" "}
           <a className="text-primary hover:underline" href="mailto:contact@amifidele.fr">
             contact@amifidele.fr
           </a>
@@ -94,7 +100,7 @@ export default function ConfidentialitePage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="8. Cookies">
+      <LegalSection title="7. Cookies">
         <p>
           Pour le détail des cookies et de vos choix, consultez la{" "}
           <Link className="text-primary hover:underline" href="/cookies">
