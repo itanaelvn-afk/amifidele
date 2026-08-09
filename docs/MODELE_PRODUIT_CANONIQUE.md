@@ -269,14 +269,14 @@ Les futurs feeds grossiront `autre` si on ne peut pas éditer les mappings facil
 | Couche | Rôle |
 |--------|------|
 | Mongo `category_mappings` | Source de vérité runtime |
-| Mongo file / collection unmatched (ou flag) | `sourceKey` inconnues : compteur + `lastSeenAt` |
+| Mongo `category_unmatched` | `sourceKey` inconnues : `count`, `lastSeenAt`, **`productIds`** (rapprochement ops — pas sur `products`) |
 | Dashboard CRUD | Créer / éditer / désactiver mappings ; traiter la file |
 | Doc / seed | Contrat + import initial MaxiZoo uniquement |
 
 **Flux**
-1. Nouveau feed → `sourceKey` inconnue → produit en `autre` + entrée file.
-2. Admin Dashboard assigne `categoryId`.
-3. Prochain sync / job de reprocess met à jour les produits.
+1. Nouveau feed → `sourceKey` inconnue → produit en `autre` + upsert file (`$addToSet` du `_id` produit).
+2. Admin Dashboard assigne `categoryId` → crée/active le mapping **et** `updateMany` sur les `productIds` rattachés.
+3. Entrée retirée de la file. Les prochains syncs utilisent le mapping.
 
 US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.com/p/3b5361f81bbe81d38fc5d0ba9035ca44).
 
@@ -291,7 +291,7 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 - [x] Édition via Dashboard (pas uniquement doc) — US créée
 - [ ] Support wildcard préfixe en runtime (optionnel Phase 1.1)
 - [x] Seed taxo V1 + mappings MaxiZoo (`api-amifidele`: `npm run seed:taxonomy`, 08/08/2026)
-- [ ] UI Dashboard CRUD mappings
+- [x] UI Dashboard CRUD mappings
 
 ---
 
@@ -303,6 +303,7 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 | `brands` | Marques unifiées |
 | `categories` | Arbre V1 |
 | `category_mappings` | Feed → `categoryId` |
+| `category_unmatched` | File ops : `sourceKey` + `productIds` à reclasser |
 | `history` | Optionnel : seulement si prix / stock / visibilité change |
 
 ---
@@ -321,7 +322,7 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 1. ~~Valider ce doc + table `category_mappings`~~ ✅
 2. ~~Seed MaxiZoo §5.4 + taxo V1~~ ✅ (`npm run seed:taxonomy`)
 3. ~~Adapter AwinFetcher (contrat canonique + resolve catégorie)~~ ✅ code — reste run import live
-4. Livrer US Dashboard/API : CRUD mappings + file non mappés.
+4. ~~Livrer US Dashboard/API : CRUD mappings + file non mappés~~ ✅ (09/08/2026)
 5. Migrer / normaliser les products MaxiZoo encore en dump plat (one-shot).
 6. Adapter API + site au contrat.
 
@@ -331,6 +332,9 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
+| 2026-08-09 17:30 | `manualOverrides` : éditions Dashboard protégées contre l’upsert AwinFetcher (categoryId, isVisible, name, description, brandId) |
+| 2026-08-09 13:15 | `category_unmatched.productIds` + reprocess immédiat à l’assignation Dashboard (1 correction → N produits) |
+| 2026-08-09 11:30 | API CRUD `category-mappings` + file unmatched ; UI Dashboard `/admin/category-mappings` |
 | 2026-08-08 15:00 | Seed taxo V1 (20) + 138 mappings ; AwinFetcher écriture canonique + resolve catégories |
 | 2026-08-07 20:54 | Validation rapprochement MaxiZoo. Ops mappings = Mongo + Dashboard + file `autre`. US backlog créée. |
 | 2026-08-07 20:41 | `_id` = `{feedId}_{productId}` + `source`. Ajout `unitPrice` / `packSize`. Abandon `awin:…:…`. |
