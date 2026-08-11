@@ -40,7 +40,12 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
             <p className="text-muted-foreground mb-1">{product.brand}</p>
             <h3 className="mb-2">{product.name}</h3>
           </div>
-          <div className="ml-4">
+          <div className="ml-4 text-right">
+            {product.oldPrice != null && product.oldPrice > product.price && (
+              <p className="text-muted-foreground text-sm line-through">
+                {product.oldPrice.toFixed(2)}€
+              </p>
+            )}
             <p className="text-primary">{product.price.toFixed(2)}€</p>
           </div>
         </div>

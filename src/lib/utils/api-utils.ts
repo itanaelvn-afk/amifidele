@@ -1,52 +1,101 @@
 /**
- * Utilitaires pour convertir les données de l'API au format utilisé par l'application
+ * Mapping API → affichage site.
+ * Priorité : champs canoniques Phase 1, puis fallbacks legacy.
  */
 
-import { DisplayProduct } from '../types';
+import { DisplayProduct, Product } from '../types';
 import { ApiProduct } from '../api';
 
-/**
- * Convertit un produit de l'API (structure dashboard) au format d'affichage simplifié
- */
-export function mapApiProductToDisplayProduct(apiProduct: ApiProduct): DisplayProduct {
-  // Extraire le prix
-  const price = apiProduct.price?.buynow || 0;
-  
-  // Extraire l'image (priorité: mImage > awImage > awThumb)
-  const image = apiProduct.uri?.mImage || apiProduct.uri?.awImage || apiProduct.uri?.awThumb || '/images/placeholder.jpg';
+function firstNonEmpty(...values: Array<string | undefined | null>): string {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim() !== '') {
+      return value.trim();
+    }
+  }
+  return '';
+}
 
-  // Extraire le nom et la description
-  const name = apiProduct.text?.name || '';
-  const description = apiProduct.text?.desc || '';
-  
-  // Extraire la catégorie (taxo V1)
-  const category =
-    apiProduct.category?.name ||
-    apiProduct.categoryId ||
-    'Autre';
-  
-  // Extraire la marque (résolue côté API via brandId)
-  const brand = apiProduct.brand?.brandName?.trim() || 'Marque inconnue';
-  
-  // Extraire le lien affilié
-  const affiliateLink = apiProduct.uri?.awTrack || apiProduct.uri?.mLink || '';
-  
-  // Extraire le nom du marchand
-  const merchantName = apiProduct.merchant?.merchantName || '';
+function asNumber(...values: Array<number | undefined | null>): number | undefined {
+  for (const value of values) {
+    if (typeof value === 'number' && !Number.isNaN(value)) {
+      return value;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Convertit un produit API (canonique ou legacy) au format d'affichage.
+ */
+export function mapApiProductToDisplayProduct(apiProduct: ApiProduct | Product): DisplayProduct {
+  const price = asNumber(apiProduct.price?.amount, apiProduct.price?.buynow) ?? 0;
+  const oldPrice = asNumber(apiProduct.price?.old, apiProduct.price?.productPriceOld);
+  const delivery = asNumber(apiProduct.price?.delivery);
+  const currency = firstNonEmpty(apiProduct.price?.currency, apiProduct.price?.curr) || 'EUR';
+
+  const image = firstNonEmpty(
+    apiProduct.images?.main,
+    apiProduct.images?.thumb,
+    apiProduct.uri?.mImage,
+    apiProduct.uri?.awImage,
+    apiProduct.uri?.awThumb
+  ) || '/images/placeholder.jpg';
+
+  const name = firstNonEmpty(apiProduct.name, apiProduct.text?.name);
+  const description = firstNonEmpty(apiProduct.description, apiProduct.text?.desc);
+
+  const category = firstNonEmpty(
+    apiProduct.category?.label,
+    apiProduct.category?.name,
+    apiProduct.categoryId
+  ) || 'Autre';
+
+  const brand = firstNonEmpty(
+    apiProduct.brand?.brandName,
+    apiProduct.brand?.name
+  ) || 'Marque inconnue';
+
+  const affiliateLink = firstNonEmpty(
+    apiProduct.links?.affiliate,
+    apiProduct.links?.merchant,
+    apiProduct.uri?.awTrack,
+    apiProduct.uri?.mLink
+  );
+
+  const merchantName = firstNonEmpty(
+    apiProduct.merchant?.name,
+    apiProduct.merchant?.merchantName
+  );
+
+  const unitAmount = apiProduct.unitPrice?.amount;
+  const unitLabel = firstNonEmpty(apiProduct.unitPrice?.unit);
+  const unitPriceLabel =
+    unitAmount != null && unitLabel
+      ? `${unitAmount.toFixed(2)} ${unitLabel}`
+      : unitAmount != null
+        ? String(unitAmount)
+        : undefined;
 
   return {
     id: apiProduct._id || apiProduct.id || '',
     name,
     category,
+    categoryId: apiProduct.categoryId || apiProduct.category?._id || apiProduct.category?.slug,
     price,
-    rating: 4.0, // Par défaut, peut être calculé ou ajouté plus tard
+    currency,
+    ...(oldPrice != null && oldPrice > 0 ? { oldPrice } : {}),
+    ...(delivery != null ? { delivery } : {}),
+    ...(unitPriceLabel ? { unitPriceLabel } : {}),
+    ...(apiProduct.packSize ? { packSize: apiProduct.packSize } : {}),
+    // Pas de note factice — n’afficher le rating que s’il existe réellement
     image,
     description,
-    features: [], // Peut être extrait d'autres champs si nécessaire
+    features: [],
     brand,
-    affiliateLink,
-    merchantName,
-    bestAffiliateLink: affiliateLink,
+    affiliateLink: affiliateLink || undefined,
+    merchantName: merchantName || undefined,
+    bestAffiliateLink: affiliateLink || undefined,
+    source: apiProduct.source,
   };
 }
 
@@ -56,4 +105,3 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct): DisplayPr
 export function mapApiProductsToDisplayProducts(apiProducts: ApiProduct[]): DisplayProduct[] {
   return apiProducts.map(mapApiProductToDisplayProduct);
 }
-

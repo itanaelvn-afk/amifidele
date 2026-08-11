@@ -1,95 +1,136 @@
 /**
- * Interface représentant un produit dans le système
- * Basée sur la structure du dashboard
+ * Types produit AmiFidele — contrat Phase 1 (MODELE_PRODUIT_CANONIQUE.md).
+ * Les champs legacy restent optionnels le temps du reimport / transition.
  */
-export interface Product {
-  _id: string;
 
-  /** Visibilité publique — false = masqué (ex. feed Awin obsolète). */
-  isVisible?: boolean;
+/** Prix canonique (+ fallbacks legacy optionnels) */
+export interface ProductPrice {
+  amount?: number;
+  currency?: string;
+  delivery?: number;
+  old?: number;
+  /** @deprecated legacy dashboard / site */
+  buynow?: number;
+  curr?: string;
+  productPriceOld?: number;
+  rrp?: number;
+  saving?: number;
+  savingsPercent?: number;
+  store?: number;
+}
 
-  /** ObjectId vers la collection brands */
-  brandId?: string;
+export interface ProductImages {
+  main?: string;
+  thumb?: string;
+}
 
-  merchant: {
-    merchantId: number;
-    merchantName: string;
-  };
+export interface ProductLinks {
+  affiliate?: string;
+  merchant?: string;
+}
 
-  brand?: {
-    awBrandId?: number;
-    brandName?: string;
-  };
+export interface ProductMerchant {
+  id?: string;
+  name?: string;
+  /** @deprecated */
+  merchantId?: number;
+  /** @deprecated */
+  merchantName?: string;
+}
 
-  /** Taxonomie V1 — slug (`chien/nourriture`) */
-  categoryId?: string;
+export interface ProductBrand {
+  awBrandId?: number;
+  brandName?: string;
+  /** Alias éventuel si l’API unifie plus tard */
+  name?: string;
+}
 
-  /** Enrichi par l'API */
-  category?: {
-    _id?: string;
-    slug?: string;
-    name?: string;
-    parentId?: string | null;
-    path?: string[];
-    [key: string]: unknown;
-  };
-
-  colour?: string;
-
-  cond: string;
-  ean: number;
-  feedId: string;
-  id: string;
-  in_stock: string;
-  is_for_sale: string;
-  lang: string;
-  modelNumber: number;
-  parentId?: number;
-  pId: number;
-  pre_order: string;
-
-  price: {
-    buynow: number;
-    curr: string;
-    delivery: number;
-    productPriceOld: number;
-    rrp: number;
-    saving?: number;
-    savingsPercent?: number;
-    store: number;
-  };
-
-  stock_quantity: string;
-
-  text: {
-    desc: string;
-    name: string;
-  };
-
-  uri: {
-    alternateImage?: string;
-    alternateImageThree?: string;
-    alternateImageTwo?: string;
-    awImage: string;
-    awThumb: string;
-    awTrack: string;
-    mImage: string;
-    mLink: string;
-  };
-
-  vertical: {
-    id: string;
-    name: string;
-  };
-
-  web_offer: string;
-
-  createdAt: string;
-  updatedAt: string;
+export interface ProductCategory {
+  _id?: string;
+  slug?: string;
+  name?: string;
+  label?: string;
+  parentId?: string | null;
+  parentName?: string | null;
+  path?: string[];
+  [key: string]: unknown;
 }
 
 /**
- * Interface pour la réponse paginée de la liste des produits
+ * Produit API (canonique + legacy optionnel).
+ */
+export interface Product {
+  _id: string;
+  id?: string;
+
+  source?: "awin" | "amazon" | "manual" | string;
+  sourceProductId?: string;
+  feedId?: string | number;
+  advertiserId?: string;
+
+  isVisible?: boolean;
+  inStock?: boolean;
+  ean?: string | number;
+  packSize?: string;
+  lastSeenAt?: string;
+
+  brandId?: string;
+  categoryId?: string;
+
+  name?: string;
+  description?: string;
+
+  merchant?: ProductMerchant;
+  brand?: ProductBrand;
+  category?: ProductCategory;
+
+  price?: ProductPrice;
+  images?: ProductImages;
+  links?: ProductLinks;
+  unitPrice?: {
+    amount?: number;
+    unit?: string;
+  };
+
+  /** @deprecated dump Awin / dashboard */
+  text?: {
+    desc?: string;
+    name?: string;
+  };
+  /** @deprecated */
+  uri?: {
+    alternateImage?: string;
+    alternateImageThree?: string;
+    alternateImageTwo?: string;
+    awImage?: string;
+    awThumb?: string;
+    awTrack?: string;
+    mImage?: string;
+    mLink?: string;
+  };
+  /** @deprecated */
+  in_stock?: string;
+  is_for_sale?: string;
+  colour?: string;
+  cond?: string;
+  lang?: string;
+  modelNumber?: number;
+  parentId?: number;
+  pId?: number;
+  pre_order?: string;
+  stock_quantity?: string;
+  vertical?: {
+    id?: string;
+    name?: string;
+  };
+  web_offer?: string;
+
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Réponse paginée de la liste des produits
  */
 export interface PaginatedProductsResponse {
   page: number;
@@ -100,13 +141,22 @@ export interface PaginatedProductsResponse {
 }
 
 /**
- * Interface simplifiée pour l'affichage dans les cartes produits
+ * Format d'affichage UI (cartes, comparaison, accueil).
  */
 export interface DisplayProduct {
   id: string;
   name: string;
   category: string;
+  categoryId?: string;
   price: number;
+  currency?: string;
+  /** Prix barré / ancien prix (canonique price.old) */
+  oldPrice?: number;
+  /** Frais de livraison (canonique price.delivery) */
+  delivery?: number;
+  unitPriceLabel?: string;
+  packSize?: string;
+  /** Absent tant qu’il n’y a pas de vraies notes */
   rating?: number;
   image: string;
   description: string;
@@ -115,6 +165,5 @@ export interface DisplayProduct {
   affiliateLink?: string;
   merchantName?: string;
   bestAffiliateLink?: string;
+  source?: string;
 }
-
-
