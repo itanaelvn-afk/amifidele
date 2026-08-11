@@ -48,9 +48,16 @@ const features = [
 ];
 
 export function HomePage({ onNavigateToComparison, products, loading, error }: HomePageProps) {
-  const featuredProducts = products.filter((p) => (p.rating ?? 0) >= 4.7).slice(0, 3);
-  const foodProducts = products.filter(p => p.category === "Alimentation" || p.category === "alimentation");
-  const toyProducts = products.filter(p => p.category === "Jouets" || p.category === "jouets");
+  // Sélection accueil : premiers produits visibles (plus de filtre rating factice)
+  const featuredProducts = products.slice(0, 3);
+  const foodProducts = products.filter((p) => {
+    const haystack = `${p.category} ${p.categoryId || ''}`.toLowerCase();
+    return haystack.includes('nourriture') || haystack.includes('alimentation');
+  });
+  const toyProducts = products.filter((p) => {
+    const haystack = `${p.category} ${p.categoryId || ''}`.toLowerCase();
+    return haystack.includes('jouet');
+  });
   // const accessoryProducts = products.filter(p => p.category === "Accessoires");
 
   return (
@@ -118,9 +125,9 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="mb-2">⭐ Produits Recommandés</h2>
+              <h2 className="mb-2">Produits à la une</h2>
               <p className="text-muted-foreground">
-                Les meilleures notes de nos utilisateurs
+                Une sélection parmi le catalogue AmiFidele
               </p>
             </div>
             <Button variant="outline" onClick={onNavigateToComparison}>
@@ -152,14 +159,19 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
                         alt={product.name}
                         className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                       />
-                      <Badge className="absolute top-4 left-4 bg-primary">
-                        ⭐ {product.rating}
-                      </Badge>
+                      {product.brand && product.brand !== 'Marque inconnue' && (
+                        <Badge className="absolute top-4 left-4 bg-primary">
+                          {product.brand}
+                        </Badge>
+                      )}
                     </div>
                     <CardContent className="p-6">
-                      <p className="text-muted-foreground mb-1">{product.brand}</p>
+                      <p className="text-muted-foreground mb-1">{product.category}</p>
                       <h4 className="mb-2">{product.name}</h4>
-                      <p className="text-primary mb-4">À partir de {product.price.toFixed(2)}€</p>
+                      <p className="text-primary mb-4">
+                        À partir de {product.price.toFixed(2)}
+                        {product.currency === 'EUR' || !product.currency ? '€' : ` ${product.currency}`}
+                      </p>
                       <Button variant="outline" className="w-full" onClick={onNavigateToComparison}>
                         Comparer les prix
                       </Button>

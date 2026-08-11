@@ -354,7 +354,7 @@ export interface Category {
 }
 
 export interface Brand {
-  id?: number;
+  id?: number | string;
   name: string;
   brandName?: string;
 }
@@ -555,15 +555,19 @@ async function loadBrandsFromProducts(): Promise<Brand[]> {
     const brandMap = new Map<string, Brand>();
     
     response.products.forEach((product: ApiProduct) => {
-      if (product.brand?.brandName) {
-        const key = product.brand.brandName;
-        if (!brandMap.has(key)) {
-          brandMap.set(key, {
-            id: product.brand?.awBrandId,
-            name: product.brand.brandName,
-            brandName: product.brand.brandName,
-          });
-        }
+      const brandName =
+        product.brand?.brandName?.trim() ||
+        product.brand?.name?.trim() ||
+        '';
+      if (!brandName) return;
+
+      const key = brandName.toLowerCase();
+      if (!brandMap.has(key)) {
+        brandMap.set(key, {
+          id: product.brandId || product.brand?.awBrandId,
+          name: brandName,
+          brandName,
+        });
       }
     });
     
