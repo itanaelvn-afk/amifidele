@@ -317,16 +317,85 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 
 ---
 
-## 8. Prochaines étapes
+## 8. Coexistence upsert AwinFetcher ↔ éditions Dashboard
+
+> Analyse US [Analyse coexistence upsert ↔ Dashboard](https://app.notion.com/p/3b7361f81bbe812fbacee18a0fb5d9f8) — 2026-08-12.  
+> Décision : **garder `manualOverrides` sticky en Phase 1.x** ; US UI « clear override » découpée ; couche `product_edits` différée Phase 2.
+
+### 8.1 État actuel
+
+| Couche | Comportement |
+|--------|----------------|
+| AwinFetcher | `$set` large du document canonique à chaque sync (`mapAwinRowToCanonical`). Avant `$set`, `stripOverriddenFields` retire les champs flaggés dans `manualOverrides`. |
+| API Dashboard (`PUT`) | `mergeManualOverrides` : si `categoryId` / `isVisible` / `name` / `description` / `brandId` change, le flag correspondant passe à `true` (sticky, jamais auto-clear). |
+| Masquage auto 15j | Ne touche **pas** les produits avec `manualOverrides.isVisible: true`. |
+| Reprocess mapping | `updateMany` catégorie ignore les produits avec `manualOverrides.categoryId: true`. |
+| Dashboard UI | Badge « Protégé contre le feed » en lecture seule — **pas** de clear / unlock. |
+
+Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `description`, `brandId`.
+
+### 8.2 Tableau propriétaire des champs
+
+| Champ | Propriétaire | Règle |
+|-------|--------------|--------|
+| `_id`, `source`, `sourceProductId`, `feedId`, `advertiserId` | **Feed** | Identité ; jamais édités côté BO (sauf création `manual`). |
+| `merchant` | **Feed** | Issu de l’annonceur / feed. |
+| `price.*`, `inStock`, `images.*`, `links.*`, `ean`, `unitPrice`, `packSize`, `lastSeenAt` | **Feed** | Doivent rester à jour à chaque sync. Pas d’override sticky Phase 1. |
+| `updatedAt` | **Système** | Toujours rafraîchi par le sync / l’API. |
+| `createdAt` | **Système** | `$setOnInsert` uniquement. |
+| `name`, `description` | **Merge** | Feed par défaut ; sticky Dashboard si édité (`manualOverrides`). |
+| `brandId` | **Merge** | Feed (findOrCreate) par défaut ; sticky si changé au BO. |
+| `categoryId` | **Merge** | Mapping feed → taxo par défaut ; sticky si classé au BO (y compris hors reprocess file). |
+| `isVisible` | **Merge** | Sync remet `true` si présent dans le feed ; masquage auto 15j ; sticky si admin a forcé. |
+| `manualOverrides` | **Dashboard** | Métadonnée de protection ; jamais écrite par AwinFetcher. |
+
+### 8.3 Limites de `manualOverrides` sticky
+
+1. **Pas de clear UI** — une fois flaggé, le champ reste protégé jusqu’à intervention manuelle Mongo / future US.
+2. **Pas de granularité prix / stock / images** — volontaire : ces champs restent feed-owned (comparateur à jour).
+3. **Pas de diff** — on ne sait pas *quelle* valeur éditoriale vs feed (seulement « protégé »).
+4. **Produits `source: manual`** — pas d’upsert Awin ; overrides inutiles mais inoffensifs.
+5. **Nom / description feed qui s’améliorent** — si override sticky, on ne récupère jamais la version feed (trade-off accepté Phase 1).
+
+### 8.4 Alternatives évaluées
+
+| Option | Verdict Phase 1 |
+|--------|-----------------|
+| **`manualOverrides` sticky (actuel)** | **Retenu** — simple, déjà en prod, couvre les cas éditoriaux critiques. |
+| Verrou produit entier (`locked: true`) | Trop grossier : bloquerait prix/stock/images. |
+| `$setOnInsert` sélectif seul | Insuffisant : ne protège pas les updates sync. |
+| Couche `product_edits` (overlay) | Propre à long terme, mais coût élevé (lecture merge, UI, sync). **Phase 2**. |
+| Pipeline update Mongo complexe | Surdimensionné tant que le volume d’éditions BO reste faible. |
+
+### 8.5 Cas limites (règles figées)
+
+| Cas | Règle |
+|-----|--------|
+| Masquage auto 15j vs override `isVisible` | Override gagne : produit reste visible (ou masqué) selon le BO. |
+| Reprocess mapping vs override `categoryId` | Override gagne : la file/mapping ne réécrit pas. |
+| Produit créé manuellement (`source: manual`) | Pas d’AwinFetcher ; CRUD Dashboard libre. |
+| Champ feed non overridable modifié au BO (ex. prix) | Non supporté Phase 1 : le prochain sync **réécrase** (comportement voulu). |
+
+### 8.6 Recommandation & découpage
+
+- **Phase 1.x (maintenir)** : ownership ci-dessus + `manualOverrides` pour les 5 champs merge.
+- **US d’implémentation suivante (petite)** : Dashboard — clear / unlock par champ (retire le flag → prochain sync reprend la main).
+- **Phase 2** : si Amazon + volume d’éditions ↑ → évaluer `product_edits` ou merge à la lecture ; pas avant.
+
+---
+
+## 9. Prochaines étapes
 
 1. ~~Valider ce doc + table `category_mappings`~~ ✅
-2. ~~Seed MaxiZoo §5.4 + taxo V1~~ ✅ (`npm run seed:taxonomy`)
-3. ~~Adapter AwinFetcher (contrat canonique + resolve catégorie)~~ ✅ code — reste run import live
-4. ~~Livrer US Dashboard/API : CRUD mappings + file non mappés~~ ✅ (09/08/2026)
-5. ~~Migrer products (purge dump plat)~~ **annulée** — MEP/dev = vider `products` + reimport AwinFetcher
-6. **Prochaine** — Adapter API + projections listing
-7. Adapter le site au contrat
-8. Ops : colonnes Awin minimales dans le download (mapping canonique uniquement)
+2. ~~Seed MaxiZoo §5.4 + taxo V1~~ ✅
+3. ~~Adapter AwinFetcher (contrat canonique + resolve catégorie)~~ ✅
+4. ~~Livrer US Dashboard/API : CRUD mappings + file non mappés~~ ✅
+5. ~~Migrer products (purge dump plat)~~ **annulée** — reimport
+6. ~~Adapter API + projections listing~~ ✅
+7. ~~Adapter le site au contrat~~ ✅
+8. ~~Ops : colonnes Awin minimales~~ ✅
+9. ~~Couper historique sync + index Mongo listing~~ ✅ (08/2026)
+10. **Prochaine** — US UI clear `manualOverrides` (Phase 1.x) ; puis BFF clé API / schéma marques
 
 ---
 
@@ -334,6 +403,7 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
+| 2026-08-12 16:00 | §8 Coexistence upsert ↔ Dashboard : ownership champs, limites sticky, reco Phase 1.x vs Phase 2. |
 | 2026-08-09 20:15 | US migration products annulée (reimport). AwinFetcher : download limité aux colonnes canoniques. |
 | 2026-08-09 17:30 | `manualOverrides` : éditions Dashboard protégées contre l’upsert AwinFetcher (categoryId, isVisible, name, description, brandId) |
 | 2026-08-09 13:15 | `category_unmatched.productIds` + reprocess immédiat à l’assignation Dashboard (1 correction → N produits) |
