@@ -1,82 +1,83 @@
-# Configuration de l'authentification API
+# Configuration de l'authentification API (site AmiFidele)
 
 ## Vue d'ensemble
 
-L'API AmiFidele utilise un système d'authentification basé sur un token API. Toutes les requêtes doivent inclure ce token dans le header `x-api-key`.
+L'API `api-amifidele` exige un header `x-api-key`.  
+**Le site public ne l'envoie plus depuis le navigateur** : les appels passent par le BFF Next.js (`/api/bff/*`), qui ajoute la clé **côté serveur**.
+
+```
+Navigateur  →  GET /api/bff/products?...  →  Route Handler Next
+                                              ↓ x-api-key
+                                         api-amifidele
+```
 
 ## Configuration
 
-### 1. Créer le fichier `.env.local`
-
-Créez un fichier `.env.local` à la racine du projet avec le contenu suivant :
+### 1. Fichier `.env.local` (racine Amifidele)
 
 ```env
-# URL de l'API
-NEXT_PUBLIC_API_URL=http://localhost:4000/api
+# URL upstream de l'API (serveur uniquement — pas de NEXT_PUBLIC_)
+API_URL=http://localhost:4000/api
 
-# Token d'authentification (OBLIGATOIRE)
-NEXT_PUBLIC_API_KEY=votre_token_ici
+# Token = valeur de API_TOKEN_AUTH dans api-amifidele/.env
+API_TOKEN=votre_token_ici
 ```
+
+Alias acceptés pour le token : `API_KEY`, `API_TOKEN_AUTH`.  
+Alias acceptés pour l'URL : `API_UPSTREAM_URL`.
 
 ### 2. Obtenir le token
 
-Le token doit correspondre à la variable `API_TOKEN_AUTH` configurée dans votre API.
+1. Ouvrir `../api-amifidele/.env`
+2. Lire / définir `API_TOKEN_AUTH`
+3. Copier la **même** valeur dans `API_TOKEN` du `.env.local` du site
 
-Pour vérifier ou configurer le token dans l'API :
-1. Ouvrez le fichier `../api-amifidele/.env`
-2. Vérifiez ou définissez la variable `API_TOKEN_AUTH`
-3. Utilisez la même valeur dans `NEXT_PUBLIC_API_KEY` de votre `.env.local`
+### 3. Exemple
 
-### 3. Exemple de configuration
-
-**Dans `../api-amifidele/.env` :**
+**`api-amifidele/.env` :**
 ```env
 API_TOKEN_AUTH=mon_super_token_secret_123
 ```
 
-**Dans `Amifidele/.env.local` :**
+**`Amifidele/.env.local` :**
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:4000/api
-NEXT_PUBLIC_API_KEY=mon_super_token_secret_123
+API_URL=http://localhost:4000/api
+API_TOKEN=mon_super_token_secret_123
 ```
+
+> Ne plus utiliser `NEXT_PUBLIC_API_KEY` ni `NEXT_PUBLIC_API_URL` pour l'auth / l'upstream.
 
 ## Utilisation
 
-Le token est automatiquement inclus dans toutes les requêtes API via le fichier `src/lib/auth.ts`.
-
-Les fonctions suivantes utilisent automatiquement le token :
-- `fetchProducts()`
-- `fetchProductById()`
-- `fetchProductsByCategory()`
-- `searchProducts()`
+- Côté client : `fetchProducts()`, etc. appellent `/api/bff/...` **sans** clé.
+- Côté serveur (RSC) : même helpers appellent directement `API_URL` avec `x-api-key`.
+- BFF : `src/app/api/bff/[...path]/route.ts` — **GET uniquement**, racines autorisées : `products`, `categories`, `brands`, `advertisers`. Sur `products`, `isVisible=true` est forcé.
 
 ## Sécurité
 
-### Variables d'environnement
+| Variable | Portée | Rôle |
+|----------|--------|------|
+| `API_TOKEN` | Serveur | Clé `x-api-key` |
+| `API_URL` | Serveur | Base URL api-amifidele |
+| ~~`NEXT_PUBLIC_API_KEY`~~ | Interdit | Exposait la clé dans le bundle |
 
-- `NEXT_PUBLIC_API_KEY` : Accessible côté client (nécessaire pour les requêtes depuis le navigateur)
-- `API_KEY` : Accessible uniquement côté serveur (plus sécurisé mais nécessite des API Routes Next.js)
-
-### Recommandations
-
-1. **Développement** : Utilisez `NEXT_PUBLIC_API_KEY` pour faciliter le développement
-2. **Production** : Pour plus de sécurité, considérez :
-   - Utiliser des API Routes Next.js pour masquer le token côté serveur
-   - Implémenter un système de rotation de tokens
-   - Utiliser des tokens avec expiration
+Vérifications :
+1. Sources / bundle client : aucune occurrence de la clé
+2. Network (onglet navigateur) : requêtes vers `/api/bff/...` sans header `x-api-key`
+3. Produits masqués : non renvoyés via le BFF
 
 ## Dépannage
 
-### Erreur 401 (Token manquant)
-- Vérifiez que `NEXT_PUBLIC_API_KEY` est défini dans `.env.local`
-- Redémarrez le serveur de développement après avoir modifié `.env.local`
+### 500 « Configuration API serveur incomplète »
+- Définir `API_TOKEN` (ou `API_KEY`) dans `.env.local`
+- Redémarrer `next dev`
 
-### Erreur 403 (Token invalide)
-- Vérifiez que le token correspond exactement à `API_TOKEN_AUTH` de l'API
-- Vérifiez qu'il n'y a pas d'espaces ou de caractères invisibles
+### 502 / erreur de communication
+- Vérifier que l'API tourne et que `API_URL` est correct
 
-### Le token n'est pas envoyé
-- Vérifiez que le fichier `src/lib/auth.ts` est correctement importé
-- Vérifiez les logs de la console pour voir les headers envoyés
+### 401 / 403 depuis le BFF
+- Aligner `API_TOKEN` avec `API_TOKEN_AUTH` de l'API
 
-
+### Ancien `NEXT_PUBLIC_API_KEY` encore présent
+- Le supprimer de `.env.local` et du déploiement (Vercel, etc.)
+- Rebuild pour purger le bundle

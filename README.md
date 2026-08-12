@@ -38,21 +38,16 @@ pnpm install
 cp .env.local.example .env.local
 ```
 
-4. Éditez `.env.local` et configurez l'URL et le token de votre API :
+4. Éditez `.env.local` (voir aussi `.env.example`) :
 ```env
-# Pour le développement local (l'API tourne sur le port 4000 par défaut)
-NEXT_PUBLIC_API_URL=http://localhost:4000/api
+# URL upstream (serveur uniquement)
+API_URL=http://localhost:4000/api
 
-# Token d'authentification pour l'API (obligatoire)
-# Ce token doit correspondre à la variable API_TOKEN_AUTH de votre API
-NEXT_PUBLIC_API_KEY=votre_token_ici
-
-# Pour la production
-# NEXT_PUBLIC_API_URL=https://api-amifidele.com/api
-# NEXT_PUBLIC_API_KEY=votre_token_production
+# Token = API_TOKEN_AUTH de api-amifidele (serveur uniquement)
+API_TOKEN=votre_token_ici
 ```
 
-> ⚠️ **Important** : Le token doit correspondre à la variable `API_TOKEN_AUTH` configurée dans votre API (`../api-amifidele/.env`)
+> ⚠️ **Important** : ne plus mettre la clé dans une variable `NEXT_PUBLIC_*`. Le navigateur passe par `/api/bff/*` (voir `docs/API_AUTHENTICATION.md`).
 
 ## 🎯 Configuration de l'API
 
@@ -122,7 +117,7 @@ Les deux services démarrent en parallèle avec des logs colorés pour les disti
 - **WEB** (bleu) : Logs du site web Next.js
 - **API** (vert) : Logs de l'API
 
-> 💡 **Astuce** : Assurez-vous que votre fichier `.env.local` contient `NEXT_PUBLIC_API_URL=http://localhost:4000/api` pour que le site web puisse communiquer avec l'API locale.
+> 💡 **Astuce** : `.env.local` doit contenir `API_URL` et `API_TOKEN` (voir `.env.example`). Le navigateur appelle `/api/bff/*`, pas l'API directement.
 
 ### Autres commandes disponibles
 
