@@ -348,7 +348,11 @@ export interface Category {
 }
 
 export interface Brand {
+  /** ObjectId Mongo (products.brandId) */
+  _id?: string;
+  /** Préférer `_id` pour filtrer ; peut être awBrandId en legacy */
   id?: number | string;
+  awBrandId?: number;
   name: string;
   brandName?: string;
 }
@@ -377,9 +381,20 @@ function mapApiCategory(cat: ApiCategoryRecord): Category {
 }
 
 type ApiBrandRecord = Brand & {
-  brandId?: number;
+  brandId?: number | string;
   awBrandId?: number;
 };
+
+function mapApiBrand(brand: ApiBrandRecord): Brand {
+  const brandName = brand.brandName || brand.name || "";
+  return {
+    _id: brand._id ? String(brand._id) : undefined,
+    id: brand._id || brand.awBrandId || brand.id || brand.brandId,
+    awBrandId: brand.awBrandId,
+    name: brandName,
+    brandName,
+  };
+}
 
 /**
  * Récupère la liste des annonceurs/marchands
@@ -449,52 +464,35 @@ export async function fetchCategories(): Promise<Category[]> {
 }
 
 /**
- * Récupère la liste des marques
+ * Récupère la liste des marques (GET /api/brands).
+ * Pas de fallback sur un dump products limit=1000.
  */
 export async function fetchBrands(): Promise<Brand[]> {
   try {
     const response = await fetch(apiUrl('/brands'), apiFetchInit());
 
     if (!response.ok) {
-      // Si l'endpoint n'existe pas, extraire depuis les produits
-      return await loadBrandsFromProducts();
+      throw new Error(`Erreur API marques: ${response.status} ${response.statusText}`);
     }
 
     const data: Brand[] | ApiResponse<Brand> | { brands: Brand[] } = await response.json();
-    
+    let list: ApiBrandRecord[] = [];
+
     if (Array.isArray(data)) {
-      return data
-        .map(brand => ({
-          id: brand.id,
-          name: brand.name || brand.brandName || '',
-          brandName: brand.brandName || brand.name || '',
-        }))
-        .filter(brand => brand.name)
-        .sort((a, b) => a.name.localeCompare(b.name));
+      list = data;
     } else if ('brands' in data && Array.isArray(data.brands)) {
-      return (data.brands as ApiBrandRecord[])
-        .map((brand) => ({
-          id: brand.id || brand.brandId || brand.awBrandId,
-          name: brand.name || brand.brandName || '',
-          brandName: brand.brandName || brand.name || '',
-        }))
-        .filter(brand => brand.name)
-        .sort((a, b) => a.name.localeCompare(b.name));
+      list = data.brands as ApiBrandRecord[];
     } else if ('data' in data && Array.isArray(data.data)) {
-      return (data.data as ApiBrandRecord[])
-        .map((brand) => ({
-          id: brand.id || brand.brandId || brand.awBrandId,
-          name: brand.name || brand.brandName || '',
-          brandName: brand.brandName || brand.name || '',
-        }))
-        .filter(brand => brand.name)
-        .sort((a, b) => a.name.localeCompare(b.name));
+      list = data.data as ApiBrandRecord[];
     }
-    
-    return [];
+
+    return list
+      .map(mapApiBrand)
+      .filter((brand) => brand.name)
+      .sort((a, b) => a.name.localeCompare(b.name, 'fr'));
   } catch (error) {
     console.error('Erreur lors de la récupération des marques:', error);
-    return await loadBrandsFromProducts();
+    return [];
   }
 }
 
@@ -524,38 +522,6 @@ async function loadCategoriesFromProducts(): Promise<Category[]> {
     return Array.from(categoryMap.values()).sort((a, b) => a.name.localeCompare(b.name));
   } catch (error) {
     console.error('Erreur lors du chargement des catégories depuis les produits:', error);
-    return [];
-  }
-}
-
-/**
- * Charge les marques depuis les produits (fallback)
- */
-async function loadBrandsFromProducts(): Promise<Brand[]> {
-  try {
-    const response = await fetchProducts(1, 1000);
-    const brandMap = new Map<string, Brand>();
-    
-    response.products.forEach((product: ApiProduct) => {
-      const brandName =
-        product.brand?.brandName?.trim() ||
-        product.brand?.name?.trim() ||
-        '';
-      if (!brandName) return;
-
-      const key = brandName.toLowerCase();
-      if (!brandMap.has(key)) {
-        brandMap.set(key, {
-          id: product.brandId || product.brand?.awBrandId,
-          name: brandName,
-          brandName,
-        });
-      }
-    });
-    
-    return Array.from(brandMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-  } catch (error) {
-    console.error('Erreur lors du chargement des marques depuis les produits:', error);
     return [];
   }
 }

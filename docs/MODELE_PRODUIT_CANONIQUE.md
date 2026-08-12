@@ -306,6 +306,26 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 | `category_unmatched` | File ops : `sourceKey` + `productIds` à reclasser |
 | `history` | Optionnel : seulement si prix / stock / visibilité change |
 
+### 6.1 Contrat `brands` (aligné AwinFetcher ↔ API ↔ clients)
+
+```json
+{
+  "_id": "ObjectId(…)",
+  "awBrandId": 12345,
+  "brandName": "Hills",
+  "createdAt": "…",
+  "updatedAt": "…"
+}
+```
+
+| Champ | Rôle |
+|-------|------|
+| `_id` | Référencé par `products.brandId` |
+| `awBrandId` | ID Awin unique (création / dédup fetcher) |
+| `brandName` | Libellé (API expose aussi `name` en alias) |
+
+`GET /api/brands` est la source de vérité listing marques — **pas** d’extraction via `products?limit=1000`.
+
 ---
 
 ## 7. Hors scope Phase 1
@@ -403,7 +423,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
-| 12/08/2026 16:00 | §8 Coexistence upsert ↔ Dashboard : ownership champs, limites sticky, reco Phase 1.x vs Phase 2. |
+| 12/08/2026 17:30 | §6.1 Contrat brands aligné (AwinFetcher ↔ API ↔ clients) ; plus de fallback listing 1000 produits. |
 | 09/08/2026 20:15 | US migration products annulée (reimport). AwinFetcher : download limité aux colonnes canoniques. |
 | 09/08/2026 17:30 | `manualOverrides` : éditions Dashboard protégées contre l’upsert AwinFetcher (categoryId, isVisible, name, description, brandId) |
 | 09/08/2026 13:15 | `category_unmatched.productIds` + reprocess immédiat à l’assignation Dashboard (1 correction → N produits) |
