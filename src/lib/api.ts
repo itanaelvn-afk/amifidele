@@ -1,14 +1,25 @@
 /**
  * Service API pour récupérer les produits depuis l'API api-amifidele
+ * (via BFF Next côté navigateur — la clé reste serveur).
  */
 
 import { getAuthHeaders } from './auth';
-import { API_CONFIG } from './api-config';
+import { API_CONFIG, getApiBaseURL } from './api-config';
 import { Product, PaginatedProductsResponse } from './types';
 
-// Configuration de l'API - à adapter selon votre environnement
-// Par défaut, utilise localhost:4000 pour le développement local
-const API_BASE_URL = API_CONFIG.baseURL;
+function apiUrl(path: string, params?: URLSearchParams): string {
+  const base = getApiBaseURL();
+  const qs = params?.toString();
+  return qs ? `${base}${path}?${qs}` : `${base}${path}`;
+}
+
+function apiFetchInit(): RequestInit & { next?: { revalidate: number } } {
+  return {
+    method: 'GET',
+    headers: getAuthHeaders(),
+    next: { revalidate: API_CONFIG.cacheRevalidate },
+  };
+}
 
 // Utiliser directement le type Product du dashboard
 export type ApiProduct = Product;
@@ -98,12 +109,7 @@ export async function fetchProducts(page: number = 1, limit: number = 20, filter
     // Toujours filtrer les produits masqués côté site public (indépendamment des filtres UI)
     appendPublicVisibility(params);
 
-    const response = await fetch(`${API_BASE_URL}/products?${params.toString()}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      // Ajoutez cache pour améliorer les performances
-      next: { revalidate: API_CONFIG.cacheRevalidate },
-    });
+    const response = await fetch(apiUrl('/products', params), apiFetchInit());
 
     if (!response.ok) {
       throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
@@ -160,11 +166,7 @@ export async function fetchProductById(id: number | string): Promise<ApiProduct 
     const params = new URLSearchParams();
     appendPublicVisibility(params);
 
-    const response = await fetch(`${API_BASE_URL}/products/${id}?${params.toString()}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      next: { revalidate: API_CONFIG.cacheRevalidate },
-    });
+    const response = await fetch(apiUrl(`/products/${id}`, params), apiFetchInit());
 
     if (response.status === 404) {
       return null;
@@ -207,11 +209,7 @@ export async function fetchProductsByCategory(category: string, page: number = 1
     params.set('limit', limit.toString());
     appendPublicVisibility(params);
 
-    const response = await fetch(`${API_BASE_URL}/products?${params.toString()}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      next: { revalidate: API_CONFIG.cacheRevalidate },
-    });
+    const response = await fetch(apiUrl('/products', params), apiFetchInit());
 
     if (!response.ok) {
       throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
@@ -277,11 +275,7 @@ export async function searchProducts(query: string, page: number = 1, limit: num
     params.set('limit', limit.toString());
     appendPublicVisibility(params);
 
-    const response = await fetch(`${API_BASE_URL}/products/search?${params.toString()}`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      next: { revalidate: API_CONFIG.cacheRevalidate },
-    });
+    const response = await fetch(apiUrl('/products/search', params), apiFetchInit());
 
     if (!response.ok) {
       throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
@@ -392,11 +386,7 @@ type ApiBrandRecord = Brand & {
  */
 export async function fetchAdvertisers(): Promise<Advertiser[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/advertisers`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      next: { revalidate: API_CONFIG.cacheRevalidate },
-    });
+    const response = await fetch(apiUrl('/advertisers'), apiFetchInit());
 
     if (!response.ok) {
       throw new Error(`Erreur API: ${response.status} ${response.statusText}`);
@@ -422,11 +412,7 @@ export async function fetchAdvertisers(): Promise<Advertiser[]> {
  */
 export async function fetchCategories(): Promise<Category[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/categories`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      next: { revalidate: API_CONFIG.cacheRevalidate },
-    });
+    const response = await fetch(apiUrl('/categories'), apiFetchInit());
 
     if (!response.ok) {
       // Si l'endpoint n'existe pas, extraire depuis les produits
@@ -467,11 +453,7 @@ export async function fetchCategories(): Promise<Category[]> {
  */
 export async function fetchBrands(): Promise<Brand[]> {
   try {
-    const response = await fetch(`${API_BASE_URL}/brands`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-      next: { revalidate: API_CONFIG.cacheRevalidate },
-    });
+    const response = await fetch(apiUrl('/brands'), apiFetchInit());
 
     if (!response.ok) {
       // Si l'endpoint n'existe pas, extraire depuis les produits

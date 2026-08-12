@@ -1,32 +1,59 @@
 /**
- * Configuration centralisée pour l'API
- * Cette configuration peut être étendue selon vos besoins
+ * Configuration API AmiFidele (site public).
+ *
+ * - Navigateur → `/api/bff/...` (pas de clé)
+ * - Serveur (RSC / scripts) → URL upstream + `API_TOKEN`
  */
 
-import { getAuthHeaders } from './auth';
+import { getAuthHeaders } from "./auth";
+
+const DEFAULT_UPSTREAM = "http://localhost:4000/api";
+const BFF_BASE = "/api/bff";
+
+function getUpstreamBaseURL(): string {
+  const raw =
+    process.env.API_URL ||
+    process.env.API_UPSTREAM_URL ||
+    DEFAULT_UPSTREAM;
+  return raw.replace(/\/$/, "");
+}
+
+/**
+ * Base URL selon le runtime :
+ * - client : BFF same-origin
+ * - serveur : API réelle (évite une boucle HTTP vers soi-même)
+ */
+export function getApiBaseURL(): string {
+  if (typeof window === "undefined") {
+    return getUpstreamBaseURL();
+  }
+  return BFF_BASE;
+}
 
 export const API_CONFIG = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
-  timeout: 10000, // 10 secondes
+  /** @deprecated Préférer getApiBaseURL() — conservé pour compat lecture. */
+  get baseURL() {
+    return getApiBaseURL();
+  },
+  timeout: 10000,
   retryAttempts: 3,
-  retryDelay: 1000, // 1 seconde
-  cacheRevalidate: 3600, // 1 heure en secondes
+  retryDelay: 1000,
+  cacheRevalidate: 3600,
+  bffBase: BFF_BASE,
+  upstreamBase: getUpstreamBaseURL(),
 };
 
 /**
- * Headers par défaut pour les requêtes API
- * Inclut automatiquement le token d'authentification si disponible
+ * Headers selon le runtime (clé uniquement côté serveur).
  */
-export const getDefaultHeaders = () => {
+export function getDefaultHeaders(): Record<string, string> {
   return getAuthHeaders();
-};
+}
 
-/**
- * Options de fetch par défaut
- */
-export const getDefaultFetchOptions = () => ({
-  method: 'GET',
-  headers: getDefaultHeaders(),
-  next: { revalidate: API_CONFIG.cacheRevalidate },
-});
-
+export function getDefaultFetchOptions() {
+  return {
+    method: "GET" as const,
+    headers: getDefaultHeaders(),
+    next: { revalidate: API_CONFIG.cacheRevalidate },
+  };
+}
