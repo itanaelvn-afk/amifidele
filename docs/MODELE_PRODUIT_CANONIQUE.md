@@ -347,10 +347,11 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 | Couche | Comportement |
 |--------|----------------|
 | AwinFetcher | `$set` large du document canonique à chaque sync (`mapAwinRowToCanonical`). Avant `$set`, `stripOverriddenFields` retire les champs flaggés dans `manualOverrides`. |
-| API Dashboard (`PUT`) | `mergeManualOverrides` : si `categoryId` / `isVisible` / `name` / `description` / `brandId` change, le flag correspondant passe à `true` (sticky, jamais auto-clear). |
+| API Dashboard (`PUT`) | `mergeManualOverrides` : si `categoryId` / `isVisible` / `name` / `description` / `brandId` change, le flag correspondant passe à `true` (sticky jusqu’à clear explicite). |
+| API Dashboard (`DELETE …/manual-overrides/:field`) | Retire un flag ; si plus aucun flag → `$unset` de `manualOverrides`. |
 | Masquage auto 15j | Ne touche **pas** les produits avec `manualOverrides.isVisible: true`. |
 | Reprocess mapping | `updateMany` catégorie ignore les produits avec `manualOverrides.categoryId: true`. |
-| Dashboard UI | Badge « Protégé contre le feed » en lecture seule — **pas** de clear / unlock. |
+| Dashboard UI | Badge « Protégé contre le feed » + action **Reprendre depuis le feed** par champ. |
 
 Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `description`, `brandId`.
 
@@ -371,11 +372,11 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 ### 8.3 Limites de `manualOverrides` sticky
 
-1. **Pas de clear UI** — une fois flaggé, le champ reste protégé jusqu’à intervention manuelle Mongo / future US.
+1. **Clear explicite uniquement** — une fois flaggé, le champ reste protégé jusqu’à « Reprendre depuis le feed » (Dashboard) ou `DELETE /api/products/:id/manual-overrides/:field`.
 2. **Pas de granularité prix / stock / images** — volontaire : ces champs restent feed-owned (comparateur à jour).
 3. **Pas de diff** — on ne sait pas *quelle* valeur éditoriale vs feed (seulement « protégé »).
 4. **Produits `source: manual`** — pas d’upsert Awin ; overrides inutiles mais inoffensifs.
-5. **Nom / description feed qui s’améliorent** — si override sticky, on ne récupère jamais la version feed (trade-off accepté Phase 1).
+5. **Nom / description feed qui s’améliorent** — si override sticky, on ne récupère jamais la version feed tant que le flag n’est pas retiré (trade-off accepté Phase 1).
 
 ### 8.4 Alternatives évaluées
 
@@ -398,8 +399,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 ### 8.6 Recommandation & découpage
 
-- **Phase 1.x (maintenir)** : ownership ci-dessus + `manualOverrides` pour les 5 champs merge.
-- **US d’implémentation suivante (petite)** : Dashboard — clear / unlock par champ (retire le flag → prochain sync reprend la main).
+- **Phase 1.x (maintenir)** : ownership ci-dessus + `manualOverrides` pour les 5 champs merge + clear UI / API.
 - **Phase 2** : si Amazon + volume d’éditions ↑ → évaluer `product_edits` ou merge à la lecture ; pas avant.
 
 ---
@@ -415,7 +415,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 7. ~~Adapter le site au contrat~~ ✅
 8. ~~Ops : colonnes Awin minimales~~ ✅
 9. ~~Couper historique sync + index Mongo listing~~ ✅ (08/2026)
-10. **Prochaine** — US UI clear `manualOverrides` (Phase 1.x) ; puis BFF clé API / schéma marques
+10. ~~Clear / unlock `manualOverrides` (Dashboard + API)~~ ✅ (12/08/2026)
 
 ---
 
@@ -423,6 +423,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
+| 12/08/2026 18:55 | Clear/unlock `manualOverrides` : `DELETE /api/products/:id/manual-overrides/:field` + UI Dashboard « Reprendre depuis le feed ». |
 | 12/08/2026 17:30 | §6.1 Contrat brands aligné (AwinFetcher ↔ API ↔ clients) ; plus de fallback listing 1000 produits. |
 | 09/08/2026 20:15 | US migration products annulée (reimport). AwinFetcher : download limité aux colonnes canoniques. |
 | 09/08/2026 17:30 | `manualOverrides` : éditions Dashboard protégées contre l’upsert AwinFetcher (categoryId, isVisible, name, description, brandId) |
