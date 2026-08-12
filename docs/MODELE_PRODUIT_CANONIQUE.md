@@ -348,7 +348,7 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 |--------|----------------|
 | AwinFetcher | `$set` large du document canonique à chaque sync (`mapAwinRowToCanonical`). Avant `$set`, `stripOverriddenFields` retire les champs flaggés dans `manualOverrides`. |
 | API Dashboard (`PUT`) | `mergeManualOverrides` : si `categoryId` / `isVisible` / `name` / `description` / `brandId` change, le flag correspondant passe à `true` (sticky jusqu’à clear explicite). |
-| API Dashboard (`DELETE …/manual-overrides/:field`) | Retire un flag ; si plus aucun flag → `$unset` de `manualOverrides`. |
+| API Dashboard (`DELETE …/manual-overrides/:field`) | Retire **uniquement** le flag ; ne modifie pas la valeur du champ (ex. `isVisible` reste `false` jusqu’au sync). Si plus aucun flag → `$unset` de `manualOverrides`. |
 | Masquage auto 15j | Ne touche **pas** les produits avec `manualOverrides.isVisible: true`. |
 | Reprocess mapping | `updateMany` catégorie ignore les produits avec `manualOverrides.categoryId: true`. |
 | Dashboard UI | Badge « Protégé contre le feed » + action **Reprendre depuis le feed** par champ. |
@@ -372,7 +372,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 ### 8.3 Limites de `manualOverrides` sticky
 
-1. **Clear explicite uniquement** — une fois flaggé, le champ reste protégé jusqu’à « Reprendre depuis le feed » (Dashboard) ou `DELETE /api/products/:id/manual-overrides/:field`.
+1. **Clear explicite uniquement** — une fois flaggé, le champ reste protégé jusqu’à « Reprendre depuis le feed » (Dashboard) ou `DELETE /api/products/:id/manual-overrides/:field`. L’unlock **ne réécrit pas** la valeur : seul AwinFetcher remet `isVisible: true` (et les autres champs feed/merge) **si le produit est présent dans le flux** ; absent du flux → rien ne change.
 2. **Pas de granularité prix / stock / images** — volontaire : ces champs restent feed-owned (comparateur à jour).
 3. **Pas de diff** — on ne sait pas *quelle* valeur éditoriale vs feed (seulement « protégé »).
 4. **Produits `source: manual`** — pas d’upsert Awin ; overrides inutiles mais inoffensifs.
@@ -423,6 +423,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
+| 12/08/2026 22:55 | Clarification unlock : l’API ne force pas `isVisible` ; seul le sync Awin le remet à `true` si le produit est réimporté. |
 | 12/08/2026 18:55 | Clear/unlock `manualOverrides` : `DELETE /api/products/:id/manual-overrides/:field` + UI Dashboard « Reprendre depuis le feed ». |
 | 12/08/2026 17:30 | §6.1 Contrat brands aligné (AwinFetcher ↔ API ↔ clients) ; plus de fallback listing 1000 produits. |
 | 09/08/2026 20:15 | US migration products annulée (reimport). AwinFetcher : download limité aux colonnes canoniques. |
