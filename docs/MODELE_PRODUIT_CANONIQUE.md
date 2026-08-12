@@ -207,7 +207,7 @@ Règles runtime AwinFetcher :
 2. Chercher un mapping `isActive` dans Mongo.
 3. Sinon → `categoryId = "autre"` **et** upsert dans la file des non mappés (voir §5.6).
 
-### 5.4 Rapprochement initial — MaxiZoo (`merchant_category`) — **validé 2026-08-07**
+### 5.4 Rapprochement initial — MaxiZoo (`merchant_category`) — **validé 07/08/2026**
 
 > Basée sur le top Mongo (~9.6k produits). Seed de démarrage ; l’édition courante se fait ensuite via Dashboard.
 
@@ -319,7 +319,7 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 
 ## 8. Coexistence upsert AwinFetcher ↔ éditions Dashboard
 
-> Analyse US [Analyse coexistence upsert ↔ Dashboard](https://app.notion.com/p/3b7361f81bbe812fbacee18a0fb5d9f8) — 2026-08-12.  
+> Analyse US [Analyse coexistence upsert ↔ Dashboard](https://app.notion.com/p/3b7361f81bbe812fbacee18a0fb5d9f8) — 12/08/2026.  
 > Décision : **garder `manualOverrides` sticky en Phase 1.x** ; US UI « clear override » découpée ; couche `product_edits` différée Phase 2.
 
 ### 8.1 État actuel
@@ -403,13 +403,13 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
-| 2026-08-12 16:00 | §8 Coexistence upsert ↔ Dashboard : ownership champs, limites sticky, reco Phase 1.x vs Phase 2. |
-| 2026-08-09 20:15 | US migration products annulée (reimport). AwinFetcher : download limité aux colonnes canoniques. |
-| 2026-08-09 17:30 | `manualOverrides` : éditions Dashboard protégées contre l’upsert AwinFetcher (categoryId, isVisible, name, description, brandId) |
-| 2026-08-09 13:15 | `category_unmatched.productIds` + reprocess immédiat à l’assignation Dashboard (1 correction → N produits) |
-| 2026-08-09 11:30 | API CRUD `category-mappings` + file unmatched ; UI Dashboard `/admin/category-mappings` |
-| 2026-08-08 15:00 | Seed taxo V1 (20) + 138 mappings ; AwinFetcher écriture canonique + resolve catégories |
-| 2026-08-07 20:54 | Validation rapprochement MaxiZoo. Ops mappings = Mongo + Dashboard + file `autre`. US backlog créée. |
-| 2026-08-07 20:41 | `_id` = `{feedId}_{productId}` + `source`. Ajout `unitPrice` / `packSize`. Abandon `awin:…:…`. |
-| 2026-08-07 20:07 | Création doc + analyse CSV (première proposition). |
-| 2026-08-06 | Principes / taxo V1 figés dans Décisions data (process). |
+| 12/08/2026 16:00 | §8 Coexistence upsert ↔ Dashboard : ownership champs, limites sticky, reco Phase 1.x vs Phase 2. |
+| 09/08/2026 20:15 | US migration products annulée (reimport). AwinFetcher : download limité aux colonnes canoniques. |
+| 09/08/2026 17:30 | `manualOverrides` : éditions Dashboard protégées contre l’upsert AwinFetcher (categoryId, isVisible, name, description, brandId) |
+| 09/08/2026 13:15 | `category_unmatched.productIds` + reprocess immédiat à l’assignation Dashboard (1 correction → N produits) |
+| 09/08/2026 11:30 | API CRUD `category-mappings` + file unmatched ; UI Dashboard `/admin/category-mappings` |
+| 08/08/2026 15:00 | Seed taxo V1 (20) + 138 mappings ; AwinFetcher écriture canonique + resolve catégories |
+| 07/08/2026 20:54 | Validation rapprochement MaxiZoo. Ops mappings = Mongo + Dashboard + file `autre`. US backlog créée. |
+| 07/08/2026 20:41 | `_id` = `{feedId}_{productId}` + `source`. Ajout `unitPrice` / `packSize`. Abandon `awin:…:…`. |
+| 07/08/2026 20:07 | Création doc + analyse CSV (première proposition). |
+| 06/08/2026 | Principes / taxo V1 figés dans Décisions data (process). |
