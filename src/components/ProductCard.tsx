@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DisplayProduct } from "@/lib/types";
-import { productPath } from "@/lib/product-path";
+import { productPath, formatDeliveryLabel } from "@/lib/product-path";
 
 interface ProductCardProps {
   product: DisplayProduct;
@@ -112,6 +112,9 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
             Disponible chez {product.merchantName}
           </p>
         )}
+        <p className="text-xs text-muted-foreground mt-1 text-center">
+          {formatDeliveryLabel(product.delivery, product.currency)}
+        </p>
       </CardContent>
     </Card>
   );

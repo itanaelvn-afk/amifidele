@@ -6,6 +6,7 @@ import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { DisplayProduct } from "@/lib/types";
+import { formatDeliveryLabel } from "@/lib/product-path";
 
 function formatPrice(amount: number, currency?: string): string {
   const suffix = currency && currency !== "EUR" ? ` ${currency}` : "€";
@@ -82,11 +83,9 @@ export function ProductDetailView({
             <p className="text-primary text-3xl font-bold">
               {formatPrice(product.price, product.currency)}
             </p>
-            {product.delivery != null && product.delivery > 0 && (
-              <p className="text-sm text-muted-foreground mt-1">
-                Livraison : {formatPrice(product.delivery, product.currency)}
-              </p>
-            )}
+            <p className="text-sm text-muted-foreground mt-1">
+              {formatDeliveryLabel(product.delivery, product.currency)}
+            </p>
             {product.unitPriceLabel && (
               <p className="text-sm text-muted-foreground">
                 Prix unitaire : {product.unitPriceLabel}

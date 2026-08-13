@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { X, ShoppingCart } from "lucide-react";
 import { DisplayProduct } from "@/lib/types";
-import { productPath } from "@/lib/product-path";
+import { productPath, formatDeliveryLabel } from "@/lib/product-path";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
 import {
@@ -89,6 +89,9 @@ export function ComparisonTable({
                     <div className="mb-3">
                       <p className="text-primary text-2xl font-bold">
                         {bestPrice.toFixed(2)}€
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {formatDeliveryLabel(product.delivery, product.currency)}
                       </p>
                     </div>
                     {product.merchantName && (
