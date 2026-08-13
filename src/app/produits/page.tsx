@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ComparisonPage } from "@/components/ComparisonPage";
 import { pageMetadata } from "@/lib/seo";
@@ -12,7 +13,15 @@ export const metadata = pageMetadata({
 export default function ProduitsPage() {
   return (
     <SiteChrome current="produits">
-      <ComparisonPage />
+      <Suspense
+        fallback={
+          <div className="container mx-auto px-4 py-20 text-center text-muted-foreground">
+            Chargement du catalogue…
+          </div>
+        }
+      >
+        <ComparisonPage />
+      </Suspense>
     </SiteChrome>
   );
 }
