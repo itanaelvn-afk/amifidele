@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { ArrowRight, Star, TrendingUp, Package, Shield } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { DisplayProduct } from "@/lib/types";
 import { Footer } from "@/components/Footer";
+import { productPath } from "@/lib/product-path";
 
 interface HomePageProps {
   onNavigateToComparison: () => void;
@@ -153,29 +155,31 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
               {featuredProducts.length > 0 ? (
                 featuredProducts.map((product) => (
                   <Card key={product.id} className="overflow-hidden group hover:shadow-lg transition-all">
-                    <div className="relative overflow-hidden">
-                      <ImageWithFallback
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      {product.brand && product.brand !== 'Marque inconnue' && (
-                        <Badge className="absolute top-4 left-4 bg-primary">
-                          {product.brand}
-                        </Badge>
-                      )}
-                    </div>
-                    <CardContent className="p-6">
-                      <p className="text-muted-foreground mb-1">{product.category}</p>
-                      <h4 className="mb-2">{product.name}</h4>
-                      <p className="text-primary mb-4">
-                        À partir de {product.price.toFixed(2)}
-                        {product.currency === 'EUR' || !product.currency ? '€' : ` ${product.currency}`}
-                      </p>
-                      <Button variant="outline" className="w-full" onClick={onNavigateToComparison}>
-                        Comparer les prix
-                      </Button>
-                    </CardContent>
+                    <Link href={productPath(product.id)} className="block">
+                      <div className="relative overflow-hidden">
+                        <ImageWithFallback
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                        {product.brand && product.brand !== 'Marque inconnue' && (
+                          <Badge className="absolute top-4 left-4 bg-primary">
+                            {product.brand}
+                          </Badge>
+                        )}
+                      </div>
+                      <CardContent className="p-6">
+                        <p className="text-muted-foreground mb-1">{product.category}</p>
+                        <h4 className="mb-2">{product.name}</h4>
+                        <p className="text-primary mb-4">
+                          À partir de {product.price.toFixed(2)}
+                          {product.currency === 'EUR' || !product.currency ? '€' : ` ${product.currency}`}
+                        </p>
+                        <span className="inline-flex w-full items-center justify-center rounded-md border px-4 py-2 text-sm font-medium">
+                          Voir la fiche
+                        </span>
+                      </CardContent>
+                    </Link>
                   </Card>
                 ))
               ) : (
@@ -218,20 +222,22 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
             </div>
             <div className="space-y-4">
               {foodProducts.slice(0, 2).map((product) => (
-                <Card key={product.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 flex gap-4">
-                    <ImageWithFallback
-                      src={product.image}
-                      alt={product.name}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <p className="text-muted-foreground">{product.brand}</p>
-                      <h4 className="mb-1">{product.name}</h4>
-                      <p className="text-primary">{product.price.toFixed(2)}€</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <Link key={product.id} href={productPath(product.id)} className="block">
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4 flex gap-4">
+                      <ImageWithFallback
+                        src={product.image}
+                        alt={product.name}
+                        className="w-24 h-24 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <p className="text-muted-foreground">{product.brand}</p>
+                        <h4 className="mb-1">{product.name}</h4>
+                        <p className="text-primary">{product.price.toFixed(2)}€</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>
@@ -249,20 +255,22 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-4">
               {toyProducts.slice(0, 2).map((product) => (
-                <Card key={product.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-4 flex gap-4">
-                    <ImageWithFallback
-                      src={product.image}
-                      alt={product.name}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <p className="text-muted-foreground">{product.brand}</p>
-                      <h4 className="mb-1">{product.name}</h4>
-                      <p className="text-primary">{product.price.toFixed(2)}€</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <Link key={product.id} href={productPath(product.id)} className="block">
+                  <Card className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-4 flex gap-4">
+                      <ImageWithFallback
+                        src={product.image}
+                        alt={product.name}
+                        className="w-24 h-24 object-cover rounded-lg"
+                      />
+                      <div className="flex-1">
+                        <p className="text-muted-foreground">{product.brand}</p>
+                        <h4 className="mb-1">{product.name}</h4>
+                        <p className="text-primary">{product.price.toFixed(2)}€</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
             <div className="relative rounded-2xl overflow-hidden h-80">
