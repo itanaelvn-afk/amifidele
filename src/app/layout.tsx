@@ -1,11 +1,31 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { getSiteUrl } from "@/lib/site-url";
+import {
+  DEFAULT_DESCRIPTION,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_TITLE,
+  SITE_NAME,
+} from "@/lib/seo";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: "Amifidele - Comparateur de produits pour animaux",
-  description: "Comparez les meilleurs produits pour vos animaux de compagnie",
+  title: DEFAULT_TITLE,
+  description: DEFAULT_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    siteName: SITE_NAME,
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: SITE_NAME }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    images: [DEFAULT_OG_IMAGE],
+  },
 };
 
 export default function RootLayout({
@@ -15,9 +35,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className="antialiased">
-        {children}
-      </body>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }

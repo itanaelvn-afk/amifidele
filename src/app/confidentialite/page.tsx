@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Politique de confidentialité | AmiFidele",
   description:
     "Politique de confidentialité et protection des données personnelles sur AmiFidele.",
-};
+  path: "/confidentialite",
+});
 
 export default function ConfidentialitePage() {
   return (

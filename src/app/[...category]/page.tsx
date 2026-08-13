@@ -10,6 +10,7 @@ import {
   categoryPath,
   slugFromSegments,
 } from "@/lib/category-path";
+import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo";
 
 type RouteParams = { category: string[] };
 
@@ -43,7 +44,21 @@ export async function generateMetadata({
     title,
     description,
     alternates: { canonical: categoryPath(slug) },
-    openGraph: { title, description, locale: "fr_FR", siteName: "AmiFidele" },
+    openGraph: {
+      title,
+      description,
+      url: categoryPath(slug),
+      type: "website",
+      locale: "fr_FR",
+      siteName: SITE_NAME,
+      images: [{ url: DEFAULT_OG_IMAGE, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [DEFAULT_OG_IMAGE],
+    },
   };
 }
 
