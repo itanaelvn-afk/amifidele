@@ -44,9 +44,8 @@ export function Footer() {
               <h3>AmiFidele</h3>
             </div>
             <p className="text-muted-foreground mb-4">
-              Votre comparateur de confiance pour trouver les meilleurs produits 
-              pour vos animaux de compagnie. Comparez les prix, lisez les avis 
-              et faites le meilleur choix.
+              Votre comparateur pour trouver les produits pour vos animaux de
+              compagnie. Comparez les prix et faites le meilleur choix.
             </p>
             <div className="flex gap-3">
               <a 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Star, TrendingUp, Package, Shield } from "lucide-react";
+import { ArrowRight, TrendingUp, Package, Shield } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -36,23 +36,18 @@ export function HomePage() {
   const features = [
     {
       icon: TrendingUp,
-      title: "Meilleurs prix",
-      description: "Comparez les prix de tous les revendeurs en un coup d'œil"
-    },
-    {
-      icon: Star,
-      title: "Avis vérifiés",
-      description: "Notes et commentaires authentiques de propriétaires d'animaux"
+      title: "Comparaison de prix",
+      description: "Visualisez les offres des marchands partenaires en un coup d'œil"
     },
     {
       icon: Package,
-      title: "Large sélection",
-      description: "Des milliers de produits pour tous types d'animaux"
+      title: "Catalogue Chat et Chien",
+      description: "Parcourez les catégories dédiées, de l'alimentation aux accessoires"
     },
     {
       icon: Shield,
-      title: "Produits testés",
-      description: "Recommandations basées sur la qualité et la sécurité"
+      title: "Fiches transparentes",
+      description: "Prix, livraison et lien marchand tels que fournis par les feeds"
     }
   ];
 
@@ -89,9 +84,6 @@ export function HomePage() {
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
                 </Button>
-                <Button size="lg" variant="outline">
-                  En savoir plus
-                </Button>
               </div>
             </div>
             <div className="relative">
@@ -110,7 +102,7 @@ export function HomePage() {
       {/* Features Section */}
       <section className="py-16 bg-card">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             {features.map((feature) => (
               <Card key={feature.title} className="border-none shadow-sm">
                 <CardContent className="p-6 text-center">
@@ -190,7 +182,7 @@ export function HomePage() {
                 ))
               ) : (
                 <div className="col-span-3 text-center py-12">
-                  <p className="text-muted-foreground">Aucun produit recommandé pour le moment</p>
+                  <p className="text-muted-foreground">Aucun produit à afficher pour le moment</p>
                 </div>
               )}
             </div>
