@@ -1,35 +1,17 @@
-"use client";
-
-import { useState } from "react";
-import { Header } from "@/components/Header";
+import type { Metadata } from "next";
+import { SiteChrome } from "@/components/SiteChrome";
 import { HomePage } from "@/components/HomePage";
-import { ComparisonPage } from "@/components/ComparisonPage";
-import { useProducts } from "@/hooks/useProducts";
 
-type Page = "home" | "comparison";
+export const metadata: Metadata = {
+  title: "AmiFidele - Comparateur de produits pour animaux",
+  description:
+    "Comparez les prix et les caractéristiques de milliers de produits pour chiens et chats chez les meilleurs marchands.",
+};
 
 export default function Home() {
-  const [currentPage, setCurrentPage] = useState<Page>("home");
-  const { products, loading, error } = useProducts();
-
   return (
-    <div className="min-h-screen">
-      <Header
-        currentPage={currentPage}
-        onNavigateToHome={() => setCurrentPage("home")}
-        onNavigateToComparison={() => setCurrentPage("comparison")}
-      />
-      
-      {currentPage === "home" ? (
-        <HomePage 
-          products={products}
-          loading={loading}
-          error={error}
-          onNavigateToComparison={() => setCurrentPage("comparison")}
-        />
-      ) : (
-        <ComparisonPage />
-      )}
-    </div>
+    <SiteChrome current="home">
+      <HomePage />
+    </SiteChrome>
   );
 }

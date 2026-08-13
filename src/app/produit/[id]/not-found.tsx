@@ -9,6 +9,10 @@ export default function ProduitNotFound() {
         <p className="text-muted-foreground mb-6">
           Cette fiche n&apos;existe pas ou n&apos;est plus visible sur AmiFidele.
         </p>
+        <Link href="/produits" className="text-primary hover:underline">
+          Voir le catalogue
+        </Link>
+        {" · "}
         <Link href="/" className="text-primary hover:underline">
           Retour à l&apos;accueil
         </Link>

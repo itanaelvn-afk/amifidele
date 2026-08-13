@@ -1,18 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PawPrint, Search, SlidersHorizontal, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { PawPrint, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
-import { DisplayProduct } from "@/lib/types";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Footer } from "@/components/Footer";
-import { useProducts } from "@/hooks/useProducts";
 import { Card } from "@/components/ui/card";
 import { ProductFiltersComponent } from "@/components/ProductFilters";
 import { ProductFilters } from "@/lib/api";
+import { useProducts } from "@/hooks/useProducts";
 
 export function ComparisonPage() {
   const [filters, setFilters] = useState<ProductFilters>({});
@@ -313,8 +311,6 @@ export function ComparisonPage() {
         onClose={() => setShowComparison(false)}
         onRemoveProduct={removeFromComparison}
       />
-
-      <Footer />
     </div>
   );
 }
