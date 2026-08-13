@@ -5,6 +5,7 @@
 
 import { DisplayProduct, Product } from '../types';
 import { ApiProduct } from '../api';
+import { buildCategoryBreadcrumb } from '../category-breadcrumb';
 
 function firstNonEmpty(...values: Array<string | undefined | null>): string {
   for (const value of values) {
@@ -44,11 +45,24 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct | Product):
   const name = firstNonEmpty(apiProduct.name, apiProduct.text?.name);
   const description = firstNonEmpty(apiProduct.description, apiProduct.text?.desc);
 
-  const category = firstNonEmpty(
-    apiProduct.category?.label,
-    apiProduct.category?.name,
-    apiProduct.categoryId
-  ) || 'Autre';
+  const categoryId =
+    firstNonEmpty(
+      apiProduct.categoryId,
+      apiProduct.category?._id,
+      apiProduct.category?.slug
+    ) || undefined;
+
+  const category =
+    firstNonEmpty(apiProduct.category?.name, apiProduct.category?.label, categoryId) ||
+    'Autre';
+
+  const categoryTrail = buildCategoryBreadcrumb({
+    categoryId,
+    name: apiProduct.category?.name,
+    parentId: apiProduct.category?.parentId,
+    parentName: apiProduct.category?.parentName,
+    slug: apiProduct.category?.slug,
+  });
 
   const brand = firstNonEmpty(
     apiProduct.brand?.brandName,
@@ -80,7 +94,8 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct | Product):
     id: apiProduct._id || apiProduct.id || '',
     name,
     category,
-    categoryId: apiProduct.categoryId || apiProduct.category?._id || apiProduct.category?.slug,
+    categoryId,
+    ...(categoryTrail.length > 0 ? { categoryTrail } : {}),
     price,
     currency,
     ...(oldPrice != null && oldPrice > 0 ? { oldPrice } : {}),
