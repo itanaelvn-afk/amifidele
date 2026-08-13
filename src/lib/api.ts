@@ -50,6 +50,10 @@ export interface ProductFilters {
   isForSale?: boolean;
   /** Toujours forcé à true sur le site public — ne pas exposer les produits masqués. */
   isVisible?: boolean;
+  /** Tri API : price | name | updatedAt */
+  sort?: "price" | "name" | "updatedAt";
+  /** Sens du tri */
+  order?: "asc" | "desc";
 }
 
 /** Visibilité forcée pour toutes les lectures publiques du site. */
@@ -90,6 +94,8 @@ export async function fetchProducts(page: number = 1, limit: number = 20, filter
       }
       
       if (filters.search) params.append('search', filters.search);
+      if (filters.sort) params.append('sort', filters.sort);
+      if (filters.order) params.append('order', filters.order);
       
       // Debug: log des filtres envoyés
       if (process.env.NODE_ENV === 'development') {
@@ -99,7 +105,9 @@ export async function fetchProducts(page: number = 1, limit: number = 20, filter
           categoryName: filters.categoryName,
           categoryId: filters.categoryId,
           merchantId: filters.merchantId,
-          search: filters.search
+          search: filters.search,
+          sort: filters.sort,
+          order: filters.order,
         });
       }
       if (filters.inStock !== undefined) params.append('inStock', filters.inStock.toString());

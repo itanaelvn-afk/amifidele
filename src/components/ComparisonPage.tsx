@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PawPrint, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { ComparisonTable } from "@/components/ComparisonTable";
@@ -11,17 +12,50 @@ import { Card } from "@/components/ui/card";
 import { ProductFiltersComponent } from "@/components/ProductFilters";
 import { ProductFilters } from "@/lib/api";
 import { useProducts } from "@/hooks/useProducts";
+import {
+  DEFAULT_PRODUCT_SORT,
+  PRODUCT_SORT_OPTIONS,
+  parseProductSortValue,
+  sortValueToApiParams,
+  type ProductSortValue,
+} from "@/lib/product-sort";
 
 export function ComparisonPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [filters, setFilters] = useState<ProductFilters>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [sortValue, setSortValue] = useState<ProductSortValue>(() =>
+    parseProductSortValue(searchParams.get("sort"))
+  );
   const limit = 20;
 
   const { products, loading, error, pagination, loadProducts } = useProducts();
+
+  // Init tri depuis l’URL
+  useEffect(() => {
+    setSortValue(parseProductSortValue(searchParams.get("sort")));
+  }, [searchParams]);
+
+  const syncSortToUrl = useCallback(
+    (next: ProductSortValue) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === DEFAULT_PRODUCT_SORT) {
+        params.delete("sort");
+      } else {
+        params.set("sort", next);
+      }
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
 
   // Debounce la recherche pour éviter une requête à chaque frappe
   useEffect(() => {
@@ -31,14 +65,23 @@ export function ComparisonPage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // Charger les produits selon les filtres + recherche stabilisée
+  // Charger les produits selon les filtres + recherche stabilisée + tri
   useEffect(() => {
     const filtersToApply: ProductFilters = { ...filters };
     if (debouncedSearch) {
       filtersToApply.search = debouncedSearch;
     }
+    const { sort, order } = sortValueToApiParams(sortValue);
+    filtersToApply.sort = sort;
+    filtersToApply.order = order;
     void loadProducts(currentPage, limit, filtersToApply);
-  }, [currentPage, filters, debouncedSearch, loadProducts]);
+  }, [currentPage, filters, debouncedSearch, sortValue, loadProducts]);
+
+  const handleSortChange = (next: ProductSortValue) => {
+    setCurrentPage(1);
+    setSortValue(next);
+    syncSortToUrl(next);
+  };
 
   const toggleProductSelection = (id: string) => {
     setSelectedProducts((prev) => {
@@ -133,6 +176,25 @@ export function ComparisonPage() {
               )}
             </div>
           </div>
+
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span className="whitespace-nowrap">Trier par</span>
+              <select
+                value={sortValue}
+                onChange={(e) =>
+                  handleSortChange(parseProductSortValue(e.target.value))
+                }
+                className="h-10 min-w-[11rem] rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                aria-label="Trier les produits"
+              >
+                {PRODUCT_SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
           
           {selectedProducts.length > 0 && (
             <Card className="p-4 bg-primary/10 border-primary/20">
@@ -154,6 +216,7 @@ export function ComparisonPage() {
               </div>
             </Card>
           )}
+          </div>
         </div>
 
         {loading && (
