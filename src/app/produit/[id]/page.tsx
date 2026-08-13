@@ -88,7 +88,7 @@ export default async function ProduitPage({
   const extraImages = collectExtraImages(raw).filter((url) => url !== display.image);
 
   return (
-    <SiteChrome>
+    <SiteChrome current="other">
       <ProductDetailView
         product={display}
         extraImages={extraImages}

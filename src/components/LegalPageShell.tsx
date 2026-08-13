@@ -25,12 +25,20 @@ export function LegalPageShell({
               </p>
             </div>
           </Link>
-          <Link
-            href="/"
-            className="text-sm text-muted-foreground hover:text-primary transition-colors"
-          >
-            Retour à l&apos;accueil
-          </Link>
+          <nav className="flex items-center gap-4 text-sm">
+            <Link
+              href="/"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              Accueil
+            </Link>
+            <Link
+              href="/produits"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              Produits
+            </Link>
+          </nav>
         </div>
       </header>
 

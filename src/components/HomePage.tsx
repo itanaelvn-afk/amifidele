@@ -1,56 +1,54 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight, Star, TrendingUp, Package, Shield } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DisplayProduct } from "@/lib/types";
-import { Footer } from "@/components/Footer";
 import { productPath } from "@/lib/product-path";
+import { useProducts } from "@/hooks/useProducts";
 
-interface HomePageProps {
-  onNavigateToComparison: () => void;
-  products: DisplayProduct[];
-  loading?: boolean;
-  error?: string | null;
-}
+export function HomePage() {
+  const { products, loading, error, loadProducts } = useProducts();
 
-const retailers = [
-  { name: "Zooplus", description: "Leader européen", color: "bg-orange-100" },
-  { name: "Amazon", description: "Livraison rapide", color: "bg-yellow-100" },
-  { name: "Cdiscount", description: "Prix bas", color: "bg-blue-100" },
-  { name: "La Ferme des Animaux", description: "Spécialiste", color: "bg-green-100" },
-  { name: "Wanimo", description: "Large choix", color: "bg-purple-100" },
-  { name: "Animalis", description: "Expert animal", color: "bg-pink-100" },
-];
+  useEffect(() => {
+    void loadProducts(1, 12);
+  }, [loadProducts]);
 
-const features = [
-  {
-    icon: TrendingUp,
-    title: "Meilleurs prix",
-    description: "Comparez les prix de tous les revendeurs en un coup d'œil"
-  },
-  {
-    icon: Star,
-    title: "Avis vérifiés",
-    description: "Notes et commentaires authentiques de propriétaires d'animaux"
-  },
-  {
-    icon: Package,
-    title: "Large sélection",
-    description: "Des milliers de produits pour tous types d'animaux"
-  },
-  {
-    icon: Shield,
-    title: "Produits testés",
-    description: "Recommandations basées sur la qualité et la sécurité"
-  }
-];
+  const retailers = [
+    { name: "Zooplus", description: "Leader européen", color: "bg-orange-100" },
+    { name: "Amazon", description: "Livraison rapide", color: "bg-yellow-100" },
+    { name: "Cdiscount", description: "Prix bas", color: "bg-blue-100" },
+    { name: "La Ferme des Animaux", description: "Spécialiste", color: "bg-green-100" },
+    { name: "Wanimo", description: "Large choix", color: "bg-purple-100" },
+    { name: "Animalis", description: "Expert animal", color: "bg-pink-100" },
+  ];
 
-export function HomePage({ onNavigateToComparison, products, loading, error }: HomePageProps) {
-  // Sélection accueil : premiers produits visibles (plus de filtre rating factice)
+  const features = [
+    {
+      icon: TrendingUp,
+      title: "Meilleurs prix",
+      description: "Comparez les prix de tous les revendeurs en un coup d'œil"
+    },
+    {
+      icon: Star,
+      title: "Avis vérifiés",
+      description: "Notes et commentaires authentiques de propriétaires d'animaux"
+    },
+    {
+      icon: Package,
+      title: "Large sélection",
+      description: "Des milliers de produits pour tous types d'animaux"
+    },
+    {
+      icon: Shield,
+      title: "Produits testés",
+      description: "Recommandations basées sur la qualité et la sécurité"
+    }
+  ];
+
   const featuredProducts = products.slice(0, 3);
   const foodProducts = products.filter((p) => {
     const haystack = `${p.category} ${p.categoryId || ''}`.toLowerCase();
@@ -81,9 +79,11 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
                 chez les meilleurs revendeurs. Faites le bon choix pour votre compagnon.
               </p>
               <div className="flex gap-4">
-                <Button size="lg" onClick={onNavigateToComparison}>
-                  Explorer les produits
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                <Button asChild size="lg">
+                  <Link href="/produits">
+                    Explorer les produits
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
                 </Button>
                 <Button size="lg" variant="outline">
                   En savoir plus
@@ -132,9 +132,11 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
                 Une sélection parmi le catalogue AmiFidele
               </p>
             </div>
-            <Button variant="outline" onClick={onNavigateToComparison}>
-              Voir tout
-              <ArrowRight className="ml-2 w-4 h-4" />
+            <Button asChild variant="outline">
+              <Link href="/produits">
+                Voir tout
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
             </Button>
           </div>
           {loading && (
@@ -214,8 +216,8 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
                   <p className="text-white/90 mb-4">
                     Nourriture équilibrée et savoureuse
                   </p>
-                  <Button variant="secondary" onClick={onNavigateToComparison}>
-                    Découvrir
+                  <Button asChild variant="secondary">
+                    <Link href="/produits">Découvrir</Link>
                   </Button>
                 </div>
               </div>
@@ -285,8 +287,8 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
                   <p className="text-white/90 mb-4">
                     Stimulation et amusement garantis
                   </p>
-                  <Button variant="secondary" onClick={onNavigateToComparison}>
-                    Découvrir
+                  <Button asChild variant="secondary">
+                    <Link href="/produits">Découvrir</Link>
                   </Button>
                 </div>
               </div>
@@ -338,14 +340,14 @@ export function HomePage({ onNavigateToComparison, products, loading, error }: H
             Commencez dès maintenant à comparer des milliers de produits et trouvez 
             les meilleures offres adaptées à votre compagnon.
           </p>
-          <Button size="lg" onClick={onNavigateToComparison}>
-            Commencer la comparaison
-            <ArrowRight className="ml-2 w-5 h-5" />
+          <Button asChild size="lg">
+            <Link href="/produits">
+              Commencer la comparaison
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Link>
           </Button>
         </div>
       </section>
-
-      <Footer />
     </div>
   );
 }

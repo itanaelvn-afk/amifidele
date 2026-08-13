@@ -1,56 +1,50 @@
 "use client";
 
-import { PawPrint, Search, Menu } from "lucide-react";
+import Link from "next/link";
+import { PawPrint, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
+export type HeaderCurrent = "home" | "produits" | "other";
+
 interface HeaderProps {
-  onNavigateToComparison?: () => void;
-  onNavigateToHome?: () => void;
-  currentPage: "home" | "comparison";
+  current?: HeaderCurrent;
 }
 
-export function Header({ onNavigateToComparison, onNavigateToHome, currentPage }: HeaderProps) {
+export function Header({ current = "other" }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <header className="border-b border-border sticky top-0 z-50 backdrop-blur-md bg-card/95 shadow-sm">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
-          <button 
-            onClick={onNavigateToHome}
+          <Link
+            href="/"
             className="flex items-center gap-3 hover:opacity-80 transition-opacity group"
           >
             <div className="p-3 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
               <PawPrint className="w-8 h-8 text-primary" />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-xl font-bold">AmiFidele</h1>
-              <p className="text-muted-foreground text-sm">Trouvez le meilleur pour votre compagnon</p>
+              <p className="text-xl font-bold">AmiFidele</p>
+              <p className="text-muted-foreground text-sm">
+                Trouvez le meilleur pour votre compagnon
+              </p>
             </div>
             <div className="sm:hidden">
-              <h1 className="text-lg font-bold">AmiFidele</h1>
+              <p className="text-lg font-bold">AmiFidele</p>
             </div>
-          </button>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-4">
-            <Button 
-              variant={currentPage === "home" ? "default" : "ghost"}
-              onClick={onNavigateToHome}
-              className="transition-all"
-            >
-              Accueil
+            <Button asChild variant={current === "home" ? "default" : "ghost"}>
+              <Link href="/">Accueil</Link>
             </Button>
-            <Button 
-              variant={currentPage === "comparison" ? "default" : "ghost"}
-              onClick={onNavigateToComparison}
-              className="transition-all"
-            >
-              Comparer
+            <Button asChild variant={current === "produits" ? "default" : "ghost"}>
+              <Link href="/produits">Produits</Link>
             </Button>
           </nav>
 
-          {/* Mobile menu button */}
           <button
             className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -60,29 +54,26 @@ export function Header({ onNavigateToComparison, onNavigateToHome, currentPage }
           </button>
         </div>
 
-        {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pt-4 border-t border-border">
             <nav className="flex flex-col gap-2">
-              <Button 
-                variant={currentPage === "home" ? "default" : "ghost"}
-                onClick={() => {
-                  onNavigateToHome?.();
-                  setMobileMenuOpen(false);
-                }}
+              <Button
+                asChild
+                variant={current === "home" ? "default" : "ghost"}
                 className="w-full justify-start"
               >
-                Accueil
+                <Link href="/" onClick={() => setMobileMenuOpen(false)}>
+                  Accueil
+                </Link>
               </Button>
-              <Button 
-                variant={currentPage === "comparison" ? "default" : "ghost"}
-                onClick={() => {
-                  onNavigateToComparison?.();
-                  setMobileMenuOpen(false);
-                }}
+              <Button
+                asChild
+                variant={current === "produits" ? "default" : "ghost"}
                 className="w-full justify-start"
               >
-                Comparer
+                <Link href="/produits" onClick={() => setMobileMenuOpen(false)}>
+                  Produits
+                </Link>
               </Button>
             </nav>
           </div>
