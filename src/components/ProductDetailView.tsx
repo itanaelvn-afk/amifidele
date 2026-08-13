@@ -6,8 +6,9 @@ import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { DisplayProduct } from "@/lib/types";
-import { formatDeliveryLabel } from "@/lib/product-path";
+import { formatDeliveryLabel, truncate } from "@/lib/product-path";
 import { categoryPath } from "@/lib/category-path";
+import { ProductDescription } from "@/components/ProductDescription";
 
 function formatPrice(amount: number, currency?: string): string {
   const suffix = currency && currency !== "EUR" ? ` ${currency}` : "€";
@@ -47,7 +48,7 @@ export function ProductDetailView({
           </>
         )}
         <span className="mx-2">/</span>
-        <span className="text-foreground">Produit</span>
+        <span className="text-foreground">{truncate(product.name, 48)}</span>
       </nav>
 
       <div className="grid gap-10 lg:grid-cols-2">
@@ -151,9 +152,7 @@ export function ProductDetailView({
       {product.description && (
         <section className="mt-12 max-w-3xl">
           <h2 className="text-xl font-semibold mb-3">Description</h2>
-          <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
-            {product.description}
-          </div>
+          <ProductDescription text={product.description} />
         </section>
       )}
     </main>
