@@ -1,10 +1,10 @@
-import { HIDDEN_ROOT_CATEGORY_SLUGS, categoryPath } from "@/lib/category-path";
+import { categoryPath } from "@/lib/category-path";
 
 export type CategoryBreadcrumbSegment = {
   /** Slug taxo V1 (ex. chat, chat/litieres, autre) */
   slug: string;
   label: string;
-  /** false pour les racines hors nav (autre, …) */
+  /** false seulement si on n’a pas de slug navigable */
   linkable: boolean;
 };
 
@@ -14,9 +14,9 @@ function titleCaseSlugSegment(segment: string): string {
   return segment.charAt(0).toUpperCase() + segment.slice(1);
 }
 
+/** Tous les slugs taxo sont cliquables dans le fil d’Ariane (y compris « autre »). */
 function isLinkableCategory(slug: string): boolean {
-  const root = slug.split("/")[0] || slug;
-  return !HIDDEN_ROOT_CATEGORY_SLUGS.has(root) && !HIDDEN_ROOT_CATEGORY_SLUGS.has(slug);
+  return Boolean(slug.trim());
 }
 
 /**

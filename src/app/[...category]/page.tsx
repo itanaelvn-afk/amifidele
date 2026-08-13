@@ -22,7 +22,7 @@ export async function generateStaticParams() {
   const categories = await fetchCategories();
   return categories
     .map((c) => c.slug || c.id || "")
-    .filter((slug) => slug && slug !== "autre" && !RESERVED_PATH_ROOTS.has(slug.split("/")[0]))
+    .filter((slug) => slug && !RESERVED_PATH_ROOTS.has(slug.split("/")[0]))
     .map((slug) => ({ category: slug.split("/") }));
 }
 
