@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { Heart, Check, ShoppingCart } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DisplayProduct } from "@/lib/types";
+import { productPath } from "@/lib/product-path";
 
 interface ProductCardProps {
   product: DisplayProduct;
@@ -14,14 +16,18 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, isSelected, onToggleSelect }: ProductCardProps) {
+  const href = productPath(product.id);
+
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group">
       <div className="relative overflow-hidden">
-        <ImageWithFallback
-          src={product.image}
-          alt={product.name}
-          className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
-        />
+        <Link href={href} className="block">
+          <ImageWithFallback
+            src={product.image}
+            alt={product.name}
+            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        </Link>
         <button 
           className="absolute top-4 right-4 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors"
           aria-label="Ajouter aux favoris"
@@ -38,7 +44,11 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
             <p className="text-muted-foreground mb-1">{product.brand}</p>
-            <h3 className="mb-2">{product.name}</h3>
+            <h3 className="mb-2">
+              <Link href={href} className="hover:text-primary transition-colors">
+                {product.name}
+              </Link>
+            </h3>
           </div>
           <div className="ml-4 text-right">
             {product.oldPrice != null && product.oldPrice > product.price && (
@@ -67,7 +77,10 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
           {product.description}
         </p>
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button asChild variant="outline" className="flex-1">
+            <Link href={href}>Voir la fiche</Link>
+          </Button>
           <Button
             variant={isSelected ? "default" : "outline"}
             className="flex-1"

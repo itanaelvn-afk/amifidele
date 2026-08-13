@@ -1,7 +1,9 @@
 "use client";
 
-import { X, ExternalLink, ShoppingCart } from "lucide-react";
+import Link from "next/link";
+import { X, ShoppingCart } from "lucide-react";
 import { DisplayProduct } from "@/lib/types";
+import { productPath } from "@/lib/product-path";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
 import {
@@ -76,7 +78,14 @@ export function ComparisonTable({
                     <p className="text-sm font-medium text-muted-foreground mb-2">
                       {product.brand}
                     </p>
-                    <h4 className="text-lg font-bold mb-3 line-clamp-3 min-h-[4.5rem]">{product.name}</h4>
+                    <h4 className="text-lg font-bold mb-3 line-clamp-3 min-h-[4.5rem]">
+                      <Link
+                        href={productPath(product.id)}
+                        className="hover:text-primary transition-colors"
+                      >
+                        {product.name}
+                      </Link>
+                    </h4>
                     <div className="mb-3">
                       <p className="text-primary text-2xl font-bold">
                         {bestPrice.toFixed(2)}€
@@ -145,6 +154,9 @@ export function ComparisonTable({
                     </div>
                   )}
 
+                  <Button asChild size="lg" variant="outline" className="w-full mt-2">
+                    <Link href={productPath(product.id)}>Voir la fiche</Link>
+                  </Button>
                   {product.bestAffiliateLink && (
                     <Button
                       size="lg"
