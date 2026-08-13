@@ -38,6 +38,18 @@ export function LegalPageShell({
             >
               Produits
             </Link>
+            <Link
+              href="/chat"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              Chat
+            </Link>
+            <Link
+              href="/chien"
+              className="text-muted-foreground hover:text-primary transition-colors"
+            >
+              Chien
+            </Link>
           </nav>
         </div>
       </header>

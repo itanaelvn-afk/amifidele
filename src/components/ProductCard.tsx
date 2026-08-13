@@ -11,8 +11,8 @@ import { productPath, formatDeliveryLabel } from "@/lib/product-path";
 
 interface ProductCardProps {
   product: DisplayProduct;
-  isSelected: boolean;
-  onToggleSelect: (id: string) => void;
+  isSelected?: boolean;
+  onToggleSelect?: (id: string) => void;
 }
 
 export function ProductCard({ product, isSelected, onToggleSelect }: ProductCardProps) {
@@ -78,9 +78,10 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
         </p>
 
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline" className="flex-1">
+          <Button asChild variant="outline" className={onToggleSelect ? "flex-1" : "w-full"}>
             <Link href={href}>Voir la fiche</Link>
           </Button>
+          {onToggleSelect && (
           <Button
             variant={isSelected ? "default" : "outline"}
             className="flex-1"
@@ -95,6 +96,7 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
               "Comparer"
             )}
           </Button>
+          )}
           {product.bestAffiliateLink && (
             <Button
               variant="default"

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PawPrint, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { NAV_ROOT_CATEGORIES, categoryPath } from "@/lib/category-path";
 
 export type HeaderCurrent = "home" | "produits" | "other";
 
@@ -43,6 +44,11 @@ export function Header({ current = "other" }: HeaderProps) {
             <Button asChild variant={current === "produits" ? "default" : "ghost"}>
               <Link href="/produits">Produits</Link>
             </Button>
+            {NAV_ROOT_CATEGORIES.map((item) => (
+              <Button key={item.slug} asChild variant="ghost">
+                <Link href={categoryPath(item.slug)}>{item.label}</Link>
+              </Button>
+            ))}
           </nav>
 
           <button
@@ -75,6 +81,21 @@ export function Header({ current = "other" }: HeaderProps) {
                   Produits
                 </Link>
               </Button>
+              {NAV_ROOT_CATEGORIES.map((item) => (
+                <Button
+                  key={item.slug}
+                  asChild
+                  variant="ghost"
+                  className="w-full justify-start"
+                >
+                  <Link
+                    href={categoryPath(item.slug)}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                </Button>
+              ))}
             </nav>
           </div>
         )}

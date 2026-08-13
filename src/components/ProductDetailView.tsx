@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { DisplayProduct } from "@/lib/types";
 import { formatDeliveryLabel } from "@/lib/product-path";
+import { categoryPath } from "@/lib/category-path";
 
 function formatPrice(amount: number, currency?: string): string {
   const suffix = currency && currency !== "EUR" ? ` ${currency}` : "€";
@@ -34,6 +35,17 @@ export function ProductDetailView({
         <Link href="/" className="hover:text-primary">
           Accueil
         </Link>
+        {product.categoryId && product.categoryId !== "autre" && (
+          <>
+            <span className="mx-2">/</span>
+            <Link
+              href={categoryPath(product.categoryId)}
+              className="hover:text-primary"
+            >
+              {product.category || product.categoryId}
+            </Link>
+          </>
+        )}
         <span className="mx-2">/</span>
         <span className="text-foreground">Produit</span>
       </nav>

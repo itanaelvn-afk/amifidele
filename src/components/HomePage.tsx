@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Star, TrendingUp, Package, Shield } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
@@ -8,14 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { productPath } from "@/lib/product-path";
+import { categoryPath, HIDDEN_ROOT_CATEGORY_SLUGS } from "@/lib/category-path";
 import { useProducts } from "@/hooks/useProducts";
+import { fetchCategories, type Category } from "@/lib/api";
 
 export function HomePage() {
   const { products, loading, error, loadProducts } = useProducts();
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     void loadProducts(1, 12);
   }, [loadProducts]);
+
+  useEffect(() => {
+    void fetchCategories().then(setCategories);
+  }, []);
 
   const retailers = [
     { name: "Zooplus", description: "Leader européen", color: "bg-orange-100" },
@@ -50,15 +57,12 @@ export function HomePage() {
   ];
 
   const featuredProducts = products.slice(0, 3);
-  const foodProducts = products.filter((p) => {
-    const haystack = `${p.category} ${p.categoryId || ''}`.toLowerCase();
-    return haystack.includes('nourriture') || haystack.includes('alimentation');
+  const rootCategories = categories.filter((c) => {
+    const slug = c.slug || c.id;
+    return Boolean(slug) && !c.parentId && !HIDDEN_ROOT_CATEGORY_SLUGS.has(slug);
   });
-  const toyProducts = products.filter((p) => {
-    const haystack = `${p.category} ${p.categoryId || ''}`.toLowerCase();
-    return haystack.includes('jouet');
-  });
-  // const accessoryProducts = products.filter(p => p.category === "Accessoires");
+  const childrenOf = (parentSlug: string) =>
+    categories.filter((c) => c.parentId === parentSlug);
 
   return (
     <div className="min-h-screen">
@@ -194,106 +198,56 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Category Sections */}
       <section className="py-16 bg-secondary/30">
         <div className="container mx-auto px-4">
-          <div className="mb-12">
-            <h2 className="mb-2">🍖 Alimentation</h2>
+          <div className="mb-10">
+            <h2 className="mb-2">Parcourir par catégorie</h2>
             <p className="text-muted-foreground">
-              Des croquettes premium aux friandises naturelles
+              Pages dédiées Chat et Chien — branchées sur le catalogue
             </p>
           </div>
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <div className="relative rounded-2xl overflow-hidden h-80">
-              <ImageWithFallback
-                src="https://images.unsplash.com/photo-1761203429183-9f8235780c42?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkb2clMjBlYXRpbmclMjBoZWFsdGh5fGVufDF8fHx8MTc2MjA4NTU1Mnww&ixlib=rb-4.1.0&q=80&w=1080"
-                alt="Alimentation pour chiens"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-8">
-                <div className="text-white">
-                  <h3 className="mb-2 text-white">Pour chiens</h3>
-                  <p className="text-white/90 mb-4">
-                    Nourriture équilibrée et savoureuse
-                  </p>
-                  <Button asChild variant="secondary">
-                    <Link href="/produits">Découvrir</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-4">
-              {foodProducts.slice(0, 2).map((product) => (
-                <Link key={product.id} href={productPath(product.id)} className="block">
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4 flex gap-4">
-                      <ImageWithFallback
-                        src={product.image}
-                        alt={product.name}
-                        className="w-24 h-24 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
-                        <p className="text-muted-foreground">{product.brand}</p>
-                        <h4 className="mb-1">{product.name}</h4>
-                        <p className="text-primary">{product.price.toFixed(2)}€</p>
-                      </div>
+          {rootCategories.length === 0 ? (
+            <p className="text-muted-foreground">Catégories en cours de chargement…</p>
+          ) : (
+            <div className="grid md:grid-cols-3 gap-6">
+              {rootCategories.map((root) => {
+                const slug = root.slug || root.id || "";
+                const kids = childrenOf(slug);
+                return (
+                  <Card key={slug} className="hover:shadow-md transition-shadow">
+                    <CardContent className="p-6">
+                      <Link href={categoryPath(slug)} className="block mb-4">
+                        <h3 className="text-xl font-semibold hover:text-primary">{root.name}</h3>
+                      </Link>
+                      {kids.length > 0 && (
+                        <ul className="space-y-2">
+                          {kids.map((child) => {
+                            const childSlug = child.slug || child.id || "";
+                            return (
+                              <li key={childSlug}>
+                                <Link
+                                  href={categoryPath(childSlug)}
+                                  className="text-sm text-muted-foreground hover:text-primary"
+                                >
+                                  {child.name}
+                                </Link>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                      <Button asChild variant="outline" size="sm" className="mt-6">
+                        <Link href={categoryPath(slug)}>
+                          Voir {root.name}
+                          <ArrowRight className="ml-2 w-4 h-4" />
+                        </Link>
+                      </Button>
                     </CardContent>
                   </Card>
-                </Link>
-              ))}
+                );
+              })}
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="mb-12">
-            <h2 className="mb-2">🎾 Jouets & Divertissement</h2>
-            <p className="text-muted-foreground">
-              Pour des heures de jeu et de complicité
-            </p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              {toyProducts.slice(0, 2).map((product) => (
-                <Link key={product.id} href={productPath(product.id)} className="block">
-                  <Card className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4 flex gap-4">
-                      <ImageWithFallback
-                        src={product.image}
-                        alt={product.name}
-                        className="w-24 h-24 object-cover rounded-lg"
-                      />
-                      <div className="flex-1">
-                        <p className="text-muted-foreground">{product.brand}</p>
-                        <h4 className="mb-1">{product.name}</h4>
-                        <p className="text-primary">{product.price.toFixed(2)}€</p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-            <div className="relative rounded-2xl overflow-hidden h-80">
-              <ImageWithFallback
-                src="https://images.unsplash.com/photo-1723115891740-8adcc7e16436?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjdXRlJTIwa2l0dGVuJTIwcGxheWluZ3xlbnwxfHx8fDE3NjIwODU1NTJ8MA&ixlib=rb-4.1.0&q=80&w=1080"
-                alt="Jouets pour chats"
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-8">
-                <div className="text-white">
-                  <h3 className="mb-2 text-white">Pour chats</h3>
-                  <p className="text-white/90 mb-4">
-                    Stimulation et amusement garantis
-                  </p>
-                  <Button asChild variant="secondary">
-                    <Link href="/produits">Découvrir</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </section>
 
