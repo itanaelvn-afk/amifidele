@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
 import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Mentions légales | AmiFidele",
   description:
     "Mentions légales du site AmiFidele, comparateur de produits pour animaux de compagnie.",
-};
+  path: "/mentions-legales",
+});
 
 export default function MentionsLegalesPage() {
   return (

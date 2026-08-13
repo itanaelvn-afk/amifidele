@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
 import { SiteChrome } from "@/components/SiteChrome";
 import { HomePage } from "@/components/HomePage";
+import { DEFAULT_DESCRIPTION, DEFAULT_TITLE, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "AmiFidele - Comparateur de produits pour animaux",
-  description:
-    "Comparez les prix et les caractéristiques de milliers de produits pour chiens et chats chez les meilleurs marchands.",
-};
+export const metadata = pageMetadata({
+  title: DEFAULT_TITLE,
+  description: DEFAULT_DESCRIPTION,
+  path: "/",
+});
 
 export default function Home() {
   return (

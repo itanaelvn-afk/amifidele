@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Gestion des cookies | AmiFidele",
   description:
     "Information sur les cookies utilisés par AmiFidele et gestion de vos préférences.",
-};
+  path: "/cookies",
+});
 
 export default function CookiesPage() {
   return (

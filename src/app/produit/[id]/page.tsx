@@ -5,6 +5,7 @@ import { mapApiProductToDisplayProduct } from "@/lib/utils/api-utils";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductDetailView } from "@/components/ProductDetailView";
 import { productPath, stripHtml, truncate } from "@/lib/product-path";
+import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo";
 
 function collectExtraImages(product: {
   images?: { main?: string; thumb?: string };
@@ -50,7 +51,7 @@ export async function generateMetadata({
   const image =
     display.image.startsWith("http://") || display.image.startsWith("https://")
       ? display.image
-      : undefined;
+      : DEFAULT_OG_IMAGE;
 
   return {
     title,
@@ -61,14 +62,14 @@ export async function generateMetadata({
       description,
       type: "website",
       locale: "fr_FR",
-      siteName: "AmiFidele",
-      ...(image ? { images: [{ url: image, alt: display.name }] } : {}),
+      siteName: SITE_NAME,
+      images: [{ url: image, alt: display.name }],
     },
     twitter: {
-      card: image ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title,
       description,
-      ...(image ? { images: [image] } : {}),
+      images: [image],
     },
   };
 }

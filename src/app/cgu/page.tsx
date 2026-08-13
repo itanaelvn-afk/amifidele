@@ -1,12 +1,13 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "Conditions générales d'utilisation | AmiFidele",
   description:
     "Conditions générales d'utilisation (CGU) du comparateur AmiFidele.",
-};
+  path: "/cgu",
+});
 
 export default function CguPage() {
   return (
