@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { DisplayProduct } from "@/lib/types";
 import { formatDeliveryLabel, truncate } from "@/lib/product-path";
-import { categoryPath } from "@/lib/category-path";
+import { categorySegmentHref } from "@/lib/category-breadcrumb";
 import { ProductDescription } from "@/components/ProductDescription";
 
 function formatPrice(amount: number, currency?: string): string {
@@ -32,21 +32,25 @@ export function ProductDetailView({
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl">
-      <nav className="text-sm text-muted-foreground mb-6">
+      <nav className="text-sm text-muted-foreground mb-6" aria-label="Fil d'Ariane">
         <Link href="/" className="hover:text-primary">
           Accueil
         </Link>
-        {product.categoryId && product.categoryId !== "autre" && (
-          <>
-            <span className="mx-2">/</span>
-            <Link
-              href={categoryPath(product.categoryId)}
-              className="hover:text-primary"
-            >
-              {product.category || product.categoryId}
-            </Link>
-          </>
-        )}
+        {(product.categoryTrail ?? []).map((segment) => {
+          const href = categorySegmentHref(segment);
+          return (
+            <span key={segment.slug}>
+              <span className="mx-2">/</span>
+              {href ? (
+                <Link href={href} className="hover:text-primary">
+                  {segment.label}
+                </Link>
+              ) : (
+                <span>{segment.label}</span>
+              )}
+            </span>
+          );
+        })}
         <span className="mx-2">/</span>
         <span className="text-foreground">{truncate(product.name, 48)}</span>
       </nav>

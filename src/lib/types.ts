@@ -3,6 +3,8 @@
  * Les champs legacy restent optionnels le temps du reimport / transition.
  */
 
+import type { CategoryBreadcrumbSegment } from "@/lib/category-breadcrumb";
+
 /** Prix canonique (+ fallbacks legacy optionnels) */
 export interface ProductPrice {
   amount?: number;
@@ -148,6 +150,8 @@ export interface DisplayProduct {
   name: string;
   category: string;
   categoryId?: string;
+  /** Segments fil d’Ariane (parent → feuille), sans Accueil ni produit */
+  categoryTrail?: CategoryBreadcrumbSegment[];
   price: number;
   currency?: string;
   /** Prix barré / ancien prix (canonique price.old) */
