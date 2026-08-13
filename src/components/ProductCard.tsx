@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, Check, ShoppingCart } from "lucide-react";
+import { Check, ShoppingCart } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DisplayProduct } from "@/lib/types";
 import { productPath, formatDeliveryLabel } from "@/lib/product-path";
@@ -28,17 +27,6 @@ export function ProductCard({ product, isSelected, onToggleSelect }: ProductCard
             className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
           />
         </Link>
-        <button 
-          className="absolute top-4 right-4 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors"
-          aria-label="Ajouter aux favoris"
-        >
-          <Heart className="w-5 h-5 text-primary" />
-        </button>
-        {product.rating && product.rating >= 4.5 && (
-          <Badge className="absolute top-4 left-4 bg-primary">
-            ⭐ Recommandé
-          </Badge>
-        )}
       </div>
       <CardContent className="p-6">
         <div className="flex justify-between items-start mb-3">
