@@ -21,11 +21,13 @@ export function ProductDetailView({
   extraImages = [],
   inStock,
   descriptionBlocks,
+  descriptionHtml,
 }: {
   product: DisplayProduct;
   extraImages?: string[];
   inStock?: boolean;
   descriptionBlocks?: DescriptionBlock[];
+  descriptionHtml?: string;
 }) {
   const gallery = [product.image, ...extraImages].filter(
     (url, index, all) => url && url !== "/images/placeholder.jpg" && all.indexOf(url) === index
@@ -162,6 +164,7 @@ export function ProductDetailView({
           <ProductDescription
             text={product.description}
             blocks={descriptionBlocks}
+            html={descriptionHtml}
           />
         </section>
       )}
