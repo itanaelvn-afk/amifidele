@@ -81,6 +81,8 @@ export interface Product {
 
   name?: string;
   description?: string;
+  /** html = édition Dashboard (whitelist) ; plain = texte feed */
+  descriptionFormat?: "html" | "plain";
 
   merchant?: ProductMerchant;
   brand?: ProductBrand;
@@ -164,6 +166,7 @@ export interface DisplayProduct {
   rating?: number;
   image: string;
   description: string;
+  descriptionFormat?: "html" | "plain";
   features?: string[];
   brand: string;
   affiliateLink?: string;

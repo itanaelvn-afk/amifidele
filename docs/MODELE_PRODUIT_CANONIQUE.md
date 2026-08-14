@@ -365,6 +365,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 | `updatedAt` | **Système** | Toujours rafraîchi par le sync / l’API. |
 | `createdAt` | **Système** | `$setOnInsert` uniquement. |
 | `name`, `description` | **Merge** | Feed par défaut ; sticky Dashboard si édité (`manualOverrides`). |
+| `descriptionFormat` | **Merge** | `plain` (feed / parser site) ; `html` après édition Dashboard (whitelist `p, h2, h3, ul, ol, li, strong, em, br`). Le sync Awin remet `plain` sauf si `manualOverrides.description`. |
 | `brandId` | **Merge** | Feed (findOrCreate) par défaut ; sticky si changé au BO. |
 | `categoryId` | **Merge** | Mapping feed → taxo par défaut ; sticky si classé au BO (y compris hors reprocess file). |
 | `isVisible` | **Merge** | Sync remet `true` si présent dans le feed ; masquage auto 15j ; sticky si admin a forcé. |
@@ -416,6 +417,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 8. ~~Ops : colonnes Awin minimales~~ ✅
 9. ~~Couper historique sync + index Mongo listing~~ ✅ (08/2026)
 10. ~~Clear / unlock `manualOverrides` (Dashboard + API)~~ ✅ (12/08/2026)
+11. ~~Édition description HTML restreint + verrouillage~~ ✅ (14/08/2026)
 
 ---
 
@@ -423,6 +425,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
+| 14/08/2026 12:40 | Description Dashboard : HTML whitelist + `descriptionFormat` (`html` \| `plain`) ; sanitization API / site ; AwinFetcher remet `plain` sauf override. |
 | 12/08/2026 22:55 | Clarification unlock : l’API ne force pas `isVisible` ; seul le sync Awin le remet à `true` si le produit est réimporté. |
 | 12/08/2026 18:55 | Clear/unlock `manualOverrides` : `DELETE /api/products/:id/manual-overrides/:field` + UI Dashboard « Reprendre depuis le feed ». |
 | 12/08/2026 17:30 | §6.1 Contrat brands aligné (AwinFetcher ↔ API ↔ clients) ; plus de fallback listing 1000 produits. |

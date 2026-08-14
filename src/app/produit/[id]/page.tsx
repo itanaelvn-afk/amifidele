@@ -5,6 +5,7 @@ import { mapApiProductToDisplayProduct } from "@/lib/utils/api-utils";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductDetailView } from "@/components/ProductDetailView";
 import { parseProductDescription } from "@/lib/format-description";
+import { sanitizeDescriptionHtml } from "@/lib/sanitize-description-html";
 import { productPath, stripHtml, truncate } from "@/lib/product-path";
 import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo";
 
@@ -88,9 +89,14 @@ export default async function ProduitPage({
 
   const display = mapApiProductToDisplayProduct(raw);
   const extraImages = collectExtraImages(raw).filter((url) => url !== display.image);
-  const descriptionBlocks = display.description
-    ? parseProductDescription(display.description)
-    : [];
+  const isHtmlDescription = display.descriptionFormat === "html";
+  const descriptionHtml = isHtmlDescription
+    ? sanitizeDescriptionHtml(display.description)
+    : undefined;
+  const descriptionBlocks =
+    !isHtmlDescription && display.description
+      ? parseProductDescription(display.description)
+      : [];
 
   return (
     <SiteChrome current="other">
@@ -99,6 +105,7 @@ export default async function ProduitPage({
         extraImages={extraImages}
         inStock={raw.inStock}
         descriptionBlocks={descriptionBlocks}
+        descriptionHtml={descriptionHtml}
       />
     </SiteChrome>
   );

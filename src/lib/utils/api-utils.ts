@@ -105,6 +105,9 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct | Product):
     // Pas de note factice — n’afficher le rating que s’il existe réellement
     image,
     description,
+    ...(apiProduct.descriptionFormat === "html" || apiProduct.descriptionFormat === "plain"
+      ? { descriptionFormat: apiProduct.descriptionFormat }
+      : {}),
     features: [],
     brand,
     affiliateLink: affiliateLink || undefined,
