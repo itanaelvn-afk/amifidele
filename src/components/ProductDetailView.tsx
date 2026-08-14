@@ -66,7 +66,10 @@ export function ProductDetailView({
             <ImageWithFallback
               src={mainImage}
               alt={product.name}
-              className="w-full h-[420px] object-contain bg-white"
+              className="w-full h-[420px] bg-white"
+              imageClassName="object-contain"
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              priority
             />
           </div>
           {thumbs.length > 0 && (
@@ -79,7 +82,9 @@ export function ProductDetailView({
                   <ImageWithFallback
                     src={src}
                     alt=""
-                    className="w-full h-24 object-contain"
+                    className="w-full h-24"
+                    imageClassName="object-contain"
+                    sizes="120px"
                   />
                 </div>
               ))}

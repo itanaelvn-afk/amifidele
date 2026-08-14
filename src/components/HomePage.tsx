@@ -93,7 +93,9 @@ export function HomePage() {
                 <ImageWithFallback
                   src="https://images.unsplash.com/photo-1588977827076-b4db84d29151?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxoYXBweSUyMHBldHMlMjB0b2dldGhlcnxlbnwxfHx8fDE3NjIwODU1NTF8MA&ixlib=rb-4.1.0&q=80&w=1080"
                   alt="Animaux heureux"
-                  className="w-full h-[500px] object-cover"
+                  className="w-full h-[500px]"
+                  sizes="(min-width: 1024px) 50vw, 100vw"
+                  priority
                 />
               </div>
             </div>
@@ -160,7 +162,9 @@ export function HomePage() {
                         <ImageWithFallback
                           src={product.image}
                           alt={product.name}
-                          className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-64 bg-white"
+                          imageClassName="object-contain group-hover:scale-105 transition-transform duration-300"
+                          sizes="(min-width: 768px) 33vw, 100vw"
                         />
                         {product.brand && product.brand !== 'Marque inconnue' && (
                           <Badge className="absolute top-4 left-4 bg-primary">

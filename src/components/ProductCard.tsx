@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { Check, ShoppingCart } from "lucide-react";
-import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
+import {
+  ImageWithFallback,
+  PRODUCT_CARD_IMAGE_SIZES,
+} from "@/components/figma/ImageWithFallback";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DisplayProduct } from "@/lib/types";
@@ -12,19 +15,23 @@ interface ProductCardProps {
   product: DisplayProduct;
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
+  priority?: boolean;
 }
 
-export function ProductCard({ product, isSelected, onToggleSelect }: ProductCardProps) {
+export function ProductCard({ product, isSelected, onToggleSelect, priority = false }: ProductCardProps) {
   const href = productPath(product.id);
 
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group">
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden bg-white">
         <Link href={href} className="block">
           <ImageWithFallback
             src={product.image}
             alt={product.name}
-            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-64 bg-white"
+            imageClassName="object-contain transition-transform duration-300 group-hover:scale-105"
+            sizes={PRODUCT_CARD_IMAGE_SIZES}
+            priority={priority}
           />
         </Link>
       </div>
