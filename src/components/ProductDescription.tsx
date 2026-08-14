@@ -23,8 +23,15 @@ function BlockView({ block }: { block: DescriptionBlock }) {
   return <p className="my-3 first:mt-0">{block.text}</p>;
 }
 
-export function ProductDescription({ text }: { text: string }) {
-  const blocks = parseProductDescription(text);
+export function ProductDescription({
+  text,
+  blocks: precomputed,
+}: {
+  text?: string;
+  blocks?: DescriptionBlock[];
+}) {
+  const blocks =
+    precomputed ?? (text ? parseProductDescription(text) : []);
   if (blocks.length === 0) return null;
 
   return (
