@@ -69,7 +69,9 @@ export function ComparisonTable({
                   <ImageWithFallback
                     src={product.image}
                     alt={product.name}
-                    className="w-full h-56 object-cover rounded-xl"
+                    className="w-full h-56 rounded-xl bg-white"
+                    imageClassName="object-contain"
+                    sizes="(min-width: 1024px) 30vw, (min-width: 768px) 45vw, 100vw"
                   />
                 </div>
 
