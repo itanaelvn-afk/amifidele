@@ -39,6 +39,7 @@ export interface ApiResponse<T> {
 
 export interface ProductFilters {
   categoryName?: string;
+  /** Slug taxo V1, ou plusieurs slugs séparés par des virgules (ex. chat,chien). */
   categoryId?: string;
   brandName?: string;
   brandId?: string;
