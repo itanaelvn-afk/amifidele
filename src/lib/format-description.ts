@@ -252,12 +252,59 @@ function repairElidedHeadingFragments(
   return result;
 }
 
+/** Incrémenter si les règles du parser changent (invalide tout le cache). */
+export const DESCRIPTION_PARSER_VERSION = 1;
+
+const PARSE_CACHE_MAX = 400;
+const parseCache = new Map<string, DescriptionBlock[]>();
+
+function hashDescription(raw: string): string {
+  let hash = 5381;
+  for (let i = 0; i < raw.length; i += 1) {
+    hash = ((hash << 5) + hash) ^ raw.charCodeAt(i);
+  }
+  return `${raw.length.toString(36)}:${(hash >>> 0).toString(36)}`;
+}
+
+function parseCacheKey(raw: string): string {
+  return `${DESCRIPTION_PARSER_VERSION}:${hashDescription(raw)}`;
+}
+
+function rememberParsed(key: string, blocks: DescriptionBlock[]): DescriptionBlock[] {
+  if (parseCache.size >= PARSE_CACHE_MAX) {
+    const oldest = parseCache.keys().next().value;
+    if (oldest) parseCache.delete(oldest);
+  }
+  parseCache.set(key, blocks);
+  return blocks;
+}
+
 /**
  * Transforme une description brute en blocs structurés pour la PDP.
+ * Cache mémoire process (LRU) : clé = version parser + hash du texte source.
  */
 export function parseProductDescription(raw: string): DescriptionBlock[] {
   if (!raw?.trim()) return [];
 
+  const key = parseCacheKey(raw);
+  const cached = parseCache.get(key);
+  if (cached) {
+    parseCache.delete(key);
+    parseCache.set(key, cached);
+    return cached;
+  }
+
+  const started = performance.now();
+  const blocks = parseProductDescriptionUncached(raw);
+  if (process.env.NODE_ENV === "development") {
+    console.debug(
+      `[parse-description] miss ${(performance.now() - started).toFixed(2)} ms (cache=${parseCache.size + 1})`
+    );
+  }
+  return rememberParsed(key, blocks);
+}
+
+function parseProductDescriptionUncached(raw: string): DescriptionBlock[] {
   let text = descriptionToPlainText(raw);
   if (!text) return [];
 

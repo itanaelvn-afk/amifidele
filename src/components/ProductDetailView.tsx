@@ -6,6 +6,7 @@ import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { DisplayProduct } from "@/lib/types";
+import type { DescriptionBlock } from "@/lib/format-description";
 import { formatDeliveryLabel, truncate } from "@/lib/product-path";
 import { categorySegmentHref } from "@/lib/category-breadcrumb";
 import { ProductDescription } from "@/components/ProductDescription";
@@ -19,10 +20,12 @@ export function ProductDetailView({
   product,
   extraImages = [],
   inStock,
+  descriptionBlocks,
 }: {
   product: DisplayProduct;
   extraImages?: string[];
   inStock?: boolean;
+  descriptionBlocks?: DescriptionBlock[];
 }) {
   const gallery = [product.image, ...extraImages].filter(
     (url, index, all) => url && url !== "/images/placeholder.jpg" && all.indexOf(url) === index
@@ -156,7 +159,10 @@ export function ProductDetailView({
       {product.description && (
         <section className="mt-12 max-w-3xl">
           <h2 className="text-xl font-semibold mb-3">Description</h2>
-          <ProductDescription text={product.description} />
+          <ProductDescription
+            text={product.description}
+            blocks={descriptionBlocks}
+          />
         </section>
       )}
     </main>
