@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { productPath } from "@/lib/product-path";
-import { categoryPath, HIDDEN_ROOT_CATEGORY_SLUGS } from "@/lib/category-path";
+import { categoryPath, HIDDEN_ROOT_CATEGORY_SLUGS, NAV_ROOT_CATEGORIES } from "@/lib/category-path";
 import { useProducts } from "@/hooks/useProducts";
 import { fetchCategories, type Category } from "@/lib/api";
 
@@ -17,7 +17,9 @@ export function HomePage() {
   const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
-    void loadProducts(1, 12);
+    // Chat + Chien uniquement — exclut « autre » et les racines masquées (ex. connecté).
+    const featuredCategoryIds = NAV_ROOT_CATEGORIES.map((c) => c.slug).join(",");
+    void loadProducts(1, 12, { categoryId: featuredCategoryIds });
   }, [loadProducts]);
 
   useEffect(() => {
@@ -125,7 +127,7 @@ export function HomePage() {
             <div>
               <h2 className="mb-2">Produits à la une</h2>
               <p className="text-muted-foreground">
-                Une sélection parmi le catalogue AmiFidele
+                Une sélection Chat et Chien parmi le catalogue AmiFidele
               </p>
             </div>
             <Button asChild variant="outline">
