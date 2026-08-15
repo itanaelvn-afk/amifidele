@@ -1,3 +1,20 @@
+/**
+ * Route API du formulaire de contact (`POST /api/contact`).
+ *
+ * Flux :
+ * 1. Le navigateur envoie nom / e-mail / message depuis `ContactForm`
+ *    (page `/contact`) vers cette route — jamais directement vers Formspree
+ *    (l’ID reste côté serveur).
+ * 2. Validation + honeypot `company` (si rempli → faux succès, pas d’envoi).
+ * 3. Si `FORMSPREE_FORM_ID` est défini : POST JSON vers
+ *    `https://formspree.io/f/<id>` ; Formspree notifie l’e-mail du compte
+ *    et stocke la soumission dans son dashboard.
+ * 4. Sans ID : en développement l’envoi est simulé (log console) ;
+ *    en production → 503 avec fallback mailto.
+ *
+ * Config : `.env.local` → `FORMSPREE_FORM_ID=xxxxxxxx`
+ * (voir `.env.example`). Ne pas committer l’ID.
+ */
 import { NextResponse } from "next/server";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -9,7 +26,7 @@ type ContactBody = {
   name?: unknown;
   email?: unknown;
   message?: unknown;
-  /** Honeypot — doit rester vide */
+  /** Honeypot — doit rester vide (bots) */
   company?: unknown;
 };
 
