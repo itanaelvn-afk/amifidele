@@ -19,6 +19,10 @@ import {
   sortValueToApiParams,
   type ProductSortValue,
 } from "@/lib/product-sort";
+import type { DisplayProduct } from "@/lib/types";
+
+const SEARCH_DEBOUNCE_MS = 350;
+const MAX_COMPARISON_PRODUCTS = 3;
 
 export function ComparisonPage() {
   const router = useRouter();
@@ -28,7 +32,8 @@ export function ComparisonPage() {
   const [filters, setFilters] = useState<ProductFilters>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  /** Produits choisis (objets complets) — survivent au changement de page / filtre. */
+  const [selectedProducts, setSelectedProducts] = useState<DisplayProduct[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortValue, setSortValue] = useState<ProductSortValue>(() =>
@@ -61,7 +66,7 @@ export function ComparisonPage() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery.trim());
-    }, 350);
+    }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
@@ -85,22 +90,26 @@ export function ComparisonPage() {
 
   const toggleProductSelection = (id: string) => {
     setSelectedProducts((prev) => {
-      if (prev.includes(id)) {
-        return prev.filter((productId) => productId !== id);
-      } else {
-        if (prev.length >= 3) {
-          return prev;
-        }
-        return [...prev, id];
+      if (prev.some((p) => p.id === id)) {
+        return prev.filter((p) => p.id !== id);
       }
+      if (prev.length >= MAX_COMPARISON_PRODUCTS) {
+        return prev;
+      }
+      const product = products.find((p) => p.id === id);
+      if (!product) {
+        return prev;
+      }
+      return [...prev, product];
     });
   };
 
   const removeFromComparison = (id: string) => {
-    setSelectedProducts((prev) => prev.filter((productId) => productId !== id));
+    setSelectedProducts((prev) => prev.filter((p) => p.id !== id));
   };
 
-  const selectedProductsData = products.filter((p) => selectedProducts.includes(p.id));
+  const isProductSelected = (id: string) =>
+    selectedProducts.some((p) => p.id === id);
 
   return (
     <div className="min-h-screen bg-background">
@@ -139,7 +148,10 @@ export function ComparisonPage() {
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery("")}
+                onClick={() => {
+                  setCurrentPage(1);
+                  setSearchQuery("");
+                }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
                 aria-label="Effacer la recherche"
               >
@@ -252,7 +264,7 @@ export function ComparisonPage() {
               <ProductCard
                 key={product.id}
                 product={product}
-                isSelected={selectedProducts.includes(product.id)}
+                isSelected={isProductSelected(product.id)}
                 onToggleSelect={toggleProductSelection}
                 priority={index < 4}
               />
@@ -370,7 +382,7 @@ export function ComparisonPage() {
 
       {/* Comparison Modal */}
       <ComparisonTable
-        products={selectedProductsData}
+        products={selectedProducts}
         isOpen={showComparison}
         onClose={() => setShowComparison(false)}
         onRemoveProduct={removeFromComparison}
