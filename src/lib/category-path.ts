@@ -4,6 +4,7 @@ export const RESERVED_PATH_ROOTS = new Set([
   "produits",
   "produit",
   "api",
+  "contact",
   "cookies",
   "cgu",
   "confidentialite",
