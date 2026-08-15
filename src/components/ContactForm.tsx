@@ -1,5 +1,11 @@
 "use client";
 
+/**
+ * Formulaire `/contact`.
+ * Envoie les données à `POST /api/contact` (proxy serveur → Formspree).
+ * Ne pas appeler Formspree depuis le navigateur : garder `FORMSPREE_FORM_ID` secret.
+ */
+
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

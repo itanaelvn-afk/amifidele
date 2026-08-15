@@ -45,9 +45,19 @@ API_URL=http://localhost:4000/api
 
 # Token = API_TOKEN_AUTH de api-amifidele (serveur uniquement)
 API_TOKEN=votre_token_ici
+
+# Formulaire de contact (Formspree) — ID après /f/ dans l’URL du formulaire
+FORMSPREE_FORM_ID=xxxxxxxx
 ```
 
 > ⚠️ **Important** : ne plus mettre la clé dans une variable `NEXT_PUBLIC_*`. Le navigateur passe par `/api/bff/*` (voir `docs/API_AUTHENTICATION.md`).
+
+### Formulaire de contact (Formspree)
+
+- Page : `/contact` → composant `ContactForm` → `POST /api/contact`
+- Le serveur relaie vers Formspree avec `FORMSPREE_FORM_ID` (jamais exposé au client)
+- Sans ID : en **dev** l’envoi est simulé ; en **prod** → erreur + fallback `contact@amifidele.fr`
+- Détail du flux : commentaires en tête de `src/app/api/contact/route.ts`
 
 ## 🎯 Configuration de l'API
 
