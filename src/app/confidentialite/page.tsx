@@ -14,22 +14,20 @@ export default function ConfidentialitePage() {
     <LegalPageShell title="Politique de confidentialité">
       <LegalSection title="1. Périmètre actuel (V1)">
         <p>
-          En l&apos;état actuel du Site, AmiFidele{" "}
-          <strong>ne collecte pas volontairement de données personnelles</strong>{" "}
-          des visiteurs : pas de compte utilisateur, pas de formulaire de
-          contact actif, pas de newsletter branchée, pas d&apos;outil
-          d&apos;analytics déployé.
-        </p>
-        <p>
-          Cette politique décrit ce qui s&apos;applique aujourd&apos;hui et ce
-          qui sera mis à jour si une collecte est introduite plus tard.
+          AmiFidele{" "}
+          <strong>collecte des données personnelles uniquement</strong> lorsque
+          vous utilisez le{" "}
+          <Link className="text-primary hover:underline" href="/contact">
+            formulaire de contact
+          </Link>
+          . Pas de compte utilisateur, pas de newsletter, pas d&apos;outil
+          d&apos;analytics déployé par AmiFidele.
         </p>
       </LegalSection>
 
       <LegalSection title="2. Responsable du traitement">
         <p>
-          Lorsqu&apos;un traitement de données personnelles sera mis en place,
-          le responsable du traitement sera l&apos;éditeur du Site AmiFidele :{" "}
+          Le responsable du traitement est l&apos;éditeur du Site AmiFidele :{" "}
           <em>[À compléter — identité / coordonnées]</em>, contact{" "}
           <a className="text-primary hover:underline" href="mailto:contact@amifidele.fr">
             contact@amifidele.fr
@@ -38,22 +36,28 @@ export default function ConfidentialitePage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Données susceptibles d’être traitées">
+      <LegalSection title="3. Données traitées">
         <p>
-          <strong>Aujourd&apos;hui</strong>, seuls des éléments techniques
-          liés au fonctionnement du Site ou de l&apos;infrastructure peuvent
-          apparaître de façon accessoire (ex. logs serveur de l&apos;hébergeur :
-          adresse IP, horodatage, user-agent), selon la configuration de
-          l&apos;hébergement.
+          <strong>Formulaire de contact</strong> : nom, adresse e-mail et
+          contenu du message, uniquement pour répondre à votre demande. Base
+          légale : intérêt légitime (traiter les demandes) et/ou exécution de
+          mesures précontractuelles à votre initiative.
         </p>
         <p>
-          <strong>Pas traités pour le moment</strong> : adresse e-mail
-          newsletter, messages de formulaire de contact, profils utilisateurs,
-          cookies analytics ou publicitaires déposés par AmiFidele.
+          <strong>Conservation</strong> : le temps nécessaire au traitement de
+          la demande, puis suppression ou archivage limité au-delà si une
+          obligation légale l&apos;exige.
         </p>
         <p>
-          AmiFidele ne traite pas les données de paiement : les achats se font
-          chez les marchands partenaires.
+          <strong>Sous-traitant technique</strong> : l&apos;envoi peut
+          transiter par Formspree (prestataire de formulaires), selon la
+          configuration du Site. Des logs techniques d&apos;hébergement (IP,
+          horodatage, user-agent) peuvent aussi apparaître chez l&apos;hébergeur.
+        </p>
+        <p>
+          <strong>Non traités</strong> : newsletter, profils utilisateurs,
+          cookies analytics ou publicitaires déposés par AmiFidele. Les achats
+          et paiements se font chez les marchands partenaires.
         </p>
       </LegalSection>
 
@@ -67,16 +71,7 @@ export default function ConfidentialitePage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="5. Finalités (si collecte ultérieure)">
-        <p>
-          Si AmiFidele introduit une collecte (contact, newsletter, mesure
-          d&apos;audience, etc.), les finalités, bases légales, destinataires et
-          durées de conservation seront précisées ici avant mise en service, et
-          le consentement sera recueilli lorsque la loi l&apos;exige.
-        </p>
-      </LegalSection>
-
-      <LegalSection title="6. Vos droits">
+      <LegalSection title="5. Vos droits">
         <p>
           Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de
           rectification, d&apos;effacement, de limitation, d&apos;opposition et
@@ -90,18 +85,22 @@ export default function ConfidentialitePage() {
           >
             cnil.fr
           </a>
-          ), dès lors qu&apos;un traitement vous concernant existe.
+          ).
         </p>
         <p>
           Pour toute demande :{" "}
           <a className="text-primary hover:underline" href="mailto:contact@amifidele.fr">
             contact@amifidele.fr
-          </a>
+          </a>{" "}
+          ou le{" "}
+          <Link className="text-primary hover:underline" href="/contact">
+            formulaire de contact
+          </Link>
           .
         </p>
       </LegalSection>
 
-      <LegalSection title="7. Cookies">
+      <LegalSection title="6. Cookies">
         <p>
           Pour le détail des cookies et de vos choix, consultez la{" "}
           <Link className="text-primary hover:underline" href="/cookies">

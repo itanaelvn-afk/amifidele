@@ -23,6 +23,13 @@ export function Footer() {
             </p>
             <p className="text-sm text-muted-foreground">
               Contact :{" "}
+              <Link
+                href="/contact"
+                className="hover:text-primary transition-colors"
+              >
+                Formulaire
+              </Link>
+              {" · "}
               <a
                 href="mailto:contact@amifidele.fr"
                 className="hover:text-primary transition-colors"
@@ -59,6 +66,14 @@ export function Footer() {
           <div>
             <h4 className="mb-4">Informations</h4>
             <ul className="space-y-3">
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Contact
+                </Link>
+              </li>
               <li>
                 <Link
                   href="/mentions-legales"
@@ -102,7 +117,7 @@ export function Footer() {
             © {currentYear} AmiFidele. Tous droits réservés.
           </p>
           <p className="text-muted-foreground text-center md:text-right text-sm max-w-xl">
-            V1 : pas de newsletter, pas de formulaire de contact, pas
+            V1 : formulaire de contact optionnel, pas de newsletter, pas
             d&apos;analytics. Voir la{" "}
             <Link
               href="/confidentialite"

@@ -70,8 +70,8 @@ export default function CguPage() {
 
       <LegalSection title="8. Données personnelles">
         <p>
-          En V1, AmiFidele ne collecte pas volontairement de données
-          personnelles des visiteurs. Le détail (et les évolutions futures) est
+          AmiFidele peut collecter des données via le formulaire de contact
+          (nom, e-mail, message) pour répondre à vos demandes. Le détail est
           décrit dans la{" "}
           <Link className="text-primary hover:underline" href="/confidentialite">
             Politique de confidentialité
@@ -89,6 +89,10 @@ export default function CguPage() {
 
       <LegalSection title="10. Contact">
         <p>
+          <Link className="text-primary hover:underline" href="/contact">
+            Formulaire de contact
+          </Link>
+          {" · "}
           <a className="text-primary hover:underline" href="mailto:contact@amifidele.fr">
             contact@amifidele.fr
           </a>

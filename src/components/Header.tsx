@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { NAV_ROOT_CATEGORIES, categoryPath } from "@/lib/category-path";
 
-export type HeaderCurrent = "home" | "produits" | "other";
+export type HeaderCurrent = "home" | "produits" | "contact" | "other";
 
 interface HeaderProps {
   current?: HeaderCurrent;
@@ -49,6 +49,9 @@ export function Header({ current = "other" }: HeaderProps) {
                 <Link href={categoryPath(item.slug)}>{item.label}</Link>
               </Button>
             ))}
+            <Button asChild variant={current === "contact" ? "default" : "ghost"}>
+              <Link href="/contact">Contact</Link>
+            </Button>
           </nav>
 
           <button
@@ -96,6 +99,15 @@ export function Header({ current = "other" }: HeaderProps) {
                   </Link>
                 </Button>
               ))}
+              <Button
+                asChild
+                variant={current === "contact" ? "default" : "ghost"}
+                className="w-full justify-start"
+              >
+                <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>
+                  Contact
+                </Link>
+              </Button>
             </nav>
           </div>
         )}
