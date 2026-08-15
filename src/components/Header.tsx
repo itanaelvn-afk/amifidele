@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { NAV_ROOT_CATEGORIES, categoryPath } from "@/lib/category-path";
 
-export type HeaderCurrent = "home" | "produits" | "contact" | "other";
+export type HeaderCurrent = "home" | "produits" | "contact" | "apropos" | "other";
 
 interface HeaderProps {
   current?: HeaderCurrent;
@@ -49,6 +49,9 @@ export function Header({ current = "other" }: HeaderProps) {
                 <Link href={categoryPath(item.slug)}>{item.label}</Link>
               </Button>
             ))}
+            <Button asChild variant={current === "apropos" ? "default" : "ghost"}>
+              <Link href="/a-propos">À propos</Link>
+            </Button>
             <Button asChild variant={current === "contact" ? "default" : "ghost"}>
               <Link href="/contact">Contact</Link>
             </Button>
@@ -99,6 +102,15 @@ export function Header({ current = "other" }: HeaderProps) {
                   </Link>
                 </Button>
               ))}
+              <Button
+                asChild
+                variant={current === "apropos" ? "default" : "ghost"}
+                className="w-full justify-start"
+              >
+                <Link href="/a-propos" onClick={() => setMobileMenuOpen(false)}>
+                  À propos
+                </Link>
+              </Button>
               <Button
                 asChild
                 variant={current === "contact" ? "default" : "ghost"}
