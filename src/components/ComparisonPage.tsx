@@ -46,9 +46,19 @@ export function ComparisonPage() {
 
   const { products, loading, error, pagination, loadProducts } = useProducts();
 
-  // Init tri depuis l’URL
+  // Init tri + filtre marque depuis l’URL (ex. /produits?brandId=… depuis /marques)
   useEffect(() => {
     setSortValue(parseProductSortValue(searchParams.get("sort")));
+    const brandId = searchParams.get("brandId")?.trim() || undefined;
+    const brandName = searchParams.get("brandName")?.trim() || undefined;
+    setFilters((prev) => {
+      if (prev.brandId === brandId && prev.brandName === brandName) return prev;
+      return {
+        ...prev,
+        brandId,
+        brandName: brandId ? brandName : undefined,
+      };
+    });
   }, [searchParams]);
 
   const syncSortToUrl = useCallback(
@@ -58,6 +68,23 @@ export function ComparisonPage() {
         params.delete("sort");
       } else {
         params.set("sort", next);
+      }
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams]
+  );
+
+  const syncBrandToUrl = useCallback(
+    (brandId?: string, brandName?: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (brandId) {
+        params.set("brandId", brandId);
+        if (brandName) params.set("brandName", brandName);
+        else params.delete("brandName");
+      } else {
+        params.delete("brandId");
+        params.delete("brandName");
       }
       const qs = params.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
@@ -198,6 +225,7 @@ export function ComparisonPage() {
           onFiltersChange={(nextFilters) => {
             setCurrentPage(1);
             setFilters(nextFilters);
+            syncBrandToUrl(nextFilters.brandId, nextFilters.brandName);
           }}
         />
         {/* Results Header */}
