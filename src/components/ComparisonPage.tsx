@@ -20,6 +20,8 @@ import {
   type ProductSortValue,
 } from "@/lib/product-sort";
 import type { DisplayProduct } from "@/lib/types";
+import { fetchSimilarProducts } from "@/lib/similar-products";
+import { SimilarProductsSection } from "@/components/SimilarProductsSection";
 
 const SEARCH_DEBOUNCE_MS = 350;
 const MAX_COMPARISON_PRODUCTS = 3;
@@ -34,6 +36,7 @@ export function ComparisonPage() {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   /** Produits choisis (objets complets) — survivent au changement de page / filtre. */
   const [selectedProducts, setSelectedProducts] = useState<DisplayProduct[]>([]);
+  const [suggestions, setSuggestions] = useState<DisplayProduct[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortValue, setSortValue] = useState<ProductSortValue>(() =>
@@ -82,6 +85,27 @@ export function ComparisonPage() {
     void loadProducts(currentPage, limit, filtersToApply);
   }, [currentPage, filters, debouncedSearch, sortValue, loadProducts]);
 
+  // Suggestions pour compléter la comparaison (1 ou 2 produits déjà choisis)
+  useEffect(() => {
+    if (selectedProducts.length === 0 || selectedProducts.length >= MAX_COMPARISON_PRODUCTS) {
+      setSuggestions([]);
+      return;
+    }
+
+    let cancelled = false;
+    const seed = selectedProducts[0];
+    void fetchSimilarProducts(seed, {
+      limit: 4,
+      excludeIds: selectedProducts.map((p) => p.id),
+    }).then((list) => {
+      if (!cancelled) setSuggestions(list);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedProducts]);
+
   const handleSortChange = (next: ProductSortValue) => {
     setCurrentPage(1);
     setSortValue(next);
@@ -96,7 +120,9 @@ export function ComparisonPage() {
       if (prev.length >= MAX_COMPARISON_PRODUCTS) {
         return prev;
       }
-      const product = products.find((p) => p.id === id);
+      const fromListing = products.find((p) => p.id === id);
+      const fromSuggestions = suggestions.find((p) => p.id === id);
+      const product = fromListing ?? fromSuggestions;
       if (!product) {
         return prev;
       }
@@ -111,6 +137,7 @@ export function ComparisonPage() {
   const isProductSelected = (id: string) =>
     selectedProducts.some((p) => p.id === id);
 
+  const selectedIds = selectedProducts.map((p) => p.id);
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
@@ -364,6 +391,18 @@ export function ComparisonPage() {
             </div>
           </Card>
         )}
+
+        {selectedProducts.length > 0 &&
+          selectedProducts.length < MAX_COMPARISON_PRODUCTS && (
+            <SimilarProductsSection
+              products={suggestions}
+              title="Compléter la comparaison"
+              subtitle="Suggestions proches du premier produit sélectionné (même catégorie, prix voisin)."
+              onToggleSelect={toggleProductSelection}
+              selectedIds={selectedIds}
+              className="mt-4 mb-8"
+            />
+          )}
       </main>
 
       {/* Floating Comparison Button */}
