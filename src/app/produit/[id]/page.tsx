@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { fetchProductById } from "@/lib/api";
 import { mapApiProductToDisplayProduct } from "@/lib/utils/api-utils";
+import { fetchSimilarProducts } from "@/lib/similar-products";
 import { SiteChrome } from "@/components/SiteChrome";
 import { ProductDetailView } from "@/components/ProductDetailView";
 import { parseProductDescription } from "@/lib/format-description";
@@ -98,6 +99,8 @@ export default async function ProduitPage({
       ? parseProductDescription(display.description)
       : [];
 
+  const similarProducts = await fetchSimilarProducts(display);
+
   return (
     <SiteChrome current="other">
       <ProductDetailView
@@ -106,6 +109,7 @@ export default async function ProduitPage({
         inStock={raw.inStock}
         descriptionBlocks={descriptionBlocks}
         descriptionHtml={descriptionHtml}
+        similarProducts={similarProducts}
       />
     </SiteChrome>
   );

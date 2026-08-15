@@ -10,6 +10,7 @@ import type { DescriptionBlock } from "@/lib/format-description";
 import { formatDeliveryLabel, truncate } from "@/lib/product-path";
 import { categorySegmentHref } from "@/lib/category-breadcrumb";
 import { ProductDescription } from "@/components/ProductDescription";
+import { SimilarProductsSection } from "@/components/SimilarProductsSection";
 
 function formatPrice(amount: number, currency?: string): string {
   const suffix = currency && currency !== "EUR" ? ` ${currency}` : "€";
@@ -22,12 +23,14 @@ export function ProductDetailView({
   inStock,
   descriptionBlocks,
   descriptionHtml,
+  similarProducts = [],
 }: {
   product: DisplayProduct;
   extraImages?: string[];
   inStock?: boolean;
   descriptionBlocks?: DescriptionBlock[];
   descriptionHtml?: string;
+  similarProducts?: DisplayProduct[];
 }) {
   const gallery = [product.image, ...extraImages].filter(
     (url, index, all) => url && url !== "/images/placeholder.jpg" && all.indexOf(url) === index
@@ -173,6 +176,8 @@ export function ProductDetailView({
           />
         </section>
       )}
+
+      <SimilarProductsSection products={similarProducts} />
     </main>
   );
 }
