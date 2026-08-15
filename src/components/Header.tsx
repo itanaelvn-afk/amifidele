@@ -6,7 +6,13 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { NAV_ROOT_CATEGORIES, categoryPath } from "@/lib/category-path";
 
-export type HeaderCurrent = "home" | "produits" | "contact" | "apropos" | "other";
+export type HeaderCurrent =
+  | "home"
+  | "produits"
+  | "marques"
+  | "contact"
+  | "apropos"
+  | "other";
 
 interface HeaderProps {
   current?: HeaderCurrent;
@@ -37,12 +43,15 @@ export function Header({ current = "other" }: HeaderProps) {
             </div>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-4">
+          <nav className="hidden lg:flex items-center gap-3">
             <Button asChild variant={current === "home" ? "default" : "ghost"}>
               <Link href="/">Accueil</Link>
             </Button>
             <Button asChild variant={current === "produits" ? "default" : "ghost"}>
               <Link href="/produits">Produits</Link>
+            </Button>
+            <Button asChild variant={current === "marques" ? "default" : "ghost"}>
+              <Link href="/marques">Marques</Link>
             </Button>
             {NAV_ROOT_CATEGORIES.map((item) => (
               <Button key={item.slug} asChild variant="ghost">
@@ -58,7 +67,7 @@ export function Header({ current = "other" }: HeaderProps) {
           </nav>
 
           <button
-            className="md:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+            className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Menu"
           >
@@ -67,7 +76,7 @@ export function Header({ current = "other" }: HeaderProps) {
         </div>
 
         {mobileMenuOpen && (
-          <div className="md:hidden mt-4 pt-4 border-t border-border">
+          <div className="lg:hidden mt-4 pt-4 border-t border-border">
             <nav className="flex flex-col gap-2">
               <Button
                 asChild
@@ -85,6 +94,15 @@ export function Header({ current = "other" }: HeaderProps) {
               >
                 <Link href="/produits" onClick={() => setMobileMenuOpen(false)}>
                   Produits
+                </Link>
+              </Button>
+              <Button
+                asChild
+                variant={current === "marques" ? "default" : "ghost"}
+                className="w-full justify-start"
+              >
+                <Link href="/marques" onClick={() => setMobileMenuOpen(false)}>
+                  Marques
                 </Link>
               </Button>
               {NAV_ROOT_CATEGORIES.map((item) => (

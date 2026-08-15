@@ -63,10 +63,22 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
   const hasActiveFilters = (() => {
     // Vérifier chaque type de filtre individuellement
     if (filters.categoryName || filters.categoryId) return true;
+    if (filters.brandId || filters.brandName) return true;
     if (filters.merchantId) return true;
     if (filters.minPrice !== undefined || filters.maxPrice !== undefined) return true;
     if (filters.search) return true;
     return false;
+  })();
+
+  /** Compte les filtres « métier » (brandId + brandName = 1, min/max prix = 1). */
+  const activeFilterCount = (() => {
+    let n = 0;
+    if (filters.categoryName || filters.categoryId) n += 1;
+    if (filters.brandId || filters.brandName) n += 1;
+    if (filters.merchantId) n += 1;
+    if (filters.minPrice !== undefined || filters.maxPrice !== undefined) n += 1;
+    if (filters.search) n += 1;
+    return n;
   })();
 
   const rootCategories = categories
@@ -95,7 +107,7 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
           <h3 className="text-lg font-semibold">Filtres</h3>
           {hasActiveFilters && (
             <Badge variant="default" className="ml-2">
-              {Object.values(filters).filter(v => v !== undefined && v !== "" && v !== false).length}
+              {activeFilterCount}
             </Badge>
           )}
         </div>
@@ -149,6 +161,23 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
                 <button
                   onClick={() => handleFilterChange("merchantId", undefined)}
                   className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </Badge>
+            )}
+            {(filters.brandId || filters.brandName) && (
+              <Badge variant="default" className="gap-2">
+                Marque: {filters.brandName || filters.brandId}
+                <button
+                  onClick={() => {
+                    const next = { ...filters };
+                    delete next.brandId;
+                    delete next.brandName;
+                    onFiltersChange(next);
+                  }}
+                  className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
+                  aria-label="Retirer le filtre marque"
                 >
                   <X className="w-3 h-3" />
                 </button>

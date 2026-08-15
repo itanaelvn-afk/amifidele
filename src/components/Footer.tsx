@@ -50,6 +50,14 @@ export function Footer() {
                   Tous les produits
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/marques"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Marques
+                </Link>
+              </li>
               {NAV_ROOT_CATEGORIES.map((item) => (
                 <li key={item.slug}>
                   <Link
