@@ -6,6 +6,7 @@ import { SiteChrome } from "@/components/SiteChrome";
 import { CategoryProductGrid } from "@/components/CategoryProductGrid";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  NAV_ROOT_CATEGORIES,
   RESERVED_PATH_ROOTS,
   categoryPath,
   slugFromSegments,
@@ -14,16 +15,25 @@ import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo";
 
 type RouteParams = { category: string[] };
 
+/** Toujours autoriser /chat, /chien… même si absents du build (API down au deploy). */
+export const dynamicParams = true;
+/** Évite un 404 figé si generateStaticParams était vide au build. */
+export const revalidate = 300;
+
 function findCategory(categories: Category[], slug: string): Category | undefined {
   return categories.find((c) => (c.slug || c.id) === slug);
 }
 
 export async function generateStaticParams() {
   const categories = await fetchCategories();
-  return categories
+  const fromApi = categories
     .map((c) => c.slug || c.id || "")
-    .filter((slug) => slug && !RESERVED_PATH_ROOTS.has(slug.split("/")[0]))
-    .map((slug) => ({ category: slug.split("/") }));
+    .filter((slug) => slug && !RESERVED_PATH_ROOTS.has(slug.split("/")[0]));
+
+  const fallback = NAV_ROOT_CATEGORIES.map((c) => c.slug);
+  const slugs = [...new Set([...fallback, ...fromApi])];
+
+  return slugs.map((slug) => ({ category: slug.split("/") }));
 }
 
 export async function generateMetadata({

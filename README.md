@@ -165,6 +165,9 @@ npm run build
 npm start
 ```
 
+Déploiement **Vercel + domaine** `amifidele.fr` : voir [`docs/DEPLOY_VERCEL.md`](docs/DEPLOY_VERCEL.md).  
+API NAS : repo `api-amifidele` → `docs/NAS_DEPLOY.md`.
+
 ## 🔧 Technologies utilisées
 
 - **Next.js 16** - Framework React
