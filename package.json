@@ -10,7 +10,9 @@
     "dev:all:script": "node scripts/dev-all.js",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "smoke:domaine": "node scripts/smoke-domaine.mjs",
+    "wait:dns": "node scripts/wait-dns.mjs"
   },
   "dependencies": {
     "@icons-pack/react-simple-icons": "^13.11.1",

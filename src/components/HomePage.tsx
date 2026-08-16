@@ -56,7 +56,12 @@ export function HomePage() {
   const featuredProducts = products.slice(0, 3);
   const rootCategories = categories.filter((c) => {
     const slug = c.slug || c.id;
-    return Boolean(slug) && !c.parentId && !HIDDEN_ROOT_CATEGORY_SLUGS.has(slug);
+    return (
+      typeof slug === "string" &&
+      slug.length > 0 &&
+      !c.parentId &&
+      !HIDDEN_ROOT_CATEGORY_SLUGS.has(slug)
+    );
   });
   const childrenOf = (parentSlug: string) =>
     categories.filter((c) => c.parentId === parentSlug);
