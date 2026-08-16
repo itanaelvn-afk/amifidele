@@ -27,12 +27,8 @@ export function HomePage() {
   }, []);
 
   const retailers = [
-    { name: "Zooplus", description: "Leader européen", color: "bg-orange-100" },
-    { name: "Amazon", description: "Livraison rapide", color: "bg-yellow-100" },
-    { name: "Cdiscount", description: "Prix bas", color: "bg-blue-100" },
-    { name: "La Ferme des Animaux", description: "Spécialiste", color: "bg-green-100" },
-    { name: "Wanimo", description: "Large choix", color: "bg-purple-100" },
-    { name: "Animalis", description: "Expert animal", color: "bg-pink-100" },
+    { name: "Maxi Zoo", description: "Animalerie en ligne", color: "bg-orange-100" },
+    { name: "Vivara", description: "Nature & jardin", color: "bg-green-100" },
   ];
 
   const features = [
@@ -263,7 +259,7 @@ export function HomePage() {
               Comparez les prix chez les meilleurs marchands en ligne
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 gap-6 max-w-md mx-auto">
             {retailers.map((retailer) => (
               <Card 
                 key={retailer.name} 
@@ -280,11 +276,6 @@ export function HomePage() {
                 </CardContent>
               </Card>
             ))}
-          </div>
-          <div className="text-center mt-8">
-            <p className="text-muted-foreground">
-              Et bien d&apos;autres revendeurs pour vous offrir les meilleurs prix
-            </p>
           </div>
         </div>
       </section>
