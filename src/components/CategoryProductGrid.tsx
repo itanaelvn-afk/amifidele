@@ -13,10 +13,6 @@ export function CategoryProductGrid({ categoryId }: { categoryId: string }) {
   const { products, loading, error, pagination, loadProducts } = useProducts();
 
   useEffect(() => {
-    setPage(1);
-  }, [categoryId]);
-
-  useEffect(() => {
     void loadProducts(page, limit, { categoryId });
   }, [page, limit, categoryId, loadProducts]);
 

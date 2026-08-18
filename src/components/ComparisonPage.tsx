@@ -39,27 +39,17 @@ export function ComparisonPage() {
   const [suggestions, setSuggestions] = useState<DisplayProduct[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [sortValue, setSortValue] = useState<ProductSortValue>(() =>
-    parseProductSortValue(searchParams.get("sort"))
-  );
+  const sortValue = parseProductSortValue(searchParams.get("sort"));
+  const urlBrandId = searchParams.get("brandId")?.trim() || undefined;
+  const urlBrandName = searchParams.get("brandName")?.trim() || undefined;
+  const filtersWithUrl: ProductFilters = {
+    ...filters,
+    brandId: urlBrandId,
+    brandName: urlBrandId ? urlBrandName : undefined,
+  };
   const limit = 20;
 
   const { products, loading, error, pagination, loadProducts } = useProducts();
-
-  // Init tri + filtre marque depuis l’URL (ex. /produits?brandId=… depuis /marques)
-  useEffect(() => {
-    setSortValue(parseProductSortValue(searchParams.get("sort")));
-    const brandId = searchParams.get("brandId")?.trim() || undefined;
-    const brandName = searchParams.get("brandName")?.trim() || undefined;
-    setFilters((prev) => {
-      if (prev.brandId === brandId && prev.brandName === brandName) return prev;
-      return {
-        ...prev,
-        brandId,
-        brandName: brandId ? brandName : undefined,
-      };
-    });
-  }, [searchParams]);
 
   const syncSortToUrl = useCallback(
     (next: ProductSortValue) => {
@@ -102,7 +92,11 @@ export function ComparisonPage() {
 
   // Charger les produits selon les filtres + recherche stabilisée + tri
   useEffect(() => {
-    const filtersToApply: ProductFilters = { ...filters };
+    const filtersToApply: ProductFilters = {
+      ...filters,
+      brandId: urlBrandId,
+      brandName: urlBrandId ? urlBrandName : undefined,
+    };
     if (debouncedSearch) {
       filtersToApply.search = debouncedSearch;
     }
@@ -110,12 +104,19 @@ export function ComparisonPage() {
     filtersToApply.sort = sort;
     filtersToApply.order = order;
     void loadProducts(currentPage, limit, filtersToApply);
-  }, [currentPage, filters, debouncedSearch, sortValue, loadProducts]);
+  }, [
+    currentPage,
+    filters,
+    urlBrandId,
+    urlBrandName,
+    debouncedSearch,
+    sortValue,
+    loadProducts,
+  ]);
 
   // Suggestions pour compléter la comparaison (1 ou 2 produits déjà choisis)
   useEffect(() => {
     if (selectedProducts.length === 0 || selectedProducts.length >= MAX_COMPARISON_PRODUCTS) {
-      setSuggestions([]);
       return;
     }
 
@@ -135,7 +136,6 @@ export function ComparisonPage() {
 
   const handleSortChange = (next: ProductSortValue) => {
     setCurrentPage(1);
-    setSortValue(next);
     syncSortToUrl(next);
   };
 
@@ -221,7 +221,7 @@ export function ComparisonPage() {
       <main className="container mx-auto px-4 py-8">
         {/* Filtres */}
         <ProductFiltersComponent
-          filters={filters}
+          filters={filtersWithUrl}
           onFiltersChange={(nextFilters) => {
             setCurrentPage(1);
             setFilters(nextFilters);
