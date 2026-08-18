@@ -143,7 +143,10 @@ export default async function CategoryPage({
           </section>
         )}
 
-        <CategoryProductGrid categoryId={cat.slug || cat.id || slug} />
+        <CategoryProductGrid
+          key={cat.slug || cat.id || slug}
+          categoryId={cat.slug || cat.id || slug}
+        />
       </main>
     </SiteChrome>
   );

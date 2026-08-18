@@ -83,7 +83,7 @@ export async function fetchSimilarProducts(
   try {
     const band = priceBand(seed.price);
     let candidates = await loadByCategory(seed.categoryId, limit, band);
-    let similar = dedupeExclude(candidates, excludeIds, limit);
+    const similar = dedupeExclude(candidates, excludeIds, limit);
 
     if (similar.length < Math.min(4, limit)) {
       const root = rootCategoryId(seed);

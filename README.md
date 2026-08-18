@@ -52,7 +52,16 @@ FORMSPREE_FORM_ID=xxxxxxxx
 
 > ⚠️ **Important** : ne plus mettre la clé dans une variable `NEXT_PUBLIC_*`. Le navigateur passe par `/api/bff/*` (voir `docs/API_AUTHENTICATION.md`).
 
-### Formulaire de contact (Formspree)
+## Tests & CI
+
+```bash
+npm run lint        # ESLint
+npm run typecheck   # TypeScript (sans générer de fichiers)
+```
+
+Pas de `next build` en CI : le build SSG appelle l’API (catégories, sitemap). Vercel le fait déjà au déploiement. La CI GitHub (`.github/workflows/ci.yml`) lance lint + typecheck sur push/PR vers `main`.
+
+## Formulaire de contact (Formspree)
 
 - Page : `/contact` → composant `ContactForm` → `POST /api/contact`
 - Le serveur relaie vers Formspree avec `FORMSPREE_FORM_ID` (jamais exposé au client)

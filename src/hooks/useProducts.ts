@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { fetchProducts, fetchProductsByCategory, searchProducts, ProductFilters } from '@/lib/api';
 import { mapApiProductsToDisplayProducts } from '@/lib/utils/api-utils';
 import { DisplayProduct } from '@/lib/types';

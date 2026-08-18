@@ -9,6 +9,7 @@
 import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -185,9 +186,9 @@ export function ContactForm() {
       <p className="text-xs text-muted-foreground">
         En envoyant ce formulaire, vous acceptez que vos données (nom, e-mail,
         message) soient utilisées pour traiter votre demande. Voir la{" "}
-        <a href="/confidentialite" className="underline hover:text-primary">
+        <Link href="/confidentialite" className="underline hover:text-primary">
           politique de confidentialité
-        </a>
+        </Link>
         .
       </p>
 
