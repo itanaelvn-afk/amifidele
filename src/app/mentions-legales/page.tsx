@@ -1,4 +1,5 @@
 import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
+import { LEGAL_HOSTING, LEGAL_PUBLISHER } from "@/lib/legal-publisher";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -13,28 +14,38 @@ export default function MentionsLegalesPage() {
     <LegalPageShell title="Mentions légales">
       <LegalSection title="1. Éditeur du site">
         <p>
-          Le site <strong>AmiFidele</strong> (ci-après « le Site ») est édité par :
+          Le site <strong>AmiFidele</strong> (ci-après « le Site ») est édité par{" "}
+          <strong>{LEGAL_PUBLISHER.fullName}</strong>, personne physique.
         </p>
         <ul className="list-disc pl-5 space-y-1">
-          <li>Raison sociale / nom : <em>[À compléter]</em></li>
-          <li>Forme juridique : <em>[À compléter]</em></li>
-          <li>Capital social : <em>[À compléter]</em></li>
-          <li>Siège social : <em>[À compléter — adresse]</em></li>
-          <li>RCS / SIREN : <em>[À compléter]</em></li>
-          <li>N° TVA intracommunautaire : <em>[À compléter si applicable]</em></li>
           <li>
             Contact :{" "}
-            <a className="text-primary hover:underline" href="mailto:contact@amifidele.fr">
-              contact@amifidele.fr
+            <a
+              className="text-primary hover:underline"
+              href={`mailto:${LEGAL_PUBLISHER.contactEmail}`}
+            >
+              {LEGAL_PUBLISHER.contactEmail}
             </a>
           </li>
-          <li>Directeur de la publication : <em>[À compléter]</em></li>
+          <li>
+            Directeur de la publication : {LEGAL_PUBLISHER.directorOfPublication}
+          </li>
         </ul>
       </LegalSection>
 
       <LegalSection title="2. Hébergement">
         <p>
-          Le Site est hébergé par : <em>[À compléter — prestataire, adresse, contact]</em>.
+          Le Site est hébergé par <strong>{LEGAL_HOSTING.name}</strong>,{" "}
+          {LEGAL_HOSTING.address} (
+          <a
+            className="text-primary hover:underline"
+            href={LEGAL_HOSTING.website}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            vercel.com
+          </a>
+          ).
         </p>
       </LegalSection>
 
@@ -73,8 +84,11 @@ export default function MentionsLegalesPage() {
       <LegalSection title="6. Contact">
         <p>
           Pour toute question relative aux présentes mentions :{" "}
-          <a className="text-primary hover:underline" href="mailto:contact@amifidele.fr">
-            contact@amifidele.fr
+          <a
+            className="text-primary hover:underline"
+            href={`mailto:${LEGAL_PUBLISHER.contactEmail}`}
+          >
+            {LEGAL_PUBLISHER.contactEmail}
           </a>
           .
         </p>

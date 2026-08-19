@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { PawPrint } from "lucide-react";
 import { Footer } from "@/components/Footer";
+import { LEGAL_LAST_UPDATED } from "@/lib/legal-publisher";
 
 export function LegalPageShell({
   title,
@@ -57,8 +58,7 @@ export function LegalPageShell({
       <main className="flex-1 container mx-auto px-4 py-10 max-w-3xl">
         <h1 className="text-3xl font-bold mb-2">{title}</h1>
         <p className="text-muted-foreground text-sm mb-8">
-          Dernière mise à jour : 7 août 2026 — version V1 (brouillon de démarrage ;
-          identité éditeur à compléter avant mise en production).
+          Dernière mise à jour : {LEGAL_LAST_UPDATED} — version V1.
         </p>
         <div className="legal-prose space-y-6 text-foreground/90 leading-relaxed">
           {children}
