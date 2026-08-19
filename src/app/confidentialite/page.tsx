@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
+import { LEGAL_PUBLISHER } from "@/lib/legal-publisher";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
@@ -27,10 +28,13 @@ export default function ConfidentialitePage() {
 
       <LegalSection title="2. Responsable du traitement">
         <p>
-          Le responsable du traitement est l&apos;éditeur du Site AmiFidele :{" "}
-          <em>[À compléter — identité / coordonnées]</em>, contact{" "}
-          <a className="text-primary hover:underline" href="mailto:contact@amifidele.fr">
-            contact@amifidele.fr
+          Le responsable du traitement est l&apos;éditeur du Site AmiFidele,{" "}
+          <strong>{LEGAL_PUBLISHER.fullName}</strong>, contact{" "}
+          <a
+            className="text-primary hover:underline"
+            href={`mailto:${LEGAL_PUBLISHER.contactEmail}`}
+          >
+            {LEGAL_PUBLISHER.contactEmail}
           </a>
           .
         </p>
