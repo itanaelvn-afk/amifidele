@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AppProviders } from "@/components/AppProviders";
 import { JsonLd } from "@/components/JsonLd";
 import { websiteJsonLd } from "@/lib/json-ld";
 import { getSiteUrl } from "@/lib/site-url";
@@ -39,7 +40,7 @@ export default function RootLayout({
     <html lang="fr">
       <body className="antialiased">
         <JsonLd data={websiteJsonLd()} />
-        {children}
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

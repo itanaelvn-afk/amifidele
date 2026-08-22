@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/consent/CookieSettingsButton";
 import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
 import { pageMetadata } from "@/lib/seo";
 
@@ -16,53 +17,65 @@ export default function CookiesPage() {
         <p>
           Un cookie est un petit fichier déposé sur votre terminal lors de la
           visite d&apos;un site. Il permet de mémoriser des informations
-          relatives à votre navigation.
+          relatives à votre navigation. AmiFidele mémorise aussi vos choix de
+          consentement dans le{" "}
+          <strong>stockage local</strong> du navigateur (localStorage).
         </p>
       </LegalSection>
 
-      <LegalSection title="2. Situation actuelle (V1)">
+      <LegalSection title="2. Catégories utilisées">
+        <ul className="list-disc pl-5 space-y-2">
+          <li>
+            <strong>Nécessaires</strong> — mémorisation de vos préférences de
+            consentement et fonctionnement technique du Site. Toujours actifs.
+          </li>
+          <li>
+            <strong>Mesure d&apos;audience</strong> — statistiques de visite
+            (ex. Plausible, GA4).{" "}
+            <em>Aucun script n&apos;est chargé tant que vous n&apos;avez pas
+            consenti et qu&apos;un outil n&apos;est pas configuré.</em>
+          </li>
+          <li>
+            <strong>Marketing</strong> — publicité / widgets display.{" "}
+            <em>Aucun script n&apos;est chargé pour l&apos;instant.</em>
+          </li>
+        </ul>
+      </LegalSection>
+
+      <LegalSection title="3. Situation actuelle (V1)">
         <p>
-          En l&apos;état, AmiFidele{" "}
+          En V1, AmiFidele{" "}
           <strong>
-            ne dépose pas volontairement de cookies analytics ni publicitaires
+            ne dépose pas de cookies analytics ni publicitaires
           </strong>{" "}
-          sur le Site. Aucune bannière de consentement n&apos;est encore
-          déployée, faute de traceurs non essentiels côté AmiFidele.
-        </p>
-        <p>
-          Des cookies techniques strictement nécessaires au fonctionnement
-          (ex. sécurité, préférences essentielles) pourront être utilisés si le
-          framework ou l&apos;hébergeur le requiert.
+          de son propre chef. La bannière de consentement est en place pour
+          enregistrer vos choix et permettre d&apos;activer ces catégories plus
+          tard sans recharger de traceurs avant accord.
         </p>
       </LegalSection>
 
-      <LegalSection title="3. Affiliation (sites tiers)">
+      <LegalSection title="4. Affiliation (sites tiers)">
         <p>
           Lors d&apos;un clic vers un marchand, le réseau d&apos;affiliation
           (ex. Awin) et/ou le marchand peuvent déposer leurs propres cookies
           pour attribuer une commission. Ces dépôts relèvent de leurs sites /
-          politiques, pas d&apos;un bandeau cookie AmiFidele.
+          politiques, hors du bandeau AmiFidele.
         </p>
       </LegalSection>
 
-      <LegalSection title="4. Évolutions prévues">
-        <p>
-          Si des cookies de mesure d&apos;audience ou marketing sont ajoutés
-          plus tard, cette page sera mise à jour (liste des cookies, finalités,
-          durées) et un mécanisme de consentement sera mis en place lorsque la
-          réglementation l&apos;exige.
+      <LegalSection title="5. Gérer vos choix">
+        <p className="mb-4">
+          Vous pouvez modifier vos préférences à tout moment :
         </p>
-      </LegalSection>
-
-      <LegalSection title="5. Gestion de vos choix">
-        <p>Vous pouvez à tout moment :</p>
-        <ul className="list-disc pl-5 space-y-1">
+        <CookieSettingsButton className="inline-flex items-center rounded-md border border-border bg-background px-4 py-2 text-sm font-medium hover:bg-muted transition-colors" />
+        <ul className="list-disc pl-5 space-y-1 mt-4">
           <li>
-            paramétrer votre navigateur pour refuser ou supprimer les cookies ;
+            via le bouton ci-dessus ou le lien « Gérer mes cookies » du pied de
+            page ;
           </li>
           <li>
-            utiliser, lorsqu&apos;elle sera disponible, la bannière / le panneau
-            de préférences cookies du Site.
+            en paramétrant votre navigateur pour refuser ou supprimer les
+            cookies / le stockage local.
           </li>
         </ul>
       </LegalSection>
