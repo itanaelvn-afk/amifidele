@@ -12,6 +12,7 @@
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
+    "audit:lighthouse": "node scripts/lighthouse-audit.mjs",
     "smoke:domaine": "node scripts/smoke-domaine.mjs",
     "wait:dns": "node scripts/wait-dns.mjs"
   },

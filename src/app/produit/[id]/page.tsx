@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/JsonLd";
 import { fetchProductById } from "@/lib/api";
+import { breadcrumbJsonLd, productJsonLd } from "@/lib/json-ld";
 import { mapApiProductToDisplayProduct } from "@/lib/utils/api-utils";
 import { fetchSimilarProducts } from "@/lib/similar-products";
 import { SiteChrome } from "@/components/SiteChrome";
@@ -103,6 +105,12 @@ export default async function ProduitPage({
 
   return (
     <SiteChrome current="other">
+      <JsonLd
+        data={[
+          productJsonLd(display),
+          breadcrumbJsonLd(display.categoryTrail ?? [], display.name),
+        ]}
+      />
       <ProductDetailView
         product={display}
         extraImages={extraImages}

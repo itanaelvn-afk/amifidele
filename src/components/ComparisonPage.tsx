@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useId } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PawPrint, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { ComparisonTable } from "@/components/ComparisonTable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { ProductFiltersComponent } from "@/components/ProductFilters";
 import { ProductFilters } from "@/lib/api";
@@ -22,11 +21,14 @@ import {
 import type { DisplayProduct } from "@/lib/types";
 import { fetchSimilarProducts } from "@/lib/similar-products";
 import { SimilarProductsSection } from "@/components/SimilarProductsSection";
+import { ProductGridSkeleton } from "@/components/ProductGridSkeleton";
+import { cn } from "@/components/utils";
 
 const SEARCH_DEBOUNCE_MS = 350;
 const MAX_COMPARISON_PRODUCTS = 3;
 
 export function ComparisonPage() {
+  const sortSelectId = useId();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -165,25 +167,12 @@ export function ComparisonPage() {
     selectedProducts.some((p) => p.id === id);
 
   const selectedIds = selectedProducts.map((p) => p.id);
+  const isInitialLoad = loading && products.length === 0;
+  const totalLabel =
+    loading && pagination.total === 0 ? "…" : pagination.total.toLocaleString("fr-FR");
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/10 via-accent/20 to-secondary/10 border-b border-border">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-3xl">
-            <Badge className="bg-primary/20 text-primary border-primary/30 mb-4">
-              🔍 Catalogue Complet
-            </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Trouvez le produit parfait
-            </h1>
-            <p className="text-muted-foreground text-lg mb-8">
-              Explorez notre catalogue complet et comparez les meilleurs produits pour vos animaux de compagnie
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Search and Filters */}
       <div className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
         <div className="container mx-auto px-4 py-6">
@@ -191,7 +180,7 @@ export function ComparisonPage() {
           <div className="relative mb-6">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
             <Input
-              type="text"
+              type="search"
               placeholder="Rechercher un produit, une marque, une catégorie..."
               value={searchQuery}
               onChange={(e) => {
@@ -199,6 +188,7 @@ export function ComparisonPage() {
                 setSearchQuery(e.target.value);
               }}
               className="pl-12 pr-10 h-12 text-base bg-background border-2 focus:border-primary transition-colors"
+              aria-label="Rechercher un produit, une marque ou une catégorie"
             />
             {searchQuery && (
               <button
@@ -233,27 +223,36 @@ export function ComparisonPage() {
           <div>
             <h2 className="text-2xl font-bold mb-2">Nos produits</h2>
             <div className="flex items-center gap-2 text-muted-foreground">
-              <span className="font-semibold text-foreground">{pagination.total}</span>
-              <span>produit{pagination.total > 1 ? 's' : ''} disponible{pagination.total > 1 ? 's' : ''}</span>
-              {pagination.totalPages > 1 && (
+              <span className="font-semibold text-foreground tabular-nums">{totalLabel}</span>
+              {!isInitialLoad && (
                 <>
-                  <span>•</span>
-                  <span>Page {pagination.page} sur {pagination.totalPages}</span>
+                  <span>
+                    produit{pagination.total > 1 ? "s" : ""} disponible
+                    {pagination.total > 1 ? "s" : ""}
+                  </span>
+                  {pagination.totalPages > 1 && (
+                    <>
+                      <span>•</span>
+                      <span>
+                        Page {pagination.page} sur {pagination.totalPages}
+                      </span>
+                    </>
+                  )}
                 </>
               )}
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <label className="flex items-center gap-2 text-sm text-muted-foreground">
+            <label htmlFor={sortSelectId} className="flex items-center gap-2 text-sm text-muted-foreground">
               <span className="whitespace-nowrap">Trier par</span>
               <select
+                id={sortSelectId}
                 value={sortValue}
                 onChange={(e) =>
                   handleSortChange(parseProductSortValue(e.target.value))
                 }
                 className="h-10 min-w-[11rem] rounded-md border border-border bg-background px-3 text-sm text-foreground"
-                aria-label="Trier les produits"
               >
                 {PRODUCT_SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -286,15 +285,7 @@ export function ComparisonPage() {
           </div>
         </div>
 
-        {loading && (
-          <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-6">
-              <PawPrint className="w-10 h-10 text-primary animate-pulse" />
-            </div>
-            <h3 className="text-xl font-semibold mb-2">Chargement des produits...</h3>
-            <p className="text-muted-foreground">Veuillez patienter</p>
-          </div>
-        )}
+        {isInitialLoad && <ProductGridSkeleton count={8} />}
 
         {error && (
           <Card className="bg-destructive/10 border-destructive/20 p-6 mb-8">
@@ -303,7 +294,7 @@ export function ComparisonPage() {
                 <X className="w-5 h-5 text-destructive" />
               </div>
               <div className="flex-1">
-                <h3 className="font-semibold text-destructive mb-1">Erreur de chargement</h3>
+                <p className="font-semibold text-destructive mb-1">Erreur de chargement</p>
                 <p className="text-destructive/80 text-sm mb-2">{error}</p>
                 <p className="text-muted-foreground text-sm">
                   Impossible de charger les produits depuis l&apos;API. Veuillez vérifier votre connexion et réessayer.
@@ -313,8 +304,14 @@ export function ComparisonPage() {
           </Card>
         )}
 
-        {!loading && !error && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+        {!isInitialLoad && !error && (
+          <div
+            className={cn(
+              "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8 min-h-[32rem] transition-opacity",
+              loading && "opacity-60 pointer-events-none"
+            )}
+            aria-busy={loading}
+          >
             {products.map((product, index) => (
               <ProductCard
                 key={product.id}
@@ -328,7 +325,7 @@ export function ComparisonPage() {
         )}
 
         {/* Pagination Controls */}
-        {!loading && !error && pagination.totalPages > 1 && (
+        {!isInitialLoad && !error && pagination.totalPages > 1 && (
           <Card className="p-6 mt-12 mb-8">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
               <div className="text-sm text-muted-foreground">
@@ -397,12 +394,12 @@ export function ComparisonPage() {
           </Card>
         )}
 
-        {!loading && !error && products.length === 0 && (
+        {!isInitialLoad && !error && products.length === 0 && (
           <Card className="p-12 text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-muted mb-6">
               <PawPrint className="w-10 h-10 text-muted-foreground" />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Aucun produit trouvé</h3>
+            <p className="text-xl font-semibold mb-2">Aucun produit trouvé</p>
             <p className="text-muted-foreground mb-6">
               Essayez de modifier vos critères de recherche ou de changer de catégorie
             </p>

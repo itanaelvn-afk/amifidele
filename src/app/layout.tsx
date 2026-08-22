@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { JsonLd } from "@/components/JsonLd";
+import { websiteJsonLd } from "@/lib/json-ld";
 import { getSiteUrl } from "@/lib/site-url";
 import {
   DEFAULT_DESCRIPTION,
@@ -35,7 +37,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <JsonLd data={websiteJsonLd()} />
+        {children}
+      </body>
     </html>
   );
 }

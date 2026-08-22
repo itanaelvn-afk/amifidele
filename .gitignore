@@ -37,6 +37,11 @@ yarn-error.log*
 # docs locales (ops / IP — ne pas committer)
 docs/*.local.md
 
+# rapports Lighthouse locaux (scores détaillés, non versionnés)
+/reports/lighthouse/
+.lighthouse-*.json
+/chrome/
+
 # vercel
 .vercel
 
