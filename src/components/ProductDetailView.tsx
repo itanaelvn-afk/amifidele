@@ -65,11 +65,11 @@ export function ProductDetailView({
 
       <div className="grid gap-10 lg:grid-cols-2">
         <div>
-          <div className="rounded-2xl overflow-hidden bg-muted/40 border border-border">
+          <div className="rounded-2xl overflow-hidden bg-muted/40 border border-border aspect-[4/3] min-h-[420px]">
             <ImageWithFallback
               src={mainImage}
               alt={product.name}
-              className="w-full h-[420px] bg-white"
+              className="w-full h-full min-h-[420px] bg-white"
               imageClassName="object-contain"
               sizes="(min-width: 1024px) 50vw, 100vw"
               priority
@@ -77,15 +77,15 @@ export function ProductDetailView({
           </div>
           {thumbs.length > 0 && (
             <div className="mt-4 grid grid-cols-4 gap-3">
-              {thumbs.slice(0, 4).map((src) => (
+              {thumbs.slice(0, 4).map((src, index) => (
                 <div
                   key={src}
                   className="rounded-lg overflow-hidden border border-border bg-white"
                 >
                   <ImageWithFallback
                     src={src}
-                    alt=""
-                    className="w-full h-24"
+                    alt={`${product.name} — vue ${index + 2}`}
+                    className="w-full h-24 aspect-square"
                     imageClassName="object-contain"
                     sizes="120px"
                   />

@@ -23,12 +23,12 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
 
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group">
-      <div className="relative overflow-hidden bg-white">
+      <div className="relative overflow-hidden bg-white aspect-[4/3] min-h-64">
         <Link href={href} className="block">
           <ImageWithFallback
             src={product.image}
             alt={product.name}
-            className="w-full h-64 bg-white"
+            className="w-full h-full min-h-64 bg-white"
             imageClassName="object-contain transition-transform duration-300 group-hover:scale-105"
             sizes={PRODUCT_CARD_IMAGE_SIZES}
             priority={priority}

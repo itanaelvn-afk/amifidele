@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useId } from "react";
 import { X, Filter, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,9 @@ interface ProductFiltersProps {
 }
 
 export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFiltersProps) {
+  const categoryId = useId();
+  const merchantId = useId();
+  const priceId = useId();
   const [merchants, setMerchants] = useState<Advertiser[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,7 +106,7 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Filter className="w-5 h-5 text-muted-foreground" />
-          <h3 className="text-lg font-semibold">Filtres</h3>
+          <span className="text-lg font-semibold">Filtres</span>
           {hasActiveFilters && (
             <Badge variant="default" className="ml-2">
               {activeFilterCount}
@@ -248,15 +251,14 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
       {/* Filtres principaux */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
-          <label className="block text-sm font-medium mb-2">Catégorie</label>
-          {loading ? (
-            <div className="w-full border rounded-md p-2 text-sm text-muted-foreground">
-              Chargement...
-            </div>
-          ) : (
-            <select
-              value={filters.categoryId ? `id:${filters.categoryId}` : filters.categoryName || ""}
-              onChange={(e) => {
+          <label htmlFor={categoryId} className="block text-sm font-medium mb-2">
+            Catégorie
+          </label>
+          <select
+            id={categoryId}
+            disabled={loading}
+            value={filters.categoryId ? `id:${filters.categoryId}` : filters.categoryName || ""}
+            onChange={(e) => {
                 const value = e.target.value;
                 if (value.startsWith("id:")) {
                   handleFilterChange("categoryId", value.replace("id:", ""));
@@ -264,10 +266,11 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
                   handleFilterChange("categoryName", value);
                 }
               }}
-              className="w-full border rounded-md p-2 text-sm bg-background"
-            >
-              <option value="">Toutes les catégories</option>
-              {rootCategories.map((root) => {
+            className="w-full border rounded-md p-2 text-sm bg-background disabled:opacity-60"
+          >
+            <option value="">{loading ? "Chargement…" : "Toutes les catégories"}</option>
+            {!loading &&
+              rootCategories.map((root) => {
                 const children = childrenByParent.get(String(root.id)) || [];
                 if (children.length === 0) {
                   return (
@@ -295,8 +298,8 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
                   </optgroup>
                 );
               })}
-              {/* Orphelins éventuels (sans parent connu) */}
-              {categories
+            {!loading &&
+              categories
                 .filter(
                   (c) =>
                     c.parentId &&
@@ -310,35 +313,36 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
                     {cat.label || cat.name}
                   </option>
                 ))}
-            </select>
-          )}
+          </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Marchand</label>
-          {loading ? (
-            <div className="w-full border rounded-md p-2 text-sm text-muted-foreground">
-              Chargement...
-            </div>
-          ) : (
-            <select
-              value={filters.merchantId || ""}
-              onChange={(e) => handleFilterChange("merchantId", e.target.value)}
-              className="w-full border rounded-md p-2 text-sm bg-background"
-            >
-              <option value="">Tous les marchands</option>
-              {merchants.map((merchant) => (
+          <label htmlFor={merchantId} className="block text-sm font-medium mb-2">
+            Marchand
+          </label>
+          <select
+            id={merchantId}
+            disabled={loading}
+            value={filters.merchantId || ""}
+            onChange={(e) => handleFilterChange("merchantId", e.target.value)}
+            className="w-full border rounded-md p-2 text-sm bg-background disabled:opacity-60"
+          >
+            <option value="">{loading ? "Chargement…" : "Tous les marchands"}</option>
+            {!loading &&
+              merchants.map((merchant) => (
                 <option key={merchant.merchantId} value={merchant.merchantId.toString()}>
                   {merchant.merchantName}
                 </option>
               ))}
-            </select>
-          )}
+          </select>
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Prix</label>
+          <label htmlFor={priceId} className="block text-sm font-medium mb-2">
+            Prix
+          </label>
           <select
+            id={priceId}
             value={
               filters.minPrice !== undefined && filters.maxPrice !== undefined
                 ? `${filters.minPrice}-${filters.maxPrice}`
