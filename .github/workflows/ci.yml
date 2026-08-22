@@ -7,9 +7,14 @@ on:
     branches: [main]
 
 jobs:
-  lint-and-typecheck:
+  lint-typecheck-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
+    env:
+      SITE_URL: https://amifidele.fr
+      API_URL: https://api.amifidele.fr/api
+      # Jeton factice : le build ne doit pas dépendre d’un secret prod
+      API_TOKEN: ci-build-placeholder
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -28,3 +33,6 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      - name: Build
+        run: npm run build

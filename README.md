@@ -57,9 +57,10 @@ FORMSPREE_FORM_ID=xxxxxxxx
 ```bash
 npm run lint        # ESLint
 npm run typecheck   # TypeScript (sans générer de fichiers)
+npm run build       # Build Next (même pipeline que la CI)
 ```
 
-Pas de `next build` en CI : le build SSG appelle l’API (catégories, sitemap). Vercel le fait déjà au déploiement. La CI GitHub (`.github/workflows/ci.yml`) lance lint + typecheck sur push/PR vers `main`.
+Détail : [`docs/CI.md`](docs/CI.md). La CI GitHub (`.github/workflows/ci.yml`) lance **lint + typecheck + build** sur push/PR vers `main`.
 
 ## Formulaire de contact (Formspree)
 
