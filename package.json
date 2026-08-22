@@ -14,6 +14,8 @@
     "typecheck": "tsc --noEmit",
     "audit:lighthouse": "node scripts/lighthouse-audit.mjs",
     "smoke:domaine": "node scripts/smoke-domaine.mjs",
+    "smoke:uptime": "node scripts/smoke-uptime.mjs",
+    "setup:uptime": "node scripts/setup-uptime-monitor.mjs",
     "wait:dns": "node scripts/wait-dns.mjs"
   },
   "dependencies": {
