@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { X, ShoppingCart } from "lucide-react";
 import { DisplayProduct } from "@/lib/types";
 import { productPath, formatDeliveryLabel } from "@/lib/product-path";
+import { trackAffiliateClick } from "@/lib/analytics";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,6 +28,8 @@ export function ComparisonTable({
   onClose,
   onRemoveProduct,
 }: ComparisonTableProps) {
+  const pathname = usePathname();
+
   if (products.length === 0) return null;
 
   // Trouver le meilleur prix pour chaque produit
@@ -166,7 +170,14 @@ export function ComparisonTable({
                     <Button
                       size="lg"
                       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold mt-4"
-                      onClick={() => window.open(product.bestAffiliateLink, '_blank', 'noopener,noreferrer')}
+                      onClick={() => {
+                        trackAffiliateClick({
+                          productId: product.id,
+                          merchantName: product.merchantName,
+                          pagePath: pathname,
+                        });
+                        window.open(product.bestAffiliateLink, "_blank", "noopener,noreferrer");
+                      }}
                     >
                       <ShoppingCart className="w-5 h-5 mr-2" />
                       Acheter maintenant

@@ -63,8 +63,8 @@ function PreferencesPanel({
               <span>
                 <span className="font-semibold block mb-1">Mesure d&apos;audience</span>
                 <span className="text-sm text-muted-foreground">
-                  Statistiques de visite (ex. Plausible / GA4). Aucun script
-                  n&apos;est branché pour l&apos;instant.
+                  Statistiques de visite via Google Analytics 4, chargé
+                  uniquement si vous acceptez cette catégorie.
                 </span>
               </span>
               <input
@@ -156,9 +156,9 @@ export function ConsentBanner() {
                 Cookies et confidentialité
               </p>
               <p className="text-sm text-muted-foreground">
-                Nous utilisons uniquement un stockage local pour mémoriser vos
-                choix. Aucun cookie analytics ou publicitaire n&apos;est chargé
-                sans votre accord.{" "}
+                Nous utilisons un stockage local pour mémoriser vos choix.
+                Google Analytics 4 n&apos;est chargé qu&apos;avec votre accord
+                (catégorie mesure d&apos;audience).{" "}
                 <Link href="/cookies" className="underline hover:text-primary">
                   En savoir plus
                 </Link>

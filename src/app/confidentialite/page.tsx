@@ -13,16 +13,17 @@ export const metadata = pageMetadata({
 export default function ConfidentialitePage() {
   return (
     <LegalPageShell title="Politique de confidentialité">
-      <LegalSection title="1. Périmètre actuel (V1)">
+      <LegalSection title="1. Périmètre actuel">
         <p>
           AmiFidele{" "}
-          <strong>collecte des données personnelles uniquement</strong> lorsque
-          vous utilisez le{" "}
+          <strong>collecte des données personnelles</strong> lorsque vous
+          utilisez le{" "}
           <Link className="text-primary hover:underline" href="/contact">
             formulaire de contact
-          </Link>
-          . Pas de compte utilisateur, pas de newsletter, pas d&apos;outil
-          d&apos;analytics déployé par AmiFidele.
+          </Link>{" "}
+          et, si vous y consentez, via{" "}
+          <strong>Google Analytics 4</strong> (mesure d&apos;audience). Pas de
+          compte utilisateur, pas de newsletter.
         </p>
       </LegalSection>
 
@@ -59,9 +60,28 @@ export default function ConfidentialitePage() {
           horodatage, user-agent) peuvent aussi apparaître chez l&apos;hébergeur.
         </p>
         <p>
+          <strong>Mesure d&apos;audience (Google Analytics 4)</strong> — si vous
+          acceptez la catégorie « Mesure d&apos;audience » : pages consultées,
+          événements de navigation (ex. clic affilié), identifiant client
+          (cookies <code className="text-sm">_ga</code> /{" "}
+          <code className="text-sm">_ga_*</code>), adresse IP anonymisée selon
+          la configuration Google. Finalité : statistiques et amélioration du
+          Site. Base légale : consentement. Durée : jusqu&apos;à environ 13
+          mois pour les cookies analytics. Sous-traitant : Google (voir{" "}
+          <a
+            className="text-primary hover:underline"
+            href="https://policies.google.com/privacy"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            politique Google
+          </a>
+          ). Sans consentement, aucun script analytics n&apos;est chargé.
+        </p>
+        <p>
           <strong>Non traités</strong> : newsletter, profils utilisateurs,
-          cookies analytics ou publicitaires déposés par AmiFidele. Les achats
-          et paiements se font chez les marchands partenaires.
+          cookies publicitaires déposés par AmiFidele. Les achats et paiements
+          se font chez les marchands partenaires.
         </p>
       </LegalSection>
 

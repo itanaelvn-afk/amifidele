@@ -9,7 +9,7 @@ Détail API : repo [`api-amifidele`](https://github.com/itanaelvn-afk/api-amifid
 |---------|------|
 | Site prod Vercel | OK — https://amifidele.vercel.app |
 | Domaines Vercel attachés | `amifidele.fr`, `www.amifidele.fr` |
-| Env Production | `SITE_URL`, `API_URL`, `API_TOKEN`, `FORMSPREE_FORM_ID` |
+| Env Production | `SITE_URL`, `API_URL`, `API_TOKEN`, `FORMSPREE_FORM_ID`, `NEXT_PUBLIC_GA_MEASUREMENT_ID` |
 | API NAS HTTPS | OK — `https://api.amifidele.fr/health` |
 | DNS LWS `@` / `www` → `76.76.21.21` | En place côté zone ; **apex `https://amifidele.fr` pas encore fiable / accessible** (cache DNS, parking résiduel, ou vérif Vercel à finaliser) |
 | Smoke domaine complet | **Bloqué** tant que l’apex n’affiche pas le site |
@@ -41,6 +41,7 @@ Filtres listing : un `200` BFF avec `products: []` peut être **légitime** (feu
 | `API_URL` | `https://api.amifidele.fr/api` |
 | `API_TOKEN` | même secret que `API_TOKEN_AUTH` (NAS) |
 | `FORMSPREE_FORM_ID` | optionnel |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Measurement ID GA4 (`G-…`) — prod uniquement ; script chargé après consentement analytics |
 
 Ne jamais préfixer la clé API avec `NEXT_PUBLIC_`.
 

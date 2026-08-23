@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { ExternalLink, ShoppingCart } from "lucide-react";
 import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +12,7 @@ import { formatDeliveryLabel, truncate } from "@/lib/product-path";
 import { categorySegmentHref } from "@/lib/category-breadcrumb";
 import { ProductDescription } from "@/components/ProductDescription";
 import { SimilarProductsSection } from "@/components/SimilarProductsSection";
+import { trackAffiliateClick } from "@/lib/analytics";
 
 function formatPrice(amount: number, currency?: string): string {
   const suffix = currency && currency !== "EUR" ? ` ${currency}` : "€";
@@ -32,6 +34,7 @@ export function ProductDetailView({
   descriptionHtml?: string;
   similarProducts?: DisplayProduct[];
 }) {
+  const pathname = usePathname();
   const gallery = [product.image, ...extraImages].filter(
     (url, index, all) => url && url !== "/images/placeholder.jpg" && all.indexOf(url) === index
   );
@@ -147,6 +150,13 @@ export function ProductDetailView({
                 href={product.bestAffiliateLink}
                 target="_blank"
                 rel="nofollow sponsored noopener noreferrer"
+                onClick={() =>
+                  trackAffiliateClick({
+                    productId: product.id,
+                    merchantName: product.merchantName,
+                    pagePath: pathname,
+                  })
+                }
               >
                 <ShoppingCart className="w-5 h-5 mr-2" />
                 Voir chez le marchand

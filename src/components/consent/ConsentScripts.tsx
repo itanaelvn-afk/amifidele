@@ -1,21 +1,44 @@
 "use client";
 
+import Script from "next/script";
 import { useConsent } from "@/components/consent/ConsentProvider";
+import { getGaMeasurementId, isGaEnabled } from "@/lib/analytics";
 
 /**
- * Point d’extension pour scripts non essentiels.
- * Ne charge rien tant qu’aucun outil n’est configuré — prêt pour
- * Plausible / GA4 / widgets Awin derrière le consentement.
+ * Scripts non essentiels (GA4, futurs widgets Awin…) derrière le consentement.
  */
 export function ConsentScripts() {
   const { ready, preferences } = useConsent();
+  const measurementId = getGaMeasurementId();
+  const loadGa = ready && isGaEnabled() && preferences.analytics && measurementId;
 
-  if (!ready) return null;
+  if (!loadGa) {
+    return null;
+  }
 
-  // Placeholders : brancher ici les scripts conditionnels.
-  // Ex. if (preferences.analytics && process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN) …
-  void preferences.analytics;
-  void preferences.marketing;
+  const inlineInit = `
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('consent', 'default', {
+      analytics_storage: 'granted',
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied'
+    });
+    gtag('config', '${measurementId}', { anonymize_ip: true });
+  `;
 
-  return null;
+  return (
+    <>
+      <Script id="ga4-init" strategy="afterInteractive">
+        {inlineInit}
+      </Script>
+      <Script
+        id="ga4-gtag"
+        strategy="afterInteractive"
+        src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
+      />
+    </>
+  );
 }
