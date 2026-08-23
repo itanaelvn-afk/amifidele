@@ -11,6 +11,8 @@ export type AffiliateClickParams = {
   productId: string;
   merchantName?: string;
   pagePath?: string;
+  /** Emplacement UI (ex. featured_partners, home, listing). */
+  placement?: string;
 };
 
 export function getGaMeasurementId(): string | undefined {
@@ -41,10 +43,12 @@ export function trackAffiliateClick({
   productId,
   merchantName,
   pagePath,
+  placement,
 }: AffiliateClickParams): void {
   gtag("event", "affiliate_click", {
     product_id: productId,
     merchant_name: merchantName ?? undefined,
     page_path: pagePath ?? undefined,
+    placement: placement ?? undefined,
   });
 }
