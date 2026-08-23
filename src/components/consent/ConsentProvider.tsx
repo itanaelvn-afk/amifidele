@@ -32,7 +32,22 @@ function subscribeConsent(onChange: () => void) {
 }
 
 function getConsentSnapshot(): ConsentPreferences | null {
-  return readStoredConsent();
+  return readStoredConsentCached();
+}
+
+/** Snapshot stable pour useSyncExternalStore (React exige la même référence si les données n'ont pas changé). */
+let consentSnapshotCache: { raw: string | null; value: ConsentPreferences | null } | null =
+  null;
+
+function readStoredConsentCached(): ConsentPreferences | null {
+  if (typeof window === "undefined") return null;
+  const raw = window.localStorage.getItem(CONSENT_STORAGE_KEY);
+  if (consentSnapshotCache && consentSnapshotCache.raw === raw) {
+    return consentSnapshotCache.value;
+  }
+  const value = readStoredConsent();
+  consentSnapshotCache = { raw, value };
+  return value;
 }
 
 function getServerConsentSnapshot(): ConsentPreferences | null {

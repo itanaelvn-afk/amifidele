@@ -60,6 +60,10 @@ export function writeStoredConsent(
     marketing: prefs.marketing,
     updatedAt: new Date().toISOString(),
   };
-  window.localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(next));
+  try {
+    window.localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    // localStorage indisponible (mode privé strict, quota…) — choix non persisté
+  }
   return next;
 }
