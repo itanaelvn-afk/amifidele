@@ -30,10 +30,9 @@ export default function CookiesPage() {
             consentement et fonctionnement technique du Site. Toujours actifs.
           </li>
           <li>
-            <strong>Mesure d&apos;audience</strong> — statistiques de visite
-            (ex. Plausible, GA4).{" "}
-            <em>Aucun script n&apos;est chargé tant que vous n&apos;avez pas
-            consenti et qu&apos;un outil n&apos;est pas configuré.</em>
+            <strong>Mesure d&apos;audience</strong> — statistiques de visite via{" "}
+            <strong>Google Analytics 4</strong>. Le script n&apos;est chargé
+            qu&apos;après votre consentement à cette catégorie.
           </li>
           <li>
             <strong>Marketing</strong> — publicité / widgets display.{" "}
@@ -42,19 +41,56 @@ export default function CookiesPage() {
         </ul>
       </LegalSection>
 
-      <LegalSection title="3. Situation actuelle (V1)">
+      <LegalSection title="3. Google Analytics 4 (mesure d'audience)">
         <p>
-          En V1, AmiFidele{" "}
-          <strong>
-            ne dépose pas de cookies analytics ni publicitaires
-          </strong>{" "}
-          de son propre chef. La bannière de consentement est en place pour
-          enregistrer vos choix et permettre d&apos;activer ces catégories plus
-          tard sans recharger de traceurs avant accord.
+          Si vous acceptez la catégorie « Mesure d&apos;audience », AmiFidele
+          charge <strong>Google Analytics 4</strong> (Google Ireland Limited /
+          Google LLC) pour mesurer les pages consultées et certains événements
+          (ex. clic vers un marchand).
+        </p>
+        <ul className="list-disc pl-5 space-y-2 mt-3">
+          <li>
+            <strong>Cookies déposés</strong> : principalement{" "}
+            <code className="text-sm">_ga</code> et{" "}
+            <code className="text-sm">_ga_*</code> (identifiant client), durée
+            maximale d&apos;environ <strong>13 mois</strong>.
+          </li>
+          <li>
+            <strong>Finalité</strong> : statistiques de fréquentation et
+            amélioration du site.
+          </li>
+          <li>
+            <strong>Base légale</strong> : votre consentement (catégorie
+            « Mesure d&apos;audience »).
+          </li>
+          <li>
+            <strong>Transfert</strong> : Google peut traiter des données aux
+            États-Unis dans le cadre de ses{" "}
+            <a
+              className="text-primary hover:underline"
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              conditions et politique de confidentialité
+            </a>
+            .
+          </li>
+        </ul>
+        <p className="mt-3">
+          Sans consentement, aucun script Google Analytics n&apos;est chargé.
         </p>
       </LegalSection>
 
-      <LegalSection title="4. Affiliation (sites tiers)">
+      <LegalSection title="4. Marketing">
+        <p>
+          La catégorie « Marketing » (publicité / widgets display) n&apos;est
+          pas encore activée sur le Site. Aucun script marketing n&apos;est
+          chargé pour l&apos;instant.
+        </p>
+      </LegalSection>
+
+      <LegalSection title="5. Affiliation (sites tiers)">
         <p>
           Lors d&apos;un clic vers un marchand, le réseau d&apos;affiliation
           (ex. Awin) et/ou le marchand peuvent déposer leurs propres cookies
@@ -63,7 +99,7 @@ export default function CookiesPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="5. Gérer vos choix">
+      <LegalSection title="6. Gérer vos choix">
         <p className="mb-4">
           Vous pouvez modifier vos préférences à tout moment :
         </p>
@@ -80,7 +116,7 @@ export default function CookiesPage() {
         </ul>
       </LegalSection>
 
-      <LegalSection title="6. En savoir plus">
+      <LegalSection title="7. En savoir plus">
         <p>
           Pour la protection des données personnelles, voir la{" "}
           <Link className="text-primary hover:underline" href="/confidentialite">

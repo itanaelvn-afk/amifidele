@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Check, ShoppingCart } from "lucide-react";
 import {
   ImageWithFallback,
@@ -10,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DisplayProduct } from "@/lib/types";
 import { productPath, formatDeliveryLabel } from "@/lib/product-path";
+import { trackAffiliateClick } from "@/lib/analytics";
 
 interface ProductCardProps {
   product: DisplayProduct;
@@ -20,6 +22,16 @@ interface ProductCardProps {
 
 export function ProductCard({ product, isSelected, onToggleSelect, priority = false }: ProductCardProps) {
   const href = productPath(product.id);
+  const pathname = usePathname();
+
+  const handleAffiliateClick = () => {
+    trackAffiliateClick({
+      productId: product.id,
+      merchantName: product.merchantName,
+      pagePath: pathname,
+    });
+    window.open(product.bestAffiliateLink, "_blank", "noopener,noreferrer");
+  };
 
   return (
     <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group">
@@ -96,7 +108,7 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
             <Button
               variant="default"
               className="bg-primary hover:bg-primary/90"
-              onClick={() => window.open(product.bestAffiliateLink, '_blank', 'noopener,noreferrer')}
+              onClick={handleAffiliateClick}
             >
               <ShoppingCart className="w-4 h-4 mr-2" />
               Acheter

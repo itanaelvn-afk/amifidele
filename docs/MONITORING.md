@@ -5,18 +5,45 @@ Stack V1 (choisie le 22/08/2026) :
 | Besoin | Outil | Pourquoi |
 |--------|--------|----------|
 | Uptime site + API | **UptimeRobot** (plan free) | Gratuit, 5 min, alertes e-mail, sans cookie sur le site |
-| Core Web Vitals (lab) | **`npm run audit:lighthouse`** | Déjà en place ; RGPD V1 = pas d’analytics client |
+| Core Web Vitals (lab) | **`npm run audit:lighthouse`** | Déjà en place |
+| Mesure d'audience site | **Google Analytics 4** | Consentement CMP requis ; prod uniquement |
 | Déploiements / erreurs build | **Dashboard Vercel** | Projet déjà hébergé là |
 | Check manuel rapide | **`npm run smoke:uptime`** | Site `/`, `/produits` + `api/health` |
 
-Pas de Vercel Analytics / Speed Insights en V1 (dépose des scripts/cookies côté navigateur — hors cadre « zéro collecte »).
+Pas de Vercel Analytics / Speed Insights (dépose des scripts/cookies côté navigateur — remplacé par GA4 derrière CMP).
+
+## Google Analytics 4
+
+| Élément | Détail |
+|---------|--------|
+| Outil | Google Analytics 4 (gtag.js) |
+| Chargement | Production uniquement + consentement catégorie « Mesure d'audience » |
+| Variable | `NEXT_PUBLIC_GA_MEASUREMENT_ID` (Vercel Production) |
+| Dashboard | https://analytics.google.com — propriété **AmiFidele** |
+| Compte | compte Google utilisé à la création de la propriété (voir éditeur) |
+| Événements custom | `affiliate_click` (clic vers marchand) |
+
+### Créer / configurer GA4
+
+1. [Google Analytics](https://analytics.google.com) → Admin → Créer une propriété **AmiFidele** (fuseau Europe/Paris).
+2. Flux Web → URL `https://amifidele.fr` → noter le **Measurement ID** (`G-…`).
+3. Vercel → Settings → Environment Variables → Production : `NEXT_PUBLIC_GA_MEASUREMENT_ID=G-…`
+4. Redéployer le site prod.
+
+### Vérifier en prod
+
+1. Navigation privée → refuser analytics → pas de requête `googletagmanager.com`.
+2. Accepter analytics → Realtime dans GA4 affiche la session (~30 s).
+3. Naviguer `/`, `/produits`, fiche produit → page views.
+4. Clic « Acheter » / « Voir chez le marchand » → événement `affiliate_click`.
 
 ## Accès
 
 | Service | URL | Compte |
 |---------|-----|--------|
 | UptimeRobot | https://dashboard.uptimerobot.com | créé via e-mail `contact@amifidele.fr` |
-| Vercel | https://vercel.com/dashboard | compte projet Amifidele |
+| Google Analytics 4 | https://analytics.google.com | propriété AmiFidele — compte Google éditeur |
+| Vercel | https://vercel.com/dashboard | compte projet AmiFidele |
 | Rapports Lighthouse locaux | `reports/lighthouse/` (gitignoré) | machine de dev |
 
 ## Monitors UptimeRobot (cibles)
