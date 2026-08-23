@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PawPrint } from "lucide-react";
+import { CookieSettingsButton } from "@/components/consent/CookieSettingsButton";
 import { Separator } from "@/components/ui/separator";
 import { categoryPath, NAV_ROOT_CATEGORIES } from "@/lib/category-path";
 
@@ -122,6 +123,9 @@ export function Footer() {
                   Cookies
                 </Link>
               </li>
+              <li>
+                <CookieSettingsButton className="text-muted-foreground hover:text-primary transition-colors text-left" />
+              </li>
             </ul>
           </div>
         </div>
@@ -133,8 +137,10 @@ export function Footer() {
             © {currentYear} AmiFidele. Tous droits réservés.
           </p>
           <p className="text-muted-foreground text-center md:text-right text-sm max-w-xl">
-            V1 : formulaire de contact optionnel, pas de newsletter, pas
-            d&apos;analytics. Voir la{" "}
+            V1 : formulaire de contact optionnel, pas de newsletter. Vos choix
+            cookies :{" "}
+            <CookieSettingsButton className="underline hover:text-primary transition-colors" />
+            . Voir la{" "}
             <Link
               href="/confidentialite"
               className="underline hover:text-primary transition-colors"
