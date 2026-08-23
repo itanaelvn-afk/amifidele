@@ -41,7 +41,7 @@ Filtres listing : un `200` BFF avec `products: []` peut être **légitime** (feu
 | `API_URL` | `https://api.amifidele.fr/api` |
 | `API_TOKEN` | même secret que `API_TOKEN_AUTH` (NAS) |
 | `FORMSPREE_FORM_ID` | optionnel |
-| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Measurement ID GA4 (`G-…`) — prod uniquement ; script chargé après consentement analytics |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Measurement ID GA4 (`G-…`, ex. `G-1X7ZYF7K7Q`) — prod uniquement ; script chargé après consentement analytics. **Saisir la valeur complète avec le préfixe `G-`** (guillemets si CLI). Un redeploy est obligatoire après ajout/modification. |
 
 Ne jamais préfixer la clé API avec `NEXT_PUBLIC_`.
 

@@ -14,8 +14,12 @@ export type AffiliateClickParams = {
 };
 
 export function getGaMeasurementId(): string | undefined {
-  const id = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
-  return id || undefined;
+  const raw = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID?.trim();
+  if (!raw) return undefined;
+  // Tolère l'ID sans préfixe G- (erreur fréquente à la saisie Vercel / CLI)
+  if (/^G-[A-Z0-9]+$/i.test(raw)) return raw.toUpperCase();
+  if (/^[A-Z0-9]+$/i.test(raw)) return `G-${raw.toUpperCase()}`;
+  return raw;
 }
 
 export function isGaEnabled(): boolean {
