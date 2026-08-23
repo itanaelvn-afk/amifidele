@@ -20,6 +20,5 @@ export const FEATURED_PARTNER_CONFIG = {
 export const FEATURED_PARTNER_LABEL = "Offres partenaires";
 
 export const FEATURED_PARTNER_DISCLAIMER =
-  "Sélection d'offres affiliées Awin — liens vers les marchands partenaires. " +
-  "AmiFidele peut percevoir une commission sans surcoût pour vous. " +
-  "Ce n'est pas un classement éditorial.";
+  "Liens affiliés vers nos partenaires. AmiFidele peut percevoir une commission, " +
+  "sans surcoût pour vous. Sélection à titre indicatif, indépendante de nos comparatifs.";

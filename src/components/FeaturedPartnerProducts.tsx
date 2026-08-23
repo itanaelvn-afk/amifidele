@@ -98,13 +98,8 @@ export function FeaturedPartnerProducts({
       aria-labelledby="featured-partners-heading"
     >
       <div className="container mx-auto px-4">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
-          <div className="max-w-2xl">
-            <h2 id="featured-partners-heading" className="mb-2">
-              {FEATURED_PARTNER_LABEL}
-            </h2>
-            <p className="text-sm text-muted-foreground">{FEATURED_PARTNER_DISCLAIMER}</p>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+          <h2 id="featured-partners-heading">{FEATURED_PARTNER_LABEL}</h2>
           <div className="hidden sm:flex gap-2 shrink-0">
             <Button
               type="button"
@@ -137,7 +132,7 @@ export function FeaturedPartnerProducts({
 
         {!error && (
           <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex touch-pan-y -ml-4">
+            <div className="flex touch-pan-y -ml-4 items-stretch">
               {loading &&
                 Array.from({ length: 3 }).map((_, index) => (
                   <div
@@ -155,7 +150,7 @@ export function FeaturedPartnerProducts({
                 products.map((product, index) => (
                   <div
                     key={product.id}
-                    className="flex-[0_0_85%] min-w-0 pl-4 sm:flex-[0_0_calc(50%-0.5rem)] lg:flex-[0_0_calc(33.333%-0.75rem)] xl:flex-[0_0_calc(25%-0.75rem)]"
+                    className="flex flex-[0_0_85%] min-w-0 pl-4 sm:flex-[0_0_calc(50%-0.5rem)] lg:flex-[0_0_calc(33.333%-0.75rem)] xl:flex-[0_0_calc(25%-0.75rem)]"
                   >
                     <ProductCard
                       product={product}
@@ -167,6 +162,10 @@ export function FeaturedPartnerProducts({
             </div>
           </div>
         )}
+
+        <p className="mt-4 text-xs italic text-muted-foreground max-w-3xl">
+          {FEATURED_PARTNER_DISCLAIMER}
+        </p>
       </div>
     </section>
   );

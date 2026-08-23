@@ -37,8 +37,8 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
   };
 
   return (
-    <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg group">
-      <div className="relative overflow-hidden bg-white aspect-[4/3] min-h-64">
+    <Card className="flex h-full flex-col overflow-hidden transition-all duration-300 hover:shadow-lg group">
+      <div className="relative shrink-0 overflow-hidden bg-white aspect-[4/3] min-h-64">
         <Link href={href} className="block">
           <ImageWithFallback
             src={product.image}
@@ -50,17 +50,17 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
           />
         </Link>
       </div>
-      <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-3">
-          <div className="flex-1">
+      <CardContent className="flex flex-1 flex-col p-6">
+        <div className="flex justify-between items-start mb-3 gap-3">
+          <div className="min-w-0 flex-1">
             <p className="text-muted-foreground mb-1">{product.brand}</p>
-            <h3 className="mb-2">
+            <h3 className="mb-2 line-clamp-2 min-h-[2.75rem]">
               <Link href={href} className="hover:text-primary transition-colors">
                 {product.name}
               </Link>
             </h3>
           </div>
-          <div className="ml-4 text-right">
+          <div className="shrink-0 text-right">
             {product.oldPrice != null && product.oldPrice > product.price && (
               <p className="text-muted-foreground text-sm line-through">
                 {product.oldPrice.toFixed(2)}€
@@ -83,11 +83,11 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
           </div>
         )}
 
-        <p className="text-muted-foreground mb-4 line-clamp-2">
+        <p className="text-muted-foreground mb-4 line-clamp-2 min-h-[2.5rem]">
           {product.description}
         </p>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="mt-auto flex flex-wrap gap-2">
           <Button asChild variant="outline" className={onToggleSelect ? "flex-1" : "w-full"}>
             <Link href={href}>Voir la fiche</Link>
           </Button>
