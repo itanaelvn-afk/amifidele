@@ -70,6 +70,11 @@ export function FeaturedPartnerProducts({
 
   useEffect(() => {
     if (!emblaApi) return;
+    emblaApi.reInit();
+  }, [emblaApi, products]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
     const update = () => {
       setCanPrev(emblaApi.canScrollPrev());
       setCanNext(emblaApi.canScrollNext());
@@ -124,31 +129,41 @@ export function FeaturedPartnerProducts({
           </div>
         </div>
 
-        {loading && (
-          <p className="text-muted-foreground text-sm">Chargement des offres partenaires…</p>
-        )}
-
         {error && (
           <p className="text-sm text-muted-foreground" role="status">
             Offres partenaires indisponibles pour le moment.
           </p>
         )}
 
-        {!loading && !error && products.length > 0 && (
+        {!error && (
           <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex gap-4 touch-pan-y">
-              {products.map((product, index) => (
-                <div
-                  key={product.id}
-                  className="min-w-[85%] sm:min-w-[calc(50%-0.5rem)] lg:min-w-[calc(33.333%-0.75rem)] xl:min-w-[calc(25%-0.75rem)] shrink-0"
-                >
-                  <ProductCard
-                    product={product}
-                    priority={index < 2}
-                    analyticsPlacement={placement}
-                  />
-                </div>
-              ))}
+            <div className="flex touch-pan-y -ml-4">
+              {loading &&
+                Array.from({ length: 3 }).map((_, index) => (
+                  <div
+                    key={`skeleton-${index}`}
+                    className="flex-[0_0_85%] min-w-0 pl-4 sm:flex-[0_0_calc(50%-0.5rem)] lg:flex-[0_0_calc(33.333%-0.75rem)] xl:flex-[0_0_calc(25%-0.75rem)]"
+                  >
+                    <div
+                      className="h-[420px] rounded-xl border bg-card animate-pulse"
+                      aria-hidden
+                    />
+                  </div>
+                ))}
+
+              {!loading &&
+                products.map((product, index) => (
+                  <div
+                    key={product.id}
+                    className="flex-[0_0_85%] min-w-0 pl-4 sm:flex-[0_0_calc(50%-0.5rem)] lg:flex-[0_0_calc(33.333%-0.75rem)] xl:flex-[0_0_calc(25%-0.75rem)]"
+                  >
+                    <ProductCard
+                      product={product}
+                      priority={index < 2}
+                      analyticsPlacement={placement}
+                    />
+                  </div>
+                ))}
             </div>
           </div>
         )}
