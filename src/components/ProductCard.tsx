@@ -18,9 +18,11 @@ interface ProductCardProps {
   isSelected?: boolean;
   onToggleSelect?: (id: string) => void;
   priority?: boolean;
+  /** Emplacement analytics pour affiliate_click (ex. featured_partners). */
+  analyticsPlacement?: string;
 }
 
-export function ProductCard({ product, isSelected, onToggleSelect, priority = false }: ProductCardProps) {
+export function ProductCard({ product, isSelected, onToggleSelect, priority = false, analyticsPlacement }: ProductCardProps) {
   const href = productPath(product.id);
   const pathname = usePathname();
 
@@ -29,6 +31,7 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
       productId: product.id,
       merchantName: product.merchantName,
       pagePath: pathname,
+      placement: analyticsPlacement,
     });
     window.open(product.bestAffiliateLink, "_blank", "noopener,noreferrer");
   };

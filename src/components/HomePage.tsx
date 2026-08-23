@@ -7,20 +7,12 @@ import { ImageWithFallback } from "@/components/figma/ImageWithFallback";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { productPath } from "@/lib/product-path";
-import { categoryPath, HIDDEN_ROOT_CATEGORY_SLUGS, NAV_ROOT_CATEGORIES } from "@/lib/category-path";
-import { useProducts } from "@/hooks/useProducts";
+import { FeaturedPartnerProducts } from "@/components/FeaturedPartnerProducts";
+import { categoryPath, HIDDEN_ROOT_CATEGORY_SLUGS } from "@/lib/category-path";
 import { fetchCategories, type Category } from "@/lib/api";
 
 export function HomePage() {
-  const { products, loading, error, loadProducts } = useProducts();
   const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    // Chat + Chien uniquement — exclut « autre » et les racines masquées (ex. connecté).
-    const featuredCategoryIds = NAV_ROOT_CATEGORIES.map((c) => c.slug).join(",");
-    void loadProducts(1, 12, { categoryId: featuredCategoryIds });
-  }, [loadProducts]);
 
   useEffect(() => {
     void fetchCategories().then(setCategories);
@@ -49,7 +41,6 @@ export function HomePage() {
     }
   ];
 
-  const featuredProducts = products.slice(0, 3);
   const rootCategories = categories.filter((c) => {
     const slug = c.slug || c.id;
     return (
@@ -123,79 +114,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="mb-2">Produits à la une</h2>
-              <p className="text-muted-foreground">
-                Une sélection Chat et Chien parmi le catalogue AmiFidele
-              </p>
-            </div>
-            <Button asChild variant="outline">
-              <Link href="/produits">
-                Voir tout
-                <ArrowRight className="ml-2 w-4 h-4" />
-              </Link>
-            </Button>
-          </div>
-          {loading && (
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Chargement des produits...</p>
-            </div>
-          )}
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 mb-6">
-              <p className="text-destructive">⚠️ {error}</p>
-              <p className="text-muted-foreground text-sm mt-2">
-                Impossible de charger les produits depuis l&apos;API. Veuillez vérifier votre connexion et réessayer.
-              </p>
-            </div>
-          )}
-          {!loading && (
-            <div className="grid md:grid-cols-3 gap-6">
-              {featuredProducts.length > 0 ? (
-                featuredProducts.map((product) => (
-                  <Card key={product.id} className="overflow-hidden group hover:shadow-lg transition-all">
-                    <Link href={productPath(product.id)} className="block">
-                      <div className="relative overflow-hidden">
-                        <ImageWithFallback
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-64 bg-white"
-                          imageClassName="object-contain group-hover:scale-105 transition-transform duration-300"
-                          sizes="(min-width: 768px) 33vw, 100vw"
-                        />
-                        {product.brand && product.brand !== 'Marque inconnue' && (
-                          <Badge className="absolute top-4 left-4 bg-primary">
-                            {product.brand}
-                          </Badge>
-                        )}
-                      </div>
-                      <CardContent className="p-6">
-                        <p className="text-muted-foreground mb-1">{product.category}</p>
-                        <h4 className="mb-2">{product.name}</h4>
-                        <p className="text-primary mb-4">
-                          À partir de {product.price.toFixed(2)}
-                          {product.currency === 'EUR' || !product.currency ? '€' : ` ${product.currency}`}
-                        </p>
-                        <span className="inline-flex w-full items-center justify-center rounded-md border px-4 py-2 text-sm font-medium">
-                          Voir la fiche
-                        </span>
-                      </CardContent>
-                    </Link>
-                  </Card>
-                ))
-              ) : (
-                <div className="col-span-3 text-center py-12">
-                  <p className="text-muted-foreground">Aucun produit à afficher pour le moment</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      </section>
+      <FeaturedPartnerProducts placement="home" className="bg-secondary/20" />
 
       <section className="py-16 bg-secondary/30">
         <div className="container mx-auto px-4">

@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PawPrint, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
 import { ComparisonTable } from "@/components/ComparisonTable";
+import { FeaturedPartnerProducts } from "@/components/FeaturedPartnerProducts";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -429,6 +430,8 @@ export function ComparisonPage() {
             />
           )}
       </main>
+
+      <FeaturedPartnerProducts placement="listing" className="border-t border-border bg-card/50" />
 
       {/* Floating Comparison Button */}
       {selectedProducts.length > 0 && (
