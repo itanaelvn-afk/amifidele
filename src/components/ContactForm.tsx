@@ -13,11 +13,36 @@ import Link from "next/link";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+export const CONTACT_TOPICS = [
+  { value: "question", label: "Question" },
+  { value: "bug", label: "Bug / problème" },
+  { value: "idee", label: "Idée / suggestion" },
+  { value: "ux", label: "Expérience du site (UX)" },
+  { value: "autre", label: "Autre" },
+] as const;
+
+export type ContactTopic = (typeof CONTACT_TOPICS)[number]["value"];
+
+const TOPIC_VALUES = new Set<string>(CONTACT_TOPICS.map((t) => t.value));
+
+export function parseContactTopic(raw: string | undefined | null): ContactTopic {
+  if (raw && TOPIC_VALUES.has(raw)) return raw as ContactTopic;
+  return "question";
+}
+
 type Status = "idle" | "submitting" | "success" | "error";
 
-export function ContactForm() {
+type ContactFormProps = {
+  /** Prérempli via `?sujet=` (ex. `/contact?sujet=idee`). */
+  initialTopic?: string;
+};
+
+export function ContactForm({ initialTopic }: ContactFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [topic, setTopic] = useState<ContactTopic>(() =>
+    parseContactTopic(initialTopic)
+  );
   const [message, setMessage] = useState("");
   const [company, setCompany] = useState(""); // honeypot
   const [status, setStatus] = useState<Status>("idle");
@@ -52,6 +77,7 @@ export function ContactForm() {
         body: JSON.stringify({
           name: name.trim(),
           email: email.trim(),
+          topic,
           message: message.trim(),
           company,
         }),
@@ -73,6 +99,7 @@ export function ContactForm() {
       setStatus("success");
       setName("");
       setEmail("");
+      setTopic("question");
       setMessage("");
       setCompany("");
       setFieldErrors({});
@@ -159,6 +186,25 @@ export function ContactForm() {
             {fieldErrors.email}
           </p>
         ) : null}
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="contact-topic" className="text-sm font-medium">
+          Type de retour
+        </label>
+        <select
+          id="contact-topic"
+          name="topic"
+          value={topic}
+          onChange={(e) => setTopic(parseContactTopic(e.target.value))}
+          className="flex h-9 w-full rounded-md border border-input bg-input-background px-3 py-1 text-base text-foreground md:text-sm outline-none transition-[color,box-shadow] focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+        >
+          {CONTACT_TOPICS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="space-y-2">

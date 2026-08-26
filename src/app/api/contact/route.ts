@@ -2,13 +2,13 @@
  * Route API du formulaire de contact (`POST /api/contact`).
  *
  * Flux :
- * 1. Le navigateur envoie nom / e-mail / message depuis `ContactForm`
+ * 1. Le navigateur envoie nom / e-mail / topic / message depuis `ContactForm`
  *    (page `/contact`) vers cette route — jamais directement vers Formspree
  *    (l’ID reste côté serveur).
  * 2. Validation + honeypot `company` (si rempli → faux succès, pas d’envoi).
  * 3. Si `FORMSPREE_FORM_ID` est défini : POST JSON vers
  *    `https://formspree.io/f/<id>` ; Formspree notifie l’e-mail du compte
- *    et stocke la soumission dans son dashboard.
+ *    et stocke la soumission dans son dashboard (sujet préfixé par type).
  * 4. Sans ID : en développement l’envoi est simulé (log console) ;
  *    en production → 503 avec fallback mailto.
  *
@@ -22,13 +22,35 @@ const MAX_NAME = 120;
 const MAX_EMAIL = 254;
 const MAX_MESSAGE = 5000;
 
+const ALLOWED_TOPICS = new Set([
+  "question",
+  "bug",
+  "idee",
+  "ux",
+  "autre",
+]);
+
+const TOPIC_LABELS: Record<string, string> = {
+  question: "Question",
+  bug: "Bug / problème",
+  idee: "Idée / suggestion",
+  ux: "Expérience du site (UX)",
+  autre: "Autre",
+};
+
 type ContactBody = {
   name?: unknown;
   email?: unknown;
+  topic?: unknown;
   message?: unknown;
   /** Honeypot — doit rester vide (bots) */
   company?: unknown;
 };
+
+function parseTopic(value: unknown): string {
+  if (typeof value === "string" && ALLOWED_TOPICS.has(value)) return value;
+  return "question";
+}
 
 function asTrimmedString(value: unknown, max: number): string | null {
   if (typeof value !== "string") return null;
@@ -53,6 +75,8 @@ export async function POST(request: Request) {
   const name = asTrimmedString(body.name, MAX_NAME);
   const email = asTrimmedString(body.email, MAX_EMAIL);
   const message = asTrimmedString(body.message, MAX_MESSAGE);
+  const topic = parseTopic(body.topic);
+  const topicLabel = TOPIC_LABELS[topic] ?? TOPIC_LABELS.question;
 
   if (!name) {
     return NextResponse.json(
@@ -80,6 +104,7 @@ export async function POST(request: Request) {
       console.info("[contact] FORMSPREE_FORM_ID absent — message simulé:", {
         name,
         email,
+        topic,
         messageLength: message.length,
       });
       return NextResponse.json({
@@ -106,9 +131,11 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         name,
         email,
+        topic,
+        topicLabel,
         message,
         _replyto: email,
-        _subject: `Contact AmiFidele — ${name}`,
+        _subject: `AmiFidele [${topicLabel}] — ${name}`,
       }),
     });
 

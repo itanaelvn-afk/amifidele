@@ -43,8 +43,9 @@ export default function ConfidentialitePage() {
 
       <LegalSection title="3. Données traitées">
         <p>
-          <strong>Formulaire de contact</strong> : nom, adresse e-mail et
-          contenu du message, uniquement pour répondre à votre demande. Base
+          <strong>Formulaire de contact</strong> : nom, adresse e-mail, type de
+          retour (question, bug, idée, UX, autre) et contenu du message,
+          uniquement pour répondre à votre demande et améliorer le Site. Base
           légale : intérêt légitime (traiter les demandes) et/ou exécution de
           mesures précontractuelles à votre initiative.
         </p>
