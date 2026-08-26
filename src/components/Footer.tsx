@@ -93,6 +93,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/contact?sujet=idee"
+                  className="text-muted-foreground hover:text-primary transition-colors"
+                >
+                  Donner un avis
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/mentions-legales"
                   className="text-muted-foreground hover:text-primary transition-colors"
                 >
