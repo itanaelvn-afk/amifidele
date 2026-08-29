@@ -5,7 +5,7 @@ import { useConsent } from "@/components/consent/ConsentProvider";
 import { getGaMeasurementId, isGaEnabled } from "@/lib/analytics";
 
 /**
- * Scripts non essentiels (GA4, futurs widgets Awin…) derrière le consentement.
+ * Scripts non essentiels (GA4, bannières Awin via AwinAdSlot…) derrière le consentement.
  */
 export function ConsentScripts() {
   const { ready, preferences } = useConsent();

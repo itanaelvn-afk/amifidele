@@ -11,6 +11,7 @@ import type { DescriptionBlock } from "@/lib/format-description";
 import { formatDeliveryLabel, truncate } from "@/lib/product-path";
 import { categorySegmentHref } from "@/lib/category-breadcrumb";
 import { ProductDescription } from "@/components/ProductDescription";
+import { AwinAdSlot } from "@/components/AwinAdSlot";
 import { SimilarProductsSection } from "@/components/SimilarProductsSection";
 import { trackAffiliateClick } from "@/lib/analytics";
 
@@ -186,6 +187,8 @@ export function ProductDetailView({
           />
         </section>
       )}
+
+      <AwinAdSlot slotId="pdp-below" className="mt-10" />
 
       <SimilarProductsSection products={similarProducts} />
     </main>

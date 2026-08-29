@@ -10,7 +10,7 @@ export type ConsentPreferences = {
   necessary: true;
   /** Mesure d’audience (Plausible / GA4…) — inactif tant qu’aucun script n’est branché */
   analytics: boolean;
-  /** Marketing / pubs display — inactif tant qu’aucun script n’est branché */
+  /** Marketing / bannières display Awin */
   marketing: boolean;
   updatedAt: string;
 };

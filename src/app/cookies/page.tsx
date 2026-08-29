@@ -35,8 +35,9 @@ export default function CookiesPage() {
             qu&apos;après votre consentement à cette catégorie.
           </li>
           <li>
-            <strong>Marketing</strong> — publicité / widgets display.{" "}
-            <em>Aucun script n&apos;est chargé pour l&apos;instant.</em>
+            <strong>Marketing</strong> — bannières / créatifs publicitaires
+            Awin (affichage + tracking d&apos;impression). Chargés uniquement
+            après votre consentement à cette catégorie.
           </li>
         </ul>
       </LegalSection>
@@ -82,11 +83,32 @@ export default function CookiesPage() {
         </p>
       </LegalSection>
 
-      <LegalSection title="4. Marketing">
+      <LegalSection title="4. Marketing (bannières Awin)">
         <p>
-          La catégorie « Marketing » (publicité / widgets display) n&apos;est
-          pas encore activée sur le Site. Aucun script marketing n&apos;est
-          chargé pour l&apos;instant.
+          Si vous acceptez la catégorie « Marketing », AmiFidele peut afficher
+          des <strong>bannières partenaires</strong> issues du réseau Awin
+          (créatifs My Creative). L&apos;image et le lien sont fournis par Awin
+          ; un clic ouvre le site du marchand via un lien affilié tracké.
+        </p>
+        <ul className="list-disc pl-5 space-y-2 mt-3">
+          <li>
+            <strong>Finalité</strong> : présenter des offres partenaires et
+            attribuer d&apos;éventuelles commissions.
+          </li>
+          <li>
+            <strong>Base légale</strong> : votre consentement (catégorie
+            Marketing).
+          </li>
+          <li>
+            <strong>Sous-traitant / réseau</strong> : Awin (chargement
+            d&apos;images / pixels depuis leurs domaines, ex.{" "}
+            <code className="text-sm">awin1.com</code>).
+          </li>
+        </ul>
+        <p className="mt-3">
+          Sans consentement Marketing, aucune bannière Awin n&apos;est affichée
+          (un rappel discret peut proposer d&apos;ouvrir les préférences
+          cookies).
         </p>
       </LegalSection>
 

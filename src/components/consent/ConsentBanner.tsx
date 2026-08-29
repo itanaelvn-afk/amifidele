@@ -80,8 +80,8 @@ function PreferencesPanel({
               <span>
                 <span className="font-semibold block mb-1">Marketing</span>
                 <span className="text-sm text-muted-foreground">
-                  Publicité / widgets display. Aucun script n&apos;est branché
-                  pour l&apos;instant.
+                  Bannières partenaires Awin (affichage et tracking
+                  d&apos;impression). Désactivé par défaut.
                 </span>
               </span>
               <input
