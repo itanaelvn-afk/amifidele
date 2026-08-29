@@ -80,9 +80,13 @@ export default function ConfidentialitePage() {
           ). Sans consentement, aucun script analytics n&apos;est chargé.
         </p>
         <p>
-          <strong>Non traités</strong> : newsletter, profils utilisateurs,
-          cookies publicitaires déposés par AmiFidele. Les achats et paiements
-          se font chez les marchands partenaires.
+          <strong>Non traités</strong> : newsletter, profils utilisateurs.
+          Les cookies / traceurs marketing (bannières Awin) ne sont chargés
+          qu&apos;avec votre consentement (catégorie Marketing — voir{" "}
+          <Link className="text-primary hover:underline" href="/cookies">
+            cookies
+          </Link>
+          ). Les achats et paiements se font chez les marchands partenaires.
         </p>
       </LegalSection>
 

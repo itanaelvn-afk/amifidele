@@ -42,6 +42,7 @@ Filtres listing : un `200` BFF avec `products: []` peut être **légitime** (feu
 | `API_TOKEN` | même secret que `API_TOKEN_AUTH` (NAS) |
 | `FORMSPREE_FORM_ID` | optionnel |
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Measurement ID GA4 (`G-…`, ex. `G-1X7ZYF7K7Q`) — prod uniquement ; script chargé après consentement analytics. **Saisir la valeur complète avec le préfixe `G-`** (guillemets si CLI). Un redeploy est obligatoire après ajout/modification. |
+| `NEXT_PUBLIC_AWIN_ADS_ENABLED` | optionnel — kill switch bannières (`false` pour couper). Créas dans `src/lib/awin-ads-config.ts`. |
 
 Ne jamais préfixer la clé API avec `NEXT_PUBLIC_`.
 
