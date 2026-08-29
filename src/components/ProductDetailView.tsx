@@ -68,12 +68,12 @@ export function ProductDetailView({
       </nav>
 
       <div className="grid gap-10 lg:grid-cols-2">
-        <div>
-          <div className="rounded-2xl overflow-hidden bg-muted/40 border border-border aspect-[4/3] min-h-[420px]">
+        <div className="min-w-0">
+          <div className="rounded-2xl overflow-hidden bg-muted/40 border border-border aspect-[4/3] min-h-[280px] sm:min-h-[420px]">
             <ImageWithFallback
               src={mainImage}
               alt={product.name}
-              className="w-full h-full min-h-[420px] bg-white"
+              className="w-full h-full min-h-[280px] sm:min-h-[420px] bg-white"
               imageClassName="object-contain"
               sizes="(min-width: 1024px) 50vw, 100vw"
               priority
@@ -99,10 +99,10 @@ export function ProductDetailView({
           )}
         </div>
 
-        <div className="space-y-5">
+        <div className="space-y-5 min-w-0">
           <div>
             <p className="text-muted-foreground mb-1">{product.brand}</p>
-            <h1 className="text-3xl font-bold mb-3">{product.name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold mb-3 break-words">{product.name}</h1>
             {product.category && (
               <Badge variant="secondary">{product.category}</Badge>
             )}
@@ -146,11 +146,16 @@ export function ProductDetailView({
           )}
 
           {product.bestAffiliateLink ? (
-            <Button asChild size="lg" className="w-full sm:w-auto">
+            <Button
+              asChild
+              size="lg"
+              className="w-full max-w-full min-w-0 sm:w-auto h-auto min-h-10 py-2.5 whitespace-normal"
+            >
               <a
                 href={product.bestAffiliateLink}
                 target="_blank"
                 rel="nofollow sponsored noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 text-center"
                 onClick={() =>
                   trackAffiliateClick({
                     productId: product.id,
@@ -159,9 +164,9 @@ export function ProductDetailView({
                   })
                 }
               >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                Voir chez le marchand
-                <ExternalLink className="w-4 h-4 ml-2" />
+                <ShoppingCart className="w-5 h-5 shrink-0" />
+                <span>Voir chez le marchand</span>
+                <ExternalLink className="w-4 h-4 shrink-0" />
               </a>
             </Button>
           ) : (
