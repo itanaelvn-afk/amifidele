@@ -29,6 +29,27 @@ import { cn } from "@/components/utils";
 const SEARCH_DEBOUNCE_MS = 350;
 const MAX_COMPARISON_PRODUCTS = 3;
 
+/** Fenêtre de numéros de page centrée sur la page courante. */
+function getVisiblePageNumbers(
+  current: number,
+  total: number,
+  maxButtons: number
+): number[] {
+  if (total <= 0) return [];
+  const count = Math.min(maxButtons, total);
+  if (total <= count) {
+    return Array.from({ length: total }, (_, i) => i + 1);
+  }
+  const half = Math.floor(count / 2);
+  let start = Math.max(1, current - half);
+  let end = start + count - 1;
+  if (end > total) {
+    end = total;
+    start = end - count + 1;
+  }
+  return Array.from({ length: count }, (_, i) => start + i);
+}
+
 export function ComparisonPage() {
   const sortSelectId = useId();
   const router = useRouter();
@@ -328,67 +349,90 @@ export function ComparisonPage() {
 
         {/* Pagination Controls */}
         {!isInitialLoad && !error && pagination.totalPages > 1 && (
-          <Card className="p-6 mt-12 mb-8">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-sm text-muted-foreground">
-                Affichage de <span className="font-semibold text-foreground">{(currentPage - 1) * limit + 1}</span> à{" "}
+          <Card className="p-4 sm:p-6 mt-12 mb-8 overflow-hidden">
+            <div className="flex flex-col items-center gap-4 min-w-0">
+              <div className="text-sm text-muted-foreground text-center px-1">
+                Affichage de{" "}
+                <span className="font-semibold text-foreground">
+                  {(currentPage - 1) * limit + 1}
+                </span>{" "}
+                à{" "}
                 <span className="font-semibold text-foreground">
                   {Math.min(currentPage * limit, pagination.total)}
                 </span>{" "}
-                sur <span className="font-semibold text-foreground">{pagination.total}</span> produits
+                sur{" "}
+                <span className="font-semibold text-foreground">
+                  {pagination.total}
+                </span>{" "}
+                produits
               </div>
-              
-              <div className="flex items-center gap-2">
+
+              <div className="flex w-full max-w-full items-center justify-center gap-1.5 sm:gap-2 min-w-0">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
-                  className="gap-2"
+                  className="shrink-0 gap-1 px-2.5 sm:gap-2 sm:px-3"
+                  aria-label="Page précédente"
                 >
                   <ChevronLeft className="w-4 h-4" />
-                  Précédent
+                  <span className="hidden sm:inline">Précédent</span>
                 </Button>
-                
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                    let pageNum: number;
-                    if (pagination.totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= pagination.totalPages - 2) {
-                      pageNum = pagination.totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
+
+                <div className="flex items-center gap-1 sm:hidden">
+                  {getVisiblePageNumbers(currentPage, pagination.totalPages, 3).map(
+                    (pageNum) => (
                       <Button
-                        key={pageNum}
+                        key={`m-${pageNum}`}
                         variant={currentPage === pageNum ? "default" : "outline"}
                         size="sm"
                         onClick={() => setCurrentPage(pageNum)}
-                        className={`min-w-[40px] ${
-                          currentPage === pageNum
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "hover:bg-accent"
-                        }`}
+                        className={cn(
+                          "min-w-9 px-2",
+                          currentPage === pageNum &&
+                            "bg-primary text-primary-foreground shadow-md"
+                        )}
                       >
                         {pageNum}
                       </Button>
-                    );
-                  })}
+                    )
+                  )}
+                </div>
+
+                <div className="hidden sm:flex items-center gap-1">
+                  {getVisiblePageNumbers(currentPage, pagination.totalPages, 5).map(
+                    (pageNum) => (
+                      <Button
+                        key={`d-${pageNum}`}
+                        variant={currentPage === pageNum ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setCurrentPage(pageNum)}
+                        className={cn(
+                          "min-w-10",
+                          currentPage === pageNum &&
+                            "bg-primary text-primary-foreground shadow-md"
+                        )}
+                      >
+                        {pageNum}
+                      </Button>
+                    )
+                  )}
                 </div>
 
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
+                  onClick={() =>
+                    setCurrentPage((prev) =>
+                      Math.min(pagination.totalPages, prev + 1)
+                    )
+                  }
                   disabled={currentPage === pagination.totalPages}
-                  className="gap-2"
+                  className="shrink-0 gap-1 px-2.5 sm:gap-2 sm:px-3"
+                  aria-label="Page suivante"
                 >
-                  Suivant
+                  <span className="hidden sm:inline">Suivant</span>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
