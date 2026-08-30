@@ -44,7 +44,10 @@ export function ProductDetailView({
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-6xl">
-      <nav className="text-sm text-muted-foreground mb-6" aria-label="Fil d'Ariane">
+      <nav
+        className="text-sm text-muted-foreground mb-6 flex flex-wrap items-center gap-y-1 break-words"
+        aria-label="Fil d'Ariane"
+      >
         <Link href="/" className="hover:text-primary">
           Accueil
         </Link>

@@ -266,7 +266,7 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
                   handleFilterChange("categoryName", value);
                 }
               }}
-            className="w-full border rounded-md p-2 text-sm bg-background disabled:opacity-60"
+            className="w-full border rounded-md p-2.5 min-h-11 text-sm bg-background disabled:opacity-60"
           >
             <option value="">{loading ? "Chargement…" : "Toutes les catégories"}</option>
             {!loading &&
@@ -325,7 +325,7 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
             disabled={loading}
             value={filters.merchantId || ""}
             onChange={(e) => handleFilterChange("merchantId", e.target.value)}
-            className="w-full border rounded-md p-2 text-sm bg-background disabled:opacity-60"
+            className="w-full border rounded-md p-2.5 min-h-11 text-sm bg-background disabled:opacity-60"
           >
             <option value="">{loading ? "Chargement…" : "Tous les marchands"}</option>
             {!loading &&
@@ -374,7 +374,7 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
                 }
               }
             }}
-            className="w-full border rounded-md p-2 text-sm bg-background"
+            className="w-full border rounded-md p-2.5 min-h-11 text-sm bg-background"
           >
             <option value="">Tous les prix</option>
             <option value="0-10">0€ - 10€</option>
