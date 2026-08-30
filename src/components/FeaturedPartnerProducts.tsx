@@ -147,7 +147,7 @@ export function FeaturedPartnerProducts({
 
         {!error && (
           <div className="overflow-hidden" ref={emblaRef}>
-            <div className="flex touch-pan-y -ml-4">
+            <div className="flex items-stretch touch-pan-y -ml-4">
               {loading &&
                 Array.from({ length: 3 }).map((_, index) => (
                   <div
@@ -155,7 +155,7 @@ export function FeaturedPartnerProducts({
                     className="flex-[0_0_85%] min-w-0 pl-4 sm:flex-[0_0_calc(50%-0.5rem)] lg:flex-[0_0_calc(33.333%-0.75rem)] xl:flex-[0_0_calc(25%-0.75rem)]"
                   >
                     <div
-                      className="h-[420px] rounded-xl border bg-card animate-pulse"
+                      className="h-full min-h-[420px] rounded-xl border bg-card animate-pulse"
                       aria-hidden
                     />
                   </div>
