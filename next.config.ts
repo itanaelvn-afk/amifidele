@@ -2,10 +2,12 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    loader: "custom",
-    loaderFile: "./src/lib/imageLoader.ts",
-    // Vide : les domaines marchands sont hétérogènes ; le loader renvoie l'URL telle quelle.
-    remotePatterns: [],
+    /**
+     * Pas d'optimisation Vercel (CDN marchands hétérogènes).
+     * Remplace le loader custom qui déclenchait
+     * `next-image-missing-loader-width` dès qu'il ignorait `width`.
+     */
+    unoptimized: true,
   },
   async redirects() {
     return [
