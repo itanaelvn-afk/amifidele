@@ -111,7 +111,7 @@ export function FeaturedPartnerProducts({
             </h2>
             <p className="text-sm text-muted-foreground">{FEATURED_PARTNER_DISCLAIMER}</p>
           </div>
-          <div className="hidden sm:flex gap-2 shrink-0 min-h-9">
+          <div className="hidden sm:flex gap-2 shrink-0 min-h-9 w-[4.75rem]">
             {navReady ? (
               <>
                 <Button
