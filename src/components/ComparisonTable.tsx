@@ -39,7 +39,7 @@ export function ComparisonTable({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="!max-w-[98vw] !w-[98vw] !sm:max-w-[98vw] max-h-[95vh] overflow-y-auto comparison-scrollbar p-8">
+      <DialogContent className="!max-w-[98vw] !w-[98vw] !sm:max-w-[98vw] max-h-[95vh] overflow-y-auto comparison-scrollbar p-4 sm:p-8">
         <DialogHeader className="mb-6">
           <DialogTitle className="text-2xl font-bold">Comparaison de produits</DialogTitle>
           <p className="text-muted-foreground mt-1">
