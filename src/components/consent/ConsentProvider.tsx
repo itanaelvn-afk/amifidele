@@ -18,6 +18,7 @@ import {
   writeStoredConsent,
   type ConsentPreferences,
 } from "@/lib/consent";
+import { updateGaConsent } from "@/lib/analytics";
 
 const CONSENT_CHANGE_EVENT = "amifidele:consent-changed";
 
@@ -96,6 +97,8 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
 
   const persist = useCallback((analytics: boolean, marketing: boolean) => {
     writeStoredConsent({ analytics, marketing });
+    // Si gtag était déjà chargé, coupe la mesure côté Consent Mode (cookies _ga peuvent rester).
+    updateGaConsent(analytics);
     notifyConsentChanged();
     setPanelOpen(false);
   }, []);

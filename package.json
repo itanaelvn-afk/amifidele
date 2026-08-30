@@ -13,6 +13,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "audit:lighthouse": "node scripts/lighthouse-audit.mjs",
+    "audit:ga": "node scripts/audit-ga.mjs",
     "smoke:domaine": "node scripts/smoke-domaine.mjs",
     "smoke:uptime": "node scripts/smoke-uptime.mjs",
     "setup:uptime": "node scripts/setup-uptime-monitor.mjs",
@@ -43,6 +44,7 @@
     "concurrently": "^10.0.4",
     "eslint": "^9.39.5",
     "eslint-config-next": "16.3.0",
+    "playwright": "^1.49.1",
     "postcss": "^8.5.26",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3"

@@ -22,6 +22,7 @@ Pas de Vercel Analytics / Speed Insights (dépose des scripts/cookies côté nav
 | Dashboard | https://analytics.google.com — propriété **AmiFidele** |
 | Compte | compte Google utilisé à la création de la propriété (voir éditeur) |
 | Événements custom | `affiliate_click` (clic vers marchand) |
+| Page views | Uniquement via `AnalyticsPageView` (`send_page_view: false` à l'init gtag) |
 
 ### Créer / configurer GA4
 
@@ -34,8 +35,12 @@ Pas de Vercel Analytics / Speed Insights (dépose des scripts/cookies côté nav
 
 1. Navigation privée → refuser analytics → pas de requête `googletagmanager.com`.
 2. Accepter analytics → Realtime dans GA4 affiche la session (~30 s).
-3. Naviguer `/`, `/produits`, fiche produit → page views.
+3. Naviguer `/`, `/produits`, fiche produit → page views (une seule par route).
 4. Clic « Acheter » / « Voir chez le marchand » → événement `affiliate_click`.
+
+```powershell
+npm run audit:ga
+```
 
 ## Accès
 
