@@ -65,6 +65,7 @@ export function ImageWithFallback({
         fill
         sizes={sizes}
         priority={priority}
+        unoptimized
         className={cn("object-cover", imageClassName)}
         onError={() => setDidError(true)}
       />
