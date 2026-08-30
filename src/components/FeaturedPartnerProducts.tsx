@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ProductCard } from "@/components/ProductCard";
@@ -37,12 +37,12 @@ export function FeaturedPartnerProducts({
   });
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
-  /** Évite un mismatch d'hydratation sur `disabled` (Embla n'existe qu'après mount). */
-  const [navReady, setNavReady] = useState(false);
-
-  useEffect(() => {
-    setNavReady(true);
-  }, []);
+  /** false au SSR / hydratation, true côté client — évite le mismatch sur `disabled`. */
+  const navReady = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   useEffect(() => {
     let cancelled = false;
