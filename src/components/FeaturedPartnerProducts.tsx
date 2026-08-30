@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ProductCard } from "@/components/ProductCard";
@@ -37,6 +37,12 @@ export function FeaturedPartnerProducts({
   });
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
+  /** false au SSR / hydratation, true côté client — évite le mismatch sur `disabled`. */
+  const navReady = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -105,27 +111,31 @@ export function FeaturedPartnerProducts({
             </h2>
             <p className="text-sm text-muted-foreground">{FEATURED_PARTNER_DISCLAIMER}</p>
           </div>
-          <div className="hidden sm:flex gap-2 shrink-0">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              aria-label="Produits précédents"
-              disabled={!canPrev}
-              onClick={() => emblaApi?.scrollPrev()}
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              aria-label="Produits suivants"
-              disabled={!canNext}
-              onClick={() => emblaApi?.scrollNext()}
-            >
-              <ChevronRight className="w-4 h-4" />
-            </Button>
+          <div className="hidden sm:flex gap-2 shrink-0 min-h-9 w-[4.75rem]">
+            {navReady ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Produits précédents"
+                  disabled={!canPrev}
+                  onClick={() => emblaApi?.scrollPrev()}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  aria-label="Produits suivants"
+                  disabled={!canNext}
+                  onClick={() => emblaApi?.scrollNext()}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </>
+            ) : null}
           </div>
         </div>
 
