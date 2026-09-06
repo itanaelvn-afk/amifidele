@@ -23,7 +23,7 @@ interface ProductCardProps {
 }
 
 export function ProductCard({ product, isSelected, onToggleSelect, priority = false, analyticsPlacement }: ProductCardProps) {
-  const href = productPath(product.id);
+  const href = productPath(product);
   const pathname = usePathname();
 
   const handleAffiliateClick = () => {

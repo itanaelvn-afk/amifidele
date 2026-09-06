@@ -37,14 +37,14 @@ export function itemListJsonLd(products: DisplayProduct[], listPath: string) {
     itemListElement: products.map((product, index) => ({
       "@type": "ListItem",
       position: index + 1,
-      url: absoluteUrl(productPath(product.id)),
+      url: absoluteUrl(productPath(product)),
       name: product.name,
     })),
   };
 }
 
 export function productJsonLd(product: DisplayProduct) {
-  const pageUrl = absoluteUrl(productPath(product.id));
+  const pageUrl = absoluteUrl(productPath(product));
   const description = stripHtml(product.description).slice(0, 500) || undefined;
   const image =
     product.image.startsWith("http://") || product.image.startsWith("https://")

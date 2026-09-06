@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "@/components/JsonLd";
 import { fetchProductById } from "@/lib/api";
 import { breadcrumbJsonLd, productJsonLd } from "@/lib/json-ld";
@@ -65,7 +65,7 @@ export async function generateMetadata({
   return {
     title,
     description,
-    alternates: { canonical: productPath(display.id) },
+    alternates: { canonical: productPath(display) },
     openGraph: {
       title,
       description,
@@ -89,12 +89,17 @@ export default async function ProduitPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const raw = await fetchProductById(decodeURIComponent(id));
+  const requestedId = decodeURIComponent(id);
+  const raw = await fetchProductById(requestedId);
   if (!raw) {
     notFound();
   }
 
   const display = mapApiProductToDisplayProduct(raw);
+  if (display.canonicalId && display.canonicalId !== requestedId) {
+    permanentRedirect(productPath(display.canonicalId));
+  }
+
   const extraImages = collectExtraImages(raw).filter((url) => url !== display.image);
   const isHtmlDescription = display.descriptionFormat === "html";
   const descriptionHtml = isHtmlDescription

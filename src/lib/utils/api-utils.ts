@@ -179,6 +179,13 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct | Product):
     offerCount,
     ...(minPrice != null ? { minPrice } : {}),
     priceFrom,
+    ...(((apiProduct as ApiProduct & { canonicalId?: string }).canonicalId)
+      ? {
+          canonicalId: String(
+            (apiProduct as ApiProduct & { canonicalId?: string }).canonicalId
+          ),
+        }
+      : {}),
     ...(offers && offers.length > 0 ? { offers } : {}),
   };
 }
