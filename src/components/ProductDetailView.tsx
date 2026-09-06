@@ -13,6 +13,7 @@ import { categorySegmentHref } from "@/lib/category-breadcrumb";
 import { ProductDescription } from "@/components/ProductDescription";
 import { AwinAdSlot } from "@/components/AwinAdSlot";
 import { SimilarProductsSection } from "@/components/SimilarProductsSection";
+import { OfferComparisonList } from "@/components/OfferComparisonList";
 import { trackAffiliateClick } from "@/lib/analytics";
 
 function formatPrice(amount: number, currency?: string): string {
@@ -114,9 +115,23 @@ export function ProductDetailView({
                 {formatPrice(product.oldPrice, product.currency)}
               </p>
             )}
-            <p className="text-primary text-3xl font-bold">
-              {formatPrice(product.price, product.currency)}
-            </p>
+            {product.priceFrom ? (
+              <p className="text-primary text-3xl font-bold">
+                <span className="block text-sm font-normal text-muted-foreground mb-1">
+                  À partir de
+                </span>
+                {formatPrice(product.price, product.currency)}
+              </p>
+            ) : (
+              <p className="text-primary text-3xl font-bold">
+                {formatPrice(product.price, product.currency)}
+              </p>
+            )}
+            {(product.offerCount ?? 0) > 1 && (
+              <p className="text-sm text-muted-foreground mt-1">
+                {product.offerCount} offres comparées
+              </p>
+            )}
             <p className="text-sm text-muted-foreground mt-1">
               {formatDeliveryLabel(product.delivery, product.currency)}
             </p>
@@ -132,17 +147,26 @@ export function ProductDetailView({
             )}
           </div>
 
-          {inStock === false && (
+          {inStock === false && !product.priceFrom && (
             <p className="text-amber-700 text-sm font-medium">
               Indiqué comme indisponible chez le marchand.
             </p>
           )}
 
-          {product.merchantName && (
-            <p className="text-muted-foreground">
-              Proposé par{" "}
-              <span className="font-medium text-foreground">{product.merchantName}</span>
-            </p>
+          {product.priceFrom ? (
+            product.merchantName && (
+              <p className="text-muted-foreground">
+                Meilleur prix chez{" "}
+                <span className="font-medium text-foreground">{product.merchantName}</span>
+              </p>
+            )
+          ) : (
+            product.merchantName && (
+              <p className="text-muted-foreground">
+                Proposé par{" "}
+                <span className="font-medium text-foreground">{product.merchantName}</span>
+              </p>
+            )
           )}
 
           {product.bestAffiliateLink ? (
@@ -165,7 +189,11 @@ export function ProductDetailView({
                 }
               >
                 <ShoppingCart className="w-5 h-5 shrink-0" />
-                <span>Voir chez le marchand</span>
+                <span>
+                  {product.priceFrom
+                    ? "Voir le meilleur prix"
+                    : "Voir chez le marchand"}
+                </span>
                 <ExternalLink className="w-4 h-4 shrink-0" />
               </a>
             </Button>
@@ -181,6 +209,14 @@ export function ProductDetailView({
           </p>
         </div>
       </div>
+
+      {product.offers && product.offers.length > 1 && (
+        <OfferComparisonList
+          offers={product.offers}
+          productId={product.id}
+          productName={product.name}
+        />
+      )}
 
       {product.description && (
         <section className="mt-12 max-w-3xl">

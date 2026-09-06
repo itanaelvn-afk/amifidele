@@ -96,6 +96,14 @@ export interface Product {
     unit?: string;
   };
 
+  /** Stats multi-offres (agrégation API par EAN) */
+  offerCount?: number;
+  minPrice?: number;
+  /** ID de fiche publique préférée (évite les URLs amazon_…) */
+  canonicalId?: string;
+  /** Offres sœurs (détail produit uniquement) */
+  offers?: Product[];
+
   /** @deprecated dump Awin / dashboard */
   text?: {
     desc?: string;
@@ -173,4 +181,30 @@ export interface DisplayProduct {
   merchantName?: string;
   bestAffiliateLink?: string;
   source?: string;
+  /** EAN / GTIN (regroupement multi-offres) */
+  ean?: string;
+  /** Nombre d’offres visibles pour le même EAN */
+  offerCount?: number;
+  /** Prix minimum parmi les offres du même EAN */
+  minPrice?: number;
+  /** true si offerCount > 1 (affichage « À partir de ») */
+  priceFrom?: boolean;
+  /** ID canonique pour les liens / SEO (préfère l’offre Awin) */
+  canonicalId?: string;
+  /** Offres sœurs (PDP), triées par prix */
+  offers?: DisplayOffer[];
+}
+
+/** Offre marchand sur une fiche multi-sources. */
+export interface DisplayOffer {
+  id: string;
+  source?: string;
+  merchantName?: string;
+  price: number;
+  currency?: string;
+  delivery?: number;
+  oldPrice?: number;
+  inStock?: boolean;
+  affiliateLink?: string;
+  isBestPrice?: boolean;
 }
