@@ -46,7 +46,7 @@ export function OfferComparisonList({
         </p>
       </div>
 
-      <ul className="divide-y divide-border border border-border rounded-xl overflow-hidden bg-background">
+      <ul className="divide-y divide-border border border-border rounded-xl overflow-hidden bg-card shadow-sm">
         {offers.map((offer) => {
           const merchant =
             offer.merchantName || sourceLabel(offer.source) || "Marchand";
