@@ -1,6 +1,6 @@
 # Modèle produit AmiFidele — Phase 1 (offre canonique)
 
-**Statut** : validé (07/08/2026) — reste à livrer le CRUD Dashboard des mappings  
+**Statut** : Phase 1 livrée · Phase 1.5 (Amazon manuelle + multi-offres à la lecture) livrée (09/2026)  
 **Source de vérité Notion** : [Décisions data](https://app.notion.com/p/3b4361f81bbe81d49b18d221c4d6ba77)  
 **Epic** : [Migration modèle Mongo multi-sources](https://app.notion.com/p/3b4361f81bbe81e0a92cedbec1ec84ff)  
 **US ops mappings** : [CRUD category_mappings + file des non mappés](https://app.notion.com/p/3b5361f81bbe81d38fc5d0ba9035ca44)
@@ -14,7 +14,8 @@ Ce document fige le contrat de données **offre** (Phase 1), le mapping Awin →
 1. Mongo = source de vérité AmiFidele. AwinFetcher (et futurs fetchers) = adaptateurs.
 2. Phase 1 : **1 document = 1 offre** (une annonce d’un marchand pour un produit source).
 3. **Pas de dump plat CSV** (~90 colonnes) dans `products`. Mapping à l’ingestion uniquement.
-4. Phase 2 (plus tard) : regroupement multi-offres par EAN / fingerprint.
+4. **Phase 1.5 (livré)** : multi-offres **à la lecture** via EAN (`offerCount`, `minPrice`, `offers[]`, `canonicalId`) — pas de collection `catalog_products`.
+5. Phase 2 (plus tard, optionnel) : produit canonique physique / job de regroupement si le volume multi-sources l’exige.
 
 ---
 
@@ -39,7 +40,7 @@ Ce document fige le contrat de données **offre** (Phase 1), le mapping Awin →
 { "_id": "89880_36640916409", "source": "awin", "sourceProductId": "36640916409", "feedId": "89880" }
 ```
 
-> Amazon (futur) : `_id` propre à Amazon (ex. ASIN) + `source: "amazon"`. Pas de collision avec Awin tant que les namespaces d’IDs restent distincts ; si doute, préfixer côté Amazon plus tard.
+> Amazon **manuel** (Phase 1.5) : `_id` type `amazon_{ean}_{timestamp}` + `source: "amazon"`. Une seule offre Amazon par EAN (index `uniq_amazon_ean`). Sur le site, l’URL publique préfère l’offre Awin du même EAN (`canonicalId`) — les ids `amazon_…` ne sont pas exposés en listing / SEO.
 
 ---
 
@@ -328,13 +329,25 @@ US backlog : [CRUD category_mappings + file des non mappés](https://app.notion.
 
 ---
 
-## 7. Hors scope Phase 1
+## 7. Phase 1.5 — multi-offres & Amazon manuel (livré)
 
-- Regroupement multi-offres par EAN
-- AmazonFetcher (sauf POC isolé)
+Toujours **1 document = 1 offre**. Le rapprochement métier se fait par **EAN** à la lecture.
+
+| Capacité | Détail |
+|----------|--------|
+| Offre Amazon manuelle | Dashboard `/products/new` (lookup EAN) → `POST /api/products` `source: amazon` ; n’écrase pas l’offre Awin |
+| Lookup EAN | `GET /api/products?ean=` (admin : `isVisible=all`) |
+| Listing enrichi | `offerCount`, `minPrice`, `canonicalId` (préfère `awin`, Amazon en dernier) |
+| Détail | `offers[]` sœurs visibles, tri prix croissant |
+| Site | « À partir de » ; PDP comparateur ; JSON-LD `AggregateOffer` ; redirect `amazon_…` → `canonicalId` |
+| Import CSV | `source: manual` ; preview warnings EAN → Créer offre / Ignorer |
+
+### Hors scope restant
+
+- AmazonFetcher automatisé (PA-API)
+- Collection `catalog_products` / `catalogProductId` (Phase 2 si besoin)
 - Ratings Awin (vides sur les feeds actuels)
-- Réécriture des anciennes catégories Mongo numériques
-
+- Soft-delete BO dédié (US backlog : masquer via `isVisible`)
 ---
 
 ## 8. Coexistence upsert AwinFetcher ↔ éditions Dashboard
@@ -395,7 +408,8 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 |-----|--------|
 | Masquage auto 15j vs override `isVisible` | Override gagne : produit reste visible (ou masqué) selon le BO. |
 | Reprocess mapping vs override `categoryId` | Override gagne : la file/mapping ne réécrit pas. |
-| Produit créé manuellement (`source: manual`) | Pas d’AwinFetcher ; CRUD Dashboard libre. |
+| Produit créé manuellement (`source: manual`) | Pas d’AwinFetcher ; CRUD Dashboard / import CSV. |
+| Offre `source: amazon` | Pas d’AwinFetcher ; créée au BO ; EAN unique parmi les Amazon. |
 | Champ feed non overridable modifié au BO (ex. prix) | Non supporté Phase 1 : le prochain sync **réécrase** (comportement voulu). |
 
 ### 8.6 Recommandation & découpage
@@ -418,6 +432,16 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 9. ~~Couper historique sync + index Mongo listing~~ ✅ (08/2026)
 10. ~~Clear / unlock `manualOverrides` (Dashboard + API)~~ ✅ (12/08/2026)
 11. ~~Édition description HTML restreint + verrouillage~~ ✅ (14/08/2026)
+12. ~~Offre Amazon manuelle (lookup EAN)~~ ✅ (09/2026)
+13. ~~Affichage multi-offres lecture + `canonicalId`~~ ✅ (09/2026)
+14. ~~Import CSV Dashboard (preview + décisions EAN)~~ ✅ (09/2026)
+
+### Suite possible
+
+- Soft-delete / masquer produit depuis le BO (US backlog)
+- Dedup listing (1 card par EAN) si doublons Awin+Amazon gênants
+- Phase 2 catalogue physique si volume multi-sources ↑
+- AmazonFetcher (bloqué PA-API)
 
 ---
 
@@ -425,6 +449,7 @@ Champs protégés aujourd’hui : `categoryId`, `isVisible`, `name`, `descriptio
 
 | Date / heure (Europe/Paris) | Changement |
 |-----------------------------|------------|
+| 06/09/2026 | Phase 1.5 doc : multi-offres lecture, Amazon manuel, CSV import, `canonicalId`. |
 | 14/08/2026 12:40 | Description Dashboard : HTML whitelist + `descriptionFormat` (`html` \| `plain`) ; sanitization API / site ; AwinFetcher remet `plain` sauf override. |
 | 12/08/2026 22:55 | Clarification unlock : l’API ne force pas `isVisible` ; seul le sync Awin le remet à `true` si le produit est réimporté. |
 | 12/08/2026 18:55 | Clear/unlock `manualOverrides` : `DELETE /api/products/:id/manual-overrides/:field` + UI Dashboard « Reprendre depuis le feed ». |
