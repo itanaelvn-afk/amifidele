@@ -4,12 +4,13 @@ Site web de comparatif de produits destiné aux propriétaires d'animaux de comp
 
 ## 🚀 Fonctionnalités
 
-- **Comparaison de produits** : Comparez facilement les produits pour vos animaux
-- **Intégration API** : Récupération dynamique des produits depuis l'API api-amifidele
-- **Liens affiliés** : Gestion automatique des liens affiliés vers les revendeurs
-- **Interface moderne** : Design attractif et responsive optimisé pour les propriétaires d'animaux
-- **Recherche et filtres** : Recherchez et filtrez les produits par catégorie
-- **Produits recommandés** : Mise en avant des meilleurs produits selon les notes
+- **Comparaison multi-offres** : même produit (EAN) → « À partir de » + tableau d’offres sur la fiche
+- **Catalogue dynamique** : produits depuis l’API api-amifidele (projection canonique)
+- **Liens affiliés** : CTA marchand (Awin / Amazon / manuel) avec tracking
+- **URLs stables** : `canonicalId` préfère l’offre Awin ; les ids `amazon_…` redirigent vers la fiche canonique
+- **Interface moderne** : design responsive pour les propriétaires d’animaux
+- **Recherche et filtres** : catégories, marques, prix
+- **SEO** : JSON-LD Product / AggregateOffer, sitemap dédupliqué par `canonicalId`
 
 ## 📋 Prérequis
 
@@ -69,43 +70,26 @@ Détail : [`docs/CI.md`](docs/CI.md). La CI GitHub (`.github/workflows/ci.yml`) 
 - Sans ID : en **dev** l’envoi est simulé ; en **prod** → erreur + fallback `contact@amifidele.fr`
 - Détail du flux : commentaires en tête de `src/app/api/contact/route.ts`
 
-## 🎯 Configuration de l'API
+## 🎯 Contrat API (lecture site)
 
-Le site est configuré pour fonctionner avec l'API `api-amifidele`. 
+Le site consomme la **projection canonique** via le BFF (`/api/bff/*`). Mapping affichage : `src/lib/utils/api-utils.ts`.
 
-### Structure attendue de l'API
+### Champs utiles multi-offres
 
-L'API doit retourner des produits au format suivant :
+| Champ | Où | Rôle |
+|-------|-----|------|
+| `ean` | listing / détail | Regroupement |
+| `offerCount` / `minPrice` | listing / détail | Affichage « À partir de » |
+| `canonicalId` | listing / détail | Lien public préféré (souvent Awin) |
+| `offers[]` | détail seulement | Comparateur PDP |
 
-```json
-{
-  "id": 1,
-  "name": "Nom du produit",
-  "category": "Alimentation",
-  "price": 45.99,
-  "rating": 4.8,
-  "image": "https://...",
-  "description": "Description du produit",
-  "features": ["Caractéristique 1", "Caractéristique 2"],
-  "brand": "Marque",
-  "affiliateLinks": [
-    {
-      "retailer": "Zooplus",
-      "url": "https://...",
-      "price": 45.99
-    }
-  ]
-}
-```
+### Endpoints utilisés
 
-### Endpoints attendus
+- `GET /api/products` — liste (filtres `categoryId`, `brandId`, `minPrice`, … ; visibilité publique forcée)
+- `GET /api/products/:id` — détail + `offers[]` si EAN partagé
+- `GET /api/categories`, `GET /api/brands`
 
-- `GET /api/products` - Liste tous les produits
-- `GET /api/products/:id` - Récupère un produit par ID
-- `GET /api/products?category=:category` - Filtre par catégorie
-- `GET /api/products/search?q=:query` - Recherche de produits
-
-Si votre API a une structure différente, vous pouvez adapter les fonctions dans `src/lib/api.ts`.
+Doc modèle : [`docs/MODELE_PRODUIT_CANONIQUE.md`](docs/MODELE_PRODUIT_CANONIQUE.md).
 
 ## 🚀 Démarrage
 
