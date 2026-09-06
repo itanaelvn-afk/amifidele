@@ -47,9 +47,13 @@ export async function generateMetadata({
   }
 
   const display = mapApiProductToDisplayProduct(raw);
+  const offerHint =
+    display.priceFrom && display.offerCount
+      ? `Comparez ${display.offerCount} offres`
+      : "Comparez";
   const description = truncate(
     stripHtml(display.description) ||
-      `Comparez ${display.name} sur AmiFidele, comparateur de produits pour animaux.`,
+      `${offerHint} ${display.name} sur AmiFidele, comparateur de produits pour animaux.`,
     160
   );
   const title = `${display.name} | AmiFidele`;

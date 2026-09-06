@@ -50,6 +50,41 @@ export function productJsonLd(product: DisplayProduct) {
     product.image.startsWith("http://") || product.image.startsWith("https://")
       ? product.image
       : undefined;
+  const currency = product.currency || "EUR";
+  const multiOffers =
+    product.offers && product.offers.length > 1 ? product.offers : null;
+
+  const offers = multiOffers
+    ? {
+        "@type": "AggregateOffer",
+        priceCurrency: currency,
+        lowPrice: product.minPrice ?? product.price,
+        highPrice: Math.max(...multiOffers.map((o) => o.price)),
+        offerCount: multiOffers.length,
+        offers: multiOffers.map((offer) => ({
+          "@type": "Offer",
+          price: offer.price,
+          priceCurrency: offer.currency || currency,
+          availability:
+            offer.inStock === false
+              ? "https://schema.org/OutOfStock"
+              : "https://schema.org/InStock",
+          url: offer.affiliateLink || pageUrl,
+          ...(offer.merchantName
+            ? { seller: { "@type": "Organization", name: offer.merchantName } }
+            : {}),
+        })),
+      }
+    : {
+        "@type": "Offer",
+        price: product.price,
+        priceCurrency: currency,
+        availability: "https://schema.org/InStock",
+        url: product.bestAffiliateLink || pageUrl,
+        ...(product.merchantName
+          ? { seller: { "@type": "Organization", name: product.merchantName } }
+          : {}),
+      };
 
   return {
     "@context": "https://schema.org",
@@ -59,19 +94,11 @@ export function productJsonLd(product: DisplayProduct) {
     image,
     url: pageUrl,
     sku: product.id,
+    ...(product.ean ? { gtin13: product.ean } : {}),
     ...(product.brand
       ? { brand: { "@type": "Brand", name: product.brand } }
       : {}),
-    offers: {
-      "@type": "Offer",
-      price: product.price,
-      priceCurrency: product.currency || "EUR",
-      availability: "https://schema.org/InStock",
-      url: product.bestAffiliateLink || pageUrl,
-      ...(product.merchantName
-        ? { seller: { "@type": "Organization", name: product.merchantName } }
-        : {}),
-    },
+    offers,
   };
 }
 

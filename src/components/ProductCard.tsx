@@ -70,7 +70,16 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
                 {product.oldPrice.toFixed(2)}€
               </p>
             )}
-            <p className="text-primary">{product.price.toFixed(2)}€</p>
+            {product.priceFrom ? (
+              <p className="text-primary">
+                <span className="block text-xs font-normal text-muted-foreground">
+                  À partir de
+                </span>
+                {product.price.toFixed(2)}€
+              </p>
+            ) : (
+              <p className="text-primary">{product.price.toFixed(2)}€</p>
+            )}
           </div>
         </div>
 
@@ -128,11 +137,15 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
             )}
           </div>
 
-          {product.merchantName && (
+          {product.priceFrom && (product.offerCount ?? 0) > 1 ? (
+            <p className="text-xs text-muted-foreground mt-2 text-center">
+              Comparé chez {product.offerCount} marchands
+            </p>
+          ) : product.merchantName ? (
             <p className="text-xs text-muted-foreground mt-2 text-center">
               Disponible chez {product.merchantName}
             </p>
-          )}
+          ) : null}
           <p className="text-xs text-muted-foreground mt-1 text-center">
             {formatDeliveryLabel(product.delivery, product.currency)}
           </p>
