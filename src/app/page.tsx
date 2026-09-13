@@ -6,6 +6,7 @@ export const metadata = pageMetadata({
   title: DEFAULT_TITLE,
   description: DEFAULT_DESCRIPTION,
   path: "/",
+  absolute: true,
 });
 
 export default function Home() {

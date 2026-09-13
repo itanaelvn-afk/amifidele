@@ -3,7 +3,7 @@ import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Conditions générales d'utilisation | AmiFidele",
+  title: "Conditions générales d'utilisation",
   description:
     "Conditions générales d'utilisation (CGU) du comparateur AmiFidele.",
   path: "/cgu",
