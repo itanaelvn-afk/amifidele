@@ -31,6 +31,11 @@ interface ProductFiltersProps {
   onFiltersChange: (filters: ProductFilters) => void;
   /** Options préchargées (RSC) — évite 3 fetch client au montage. */
   initialOptions?: CatalogFilterOptions | null;
+  /**
+   * Catégorie imposée par la route (ex. `/chien/nourriture`).
+   * Masque le select catégorie ; le parent doit forcément renvoyer ce `categoryId`.
+   */
+  lockedCategoryId?: string;
 }
 
 function resolveInitialOptions(
@@ -40,9 +45,12 @@ function resolveInitialOptions(
   return readClientFilterOptionsCache();
 }
 
-function countActiveFilters(filters: ProductFilters): number {
+function countActiveFilters(
+  filters: ProductFilters,
+  lockedCategoryId?: string
+): number {
   let n = 0;
-  if (filters.categoryName || filters.categoryId) n += 1;
+  if (!lockedCategoryId && (filters.categoryName || filters.categoryId)) n += 1;
   if (filters.brandId || filters.brandName) n += 1;
   if (filters.merchantId) n += 1;
   if (filters.minPrice !== undefined || filters.maxPrice !== undefined) n += 1;
@@ -54,6 +62,7 @@ export function ProductFiltersComponent({
   filters,
   onFiltersChange,
   initialOptions = null,
+  lockedCategoryId,
 }: ProductFiltersProps) {
   const ids = useId();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -97,6 +106,18 @@ export function ProductFiltersComponent({
     };
   }, [hasSeed]);
 
+  const emitFilters = (next: ProductFilters) => {
+    if (lockedCategoryId) {
+      onFiltersChange({
+        ...next,
+        categoryId: lockedCategoryId,
+        categoryName: undefined,
+      });
+      return;
+    }
+    onFiltersChange(next);
+  };
+
   const handleFilterChange = (key: keyof ProductFilters, value: string | number | boolean | undefined) => {
     let normalizedValue: string | number | boolean | undefined = value;
     if (value === "" || value === null) {
@@ -111,7 +132,7 @@ export function ProductFiltersComponent({
       newFilters.categoryName = undefined;
     }
 
-    onFiltersChange(newFilters);
+    emitFilters(newFilters);
   };
 
   const applyPriceRange = (minPrice?: number, maxPrice?: number) => {
@@ -120,7 +141,7 @@ export function ProductFiltersComponent({
     else next.minPrice = minPrice;
     if (maxPrice === undefined) delete next.maxPrice;
     else next.maxPrice = maxPrice;
-    onFiltersChange(next);
+    emitFilters(next);
   };
 
   const applyBrand = (brandId?: string, brandName?: string) => {
@@ -133,15 +154,16 @@ export function ProductFiltersComponent({
       if (brandName) next.brandName = brandName;
       else delete next.brandName;
     }
-    onFiltersChange(next);
+    emitFilters(next);
   };
 
   const handleReset = () => {
-    onFiltersChange({});
+    emitFilters(lockedCategoryId ? { categoryId: lockedCategoryId } : {});
   };
 
-  const activeFilterCount = countActiveFilters(filters);
+  const activeFilterCount = countActiveFilters(filters, lockedCategoryId);
   const hasActiveFilters = activeFilterCount > 0;
+  const showCategoryField = !lockedCategoryId;
 
   const rootCategories = categories
     .filter((c) => !c.parentId)
@@ -190,7 +212,7 @@ export function ProductFiltersComponent({
 
     return (
       <div className="flex flex-wrap gap-2">
-        {filters.categoryName && (
+        {showCategoryField && filters.categoryName && (
           <Badge variant="default" className="gap-2">
             Catégorie: {filters.categoryName}
             <button
@@ -203,7 +225,7 @@ export function ProductFiltersComponent({
             </button>
           </Badge>
         )}
-        {filters.categoryId && (
+        {showCategoryField && filters.categoryId && (
           <Badge variant="default" className="gap-2">
             Catégorie:{" "}
             {categoryDisplayLabel(
@@ -285,7 +307,14 @@ export function ProductFiltersComponent({
     const priceFieldId = `${ids}-${prefix}-price`;
 
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div
+        className={
+          showCategoryField
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            : "grid grid-cols-1 sm:grid-cols-3 gap-4"
+        }
+      >
+        {showCategoryField && (
         <div>
           <label htmlFor={categoryFieldId} className="block text-sm font-medium mb-2">
             Catégorie
@@ -351,6 +380,7 @@ export function ProductFiltersComponent({
                 ))}
           </select>
         </div>
+        )}
 
         <div>
           <label htmlFor={brandFieldId} className="block text-sm font-medium mb-2">

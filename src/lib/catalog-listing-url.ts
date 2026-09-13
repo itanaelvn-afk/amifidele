@@ -57,7 +57,8 @@ export function parseCatalogListingParams(
 
 /** Sérialise l’état catalogue (omet les valeurs par défaut). */
 export function catalogListingToSearchParams(
-  state: CatalogListingState
+  state: CatalogListingState,
+  options?: { omitCategory?: boolean }
 ): URLSearchParams {
   const params = new URLSearchParams();
 
@@ -65,8 +66,10 @@ export function catalogListingToSearchParams(
   if (state.page > 1) params.set("page", String(state.page));
   if (state.sort !== DEFAULT_PRODUCT_SORT) params.set("sort", state.sort);
 
-  if (state.categoryId) params.set("categoryId", state.categoryId);
-  else if (state.categoryName) params.set("categoryName", state.categoryName);
+  if (!options?.omitCategory) {
+    if (state.categoryId) params.set("categoryId", state.categoryId);
+    else if (state.categoryName) params.set("categoryName", state.categoryName);
+  }
 
   if (state.merchantId) params.set("merchantId", state.merchantId);
 
@@ -107,9 +110,10 @@ export function mergeCatalogListingState(
 
 export function catalogListingHref(
   pathname: string,
-  state: CatalogListingState
+  state: CatalogListingState,
+  options?: { omitCategory?: boolean }
 ): string {
-  const qs = catalogListingToSearchParams(state).toString();
+  const qs = catalogListingToSearchParams(state, options).toString();
   return qs ? `${pathname}?${qs}` : pathname;
 }
 
