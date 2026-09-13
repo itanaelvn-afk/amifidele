@@ -5,39 +5,91 @@ import { X, Filter, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { fetchAdvertisers, fetchCategories, ProductFilters, Advertiser, Category } from "@/lib/api";
+import {
+  ProductFilters,
+  Advertiser,
+  Category,
+} from "@/lib/api";
+import {
+  type CatalogFilterOptions,
+  hasUsableFilterOptions,
+  loadCatalogFilterOptions,
+  readClientFilterOptionsCache,
+  writeClientFilterOptionsCache,
+} from "@/lib/catalog-filter-options";
 
 interface ProductFiltersProps {
   filters: ProductFilters;
   onFiltersChange: (filters: ProductFilters) => void;
+  /** Options préchargées (RSC) — évite 3 fetch client au montage. */
+  initialOptions?: CatalogFilterOptions | null;
 }
 
-export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFiltersProps) {
+function resolveInitialOptions(
+  initialOptions?: CatalogFilterOptions | null
+): CatalogFilterOptions | null {
+  if (hasUsableFilterOptions(initialOptions)) return initialOptions!;
+  return readClientFilterOptionsCache();
+}
+
+export function ProductFiltersComponent({
+  filters,
+  onFiltersChange,
+  initialOptions = null,
+}: ProductFiltersProps) {
   const categoryId = useId();
+  const brandSelectId = useId();
   const merchantId = useId();
   const priceId = useId();
-  const [merchants, setMerchants] = useState<Advertiser[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+
+  const seeded = resolveInitialOptions(initialOptions);
+  const [merchants, setMerchants] = useState<Advertiser[]>(seeded?.merchants ?? []);
+  const [brands, setBrands] = useState<CatalogFilterOptions["brands"]>(
+    seeded?.brands ?? []
+  );
+  const [categories, setCategories] = useState<Category[]>(seeded?.categories ?? []);
+  const [loading, setLoading] = useState(!hasUsableFilterOptions(seeded));
 
   useEffect(() => {
-    async function loadFilterOptions() {
+    if (hasUsableFilterOptions(initialOptions)) {
+      writeClientFilterOptionsCache(initialOptions!);
+      setMerchants(initialOptions!.merchants);
+      setCategories(initialOptions!.categories);
+      setBrands(initialOptions!.brands);
+      setLoading(false);
+      return;
+    }
+
+    const cached = readClientFilterOptionsCache();
+    if (cached) {
+      setMerchants(cached.merchants);
+      setCategories(cached.categories);
+      setBrands(cached.brands);
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    async function loadFilterOptionsFallback() {
       try {
         setLoading(true);
-        const [merchantsData, categoriesData] = await Promise.all([
-          fetchAdvertisers(),
-          fetchCategories(),
-        ]);
-        setMerchants(merchantsData);
-        setCategories(categoriesData);
+        const next = await loadCatalogFilterOptions();
+        if (cancelled) return;
+        writeClientFilterOptionsCache(next);
+        setMerchants(next.merchants);
+        setCategories(next.categories);
+        setBrands(next.brands);
       } catch (err) {
         console.error("Erreur lors du chargement des options de filtres:", err);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     }
-    loadFilterOptions();
-  }, []);
+    void loadFilterOptionsFallback();
+    return () => {
+      cancelled = true;
+    };
+  }, [initialOptions]);
 
   const handleFilterChange = (key: keyof ProductFilters, value: string | number | boolean | undefined) => {
     // Normaliser les valeurs vides
@@ -65,6 +117,20 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
     else next.minPrice = minPrice;
     if (maxPrice === undefined) delete next.maxPrice;
     else next.maxPrice = maxPrice;
+    onFiltersChange(next);
+  };
+
+  /** Met à jour brandId + brandName ensemble (sync URL côté ComparisonPage). */
+  const applyBrand = (brandId?: string, brandName?: string) => {
+    const next = { ...filters };
+    if (!brandId) {
+      delete next.brandId;
+      delete next.brandName;
+    } else {
+      next.brandId = brandId;
+      if (brandName) next.brandName = brandName;
+      else delete next.brandName;
+    }
     onFiltersChange(next);
   };
 
@@ -110,6 +176,13 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
 
   const categoryDisplayLabel = (cat: Category | undefined, fallback: string) =>
     cat?.label || cat?.name || fallback;
+
+  const brandOptions = brands;
+
+  const selectedBrandLabel =
+    filters.brandName ||
+    brandOptions.find((b) => b.id === filters.brandId)?.name ||
+    filters.brandId;
 
   return (
     <Card className="p-6 mb-6">
@@ -180,14 +253,10 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
             )}
             {(filters.brandId || filters.brandName) && (
               <Badge variant="default" className="gap-2">
-                Marque: {filters.brandName || filters.brandId}
+                Marque: {selectedBrandLabel}
                 <button
-                  onClick={() => {
-                    const next = { ...filters };
-                    delete next.brandId;
-                    delete next.brandName;
-                    onFiltersChange(next);
-                  }}
+                  type="button"
+                  onClick={() => applyBrand(undefined)}
                   className="ml-1 hover:bg-primary/20 rounded-full p-0.5"
                   aria-label="Retirer le filtre marque"
                 >
@@ -259,7 +328,7 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
       )}
 
       {/* Filtres principaux */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <div>
           <label htmlFor={categoryId} className="block text-sm font-medium mb-2">
             Catégorie
@@ -323,6 +392,45 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
                     {cat.label || cat.name}
                   </option>
                 ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor={brandSelectId} className="block text-sm font-medium mb-2">
+            Marque
+          </label>
+          <select
+            id={brandSelectId}
+            disabled={loading}
+            value={filters.brandId || ""}
+            onChange={(e) => {
+              const id = e.target.value;
+              if (!id) {
+                applyBrand(undefined);
+                return;
+              }
+              const match = brandOptions.find((b) => b.id === id);
+              applyBrand(id, match?.name);
+            }}
+            className="w-full border rounded-md p-2 text-sm bg-background disabled:opacity-60"
+          >
+            <option value="">
+              {loading
+                ? "Chargement…"
+                : brandOptions.length === 0
+                  ? "Aucune marque"
+                  : "Toutes les marques"}
+            </option>
+            {filters.brandId &&
+              !brandOptions.some((b) => b.id === filters.brandId) && (
+                <option value={filters.brandId}>{selectedBrandLabel}</option>
+              )}
+            {!loading &&
+              brandOptions.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
           </select>
         </div>
 
