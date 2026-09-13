@@ -291,7 +291,7 @@ export function ComparisonPage({
                 onChange={(e) =>
                   handleSortChange(parseProductSortValue(e.target.value))
                 }
-                className="h-10 min-w-[11rem] rounded-md border border-border bg-background px-3 text-sm text-foreground"
+                className="h-10 min-w-[11rem] rounded-md border border-border bg-white px-3 text-sm text-foreground"
               >
                 {PRODUCT_SORT_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
