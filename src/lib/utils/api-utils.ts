@@ -6,6 +6,7 @@
 import { DisplayOffer, DisplayProduct, Product } from '../types';
 import { ApiProduct } from '../api';
 import { buildCategoryBreadcrumb } from '../category-breadcrumb';
+import { resolveDetailImageUrl, resolveListingImageUrl } from '../product-image';
 
 function firstNonEmpty(...values: Array<string | undefined | null>): string {
   for (const value of values) {
@@ -74,13 +75,18 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct | Product):
   const priceFrom = offerCount > 1;
   const displayPrice = priceFrom && minPrice != null ? minPrice : price;
 
-  const image = firstNonEmpty(
+  const imageRaw = firstNonEmpty(
     apiProduct.images?.main,
     apiProduct.images?.thumb,
     apiProduct.uri?.mImage,
     apiProduct.uri?.awImage,
     apiProduct.uri?.awThumb
   ) || '/images/placeholder.jpg';
+  const image = resolveDetailImageUrl(imageRaw) || imageRaw;
+  const imageListing =
+    resolveListingImageUrl(apiProduct.images?.main, apiProduct.images?.thumb) ||
+    resolveListingImageUrl(imageRaw) ||
+    image;
 
   const name = firstNonEmpty(apiProduct.name, apiProduct.text?.name);
   const description = firstNonEmpty(apiProduct.description, apiProduct.text?.desc);
@@ -165,6 +171,7 @@ export function mapApiProductToDisplayProduct(apiProduct: ApiProduct | Product):
     ...(unitPriceLabel ? { unitPriceLabel } : {}),
     ...(apiProduct.packSize ? { packSize: apiProduct.packSize } : {}),
     image,
+    imageListing,
     description,
     ...(apiProduct.descriptionFormat === "html" || apiProduct.descriptionFormat === "plain"
       ? { descriptionFormat: apiProduct.descriptionFormat }

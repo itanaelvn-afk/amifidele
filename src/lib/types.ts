@@ -172,7 +172,10 @@ export interface DisplayProduct {
   packSize?: string;
   /** Absent tant qu’il n’y a pas de vraies notes */
   rating?: number;
+  /** Image principale (PDP / OG) */
   image: string;
+  /** Image allégée pour grilles listing (CDN resize si possible) */
+  imageListing?: string;
   description: string;
   descriptionFormat?: "html" | "plain";
   features?: string[];

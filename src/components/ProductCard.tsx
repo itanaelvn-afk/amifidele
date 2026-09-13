@@ -45,7 +45,7 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
       <div className="relative shrink-0 overflow-hidden bg-white aspect-[4/3] min-h-64">
         <Link href={href} className="block h-full">
           <ImageWithFallback
-            src={product.image}
+            src={product.imageListing || product.image}
             alt={product.name}
             className="w-full h-full min-h-64 bg-white"
             imageClassName="object-contain transition-transform duration-300 group-hover:scale-105"
