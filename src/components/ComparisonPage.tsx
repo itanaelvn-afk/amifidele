@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { ProductFiltersComponent } from "@/components/ProductFilters";
 import { ProductFilters } from "@/lib/api";
+import type { CatalogFilterOptions } from "@/lib/catalog-filter-options";
 import { useProducts } from "@/hooks/useProducts";
 import {
   DEFAULT_PRODUCT_SORT,
@@ -50,7 +51,11 @@ function getVisiblePageNumbers(
   return Array.from({ length: count }, (_, i) => start + i);
 }
 
-export function ComparisonPage() {
+export function ComparisonPage({
+  filterOptions = null,
+}: {
+  filterOptions?: CatalogFilterOptions | null;
+}) {
   const sortSelectId = useId();
   const router = useRouter();
   const pathname = usePathname();
@@ -235,6 +240,7 @@ export function ComparisonPage() {
         {/* Filtres */}
         <ProductFiltersComponent
           filters={filtersWithUrl}
+          initialOptions={filterOptions}
           onFiltersChange={(nextFilters) => {
             setCurrentPage(1);
             setFilters(nextFilters);
@@ -453,8 +459,10 @@ export function ComparisonPage() {
               <Button
                 variant="outline"
                 onClick={() => {
+                  setCurrentPage(1);
                   setSearchQuery("");
                   setFilters({});
+                  syncBrandToUrl(undefined);
                 }}
               >
                 Réinitialiser les filtres
