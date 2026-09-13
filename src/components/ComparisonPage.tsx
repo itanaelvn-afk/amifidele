@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useId } from "react";
+import { useState, useEffect, useCallback, useId, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { PawPrint, Search, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { ProductCard } from "@/components/ProductCard";
@@ -13,9 +13,16 @@ import { Card } from "@/components/ui/card";
 import { ProductFiltersComponent } from "@/components/ProductFilters";
 import { ProductFilters } from "@/lib/api";
 import type { CatalogFilterOptions } from "@/lib/catalog-filter-options";
+import {
+  EMPTY_CATALOG_LISTING,
+  catalogListingHref,
+  catalogListingToProductFilters,
+  mergeCatalogListingState,
+  parseCatalogListingParams,
+  type CatalogListingState,
+} from "@/lib/catalog-listing-url";
 import { useProducts } from "@/hooks/useProducts";
 import {
-  DEFAULT_PRODUCT_SORT,
   PRODUCT_SORT_OPTIONS,
   parseProductSortValue,
   sortValueToApiParams,
@@ -29,6 +36,7 @@ import { cn } from "@/components/utils";
 
 const SEARCH_DEBOUNCE_MS = 350;
 const MAX_COMPARISON_PRODUCTS = 3;
+const LIMIT = 20;
 
 /** Fenêtre de numéros de page centrée sur la page courante. */
 function getVisiblePageNumbers(
@@ -51,6 +59,20 @@ function getVisiblePageNumbers(
   return Array.from({ length: count }, (_, i) => start + i);
 }
 
+function filtersToListingPatch(filters: ProductFilters): Partial<CatalogListingState> {
+  return {
+    categoryId: filters.categoryId,
+    categoryName: filters.categoryId ? undefined : filters.categoryName,
+    merchantId: filters.merchantId,
+    brandId: filters.brandId,
+    brandName: filters.brandId ? filters.brandName : undefined,
+    minPrice: filters.minPrice,
+    maxPrice: filters.maxPrice,
+    search: filters.search?.trim() || "",
+    page: 1,
+  };
+}
+
 export function ComparisonPage({
   filterOptions = null,
 }: {
@@ -61,88 +83,66 @@ export function ComparisonPage({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [filters, setFilters] = useState<ProductFilters>({});
-  const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const listing = useMemo(
+    () => parseCatalogListingParams(searchParams),
+    [searchParams]
+  );
+  const filtersFromUrl = useMemo(
+    () => catalogListingToProductFilters(listing),
+    [listing]
+  );
+
+  const [searchInput, setSearchInput] = useState(listing.search);
+  const [prevUrlSearch, setPrevUrlSearch] = useState(listing.search);
+  if (listing.search !== prevUrlSearch) {
+    setPrevUrlSearch(listing.search);
+    setSearchInput(listing.search);
+  }
+
   /** Produits choisis (objets complets) — survivent au changement de page / filtre. */
   const [selectedProducts, setSelectedProducts] = useState<DisplayProduct[]>([]);
   const [suggestions, setSuggestions] = useState<DisplayProduct[]>([]);
   const [showComparison, setShowComparison] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const sortValue = parseProductSortValue(searchParams.get("sort"));
-  const urlBrandId = searchParams.get("brandId")?.trim() || undefined;
-  const urlBrandName = searchParams.get("brandName")?.trim() || undefined;
-  const filtersWithUrl: ProductFilters = {
-    ...filters,
-    brandId: urlBrandId,
-    brandName: urlBrandId ? urlBrandName : undefined,
-  };
-  const limit = 20;
 
   const { products, loading, error, pagination, loadProducts } = useProducts();
 
-  const syncSortToUrl = useCallback(
-    (next: ProductSortValue) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (next === DEFAULT_PRODUCT_SORT) {
-        params.delete("sort");
-      } else {
-        params.set("sort", next);
-      }
-      const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  const replaceListing = useCallback(
+    (patch: Partial<CatalogListingState>) => {
+      const next = mergeCatalogListingState(listing, patch);
+      router.replace(catalogListingHref(pathname, next), { scroll: false });
     },
-    [pathname, router, searchParams]
+    [listing, pathname, router]
   );
 
-  const syncBrandToUrl = useCallback(
-    (brandId?: string, brandName?: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (brandId) {
-        params.set("brandId", brandId);
-        if (brandName) params.set("brandName", brandName);
-        else params.delete("brandName");
-      } else {
-        params.delete("brandId");
-        params.delete("brandName");
-      }
-      const qs = params.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
-    },
-    [pathname, router, searchParams]
-  );
+  const resetListing = useCallback(() => {
+    setSearchInput("");
+    router.replace(pathname, { scroll: false });
+  }, [pathname, router]);
 
-  // Debounce la recherche pour éviter une requête à chaque frappe
+  // Debounce : pousse `q` dans l’URL (et reset page) une fois la frappe stabilisée
   useEffect(() => {
+    const trimmed = searchInput.trim();
+    if (trimmed === listing.search) return;
     const timer = setTimeout(() => {
-      setDebouncedSearch(searchQuery.trim());
+      replaceListing({ search: trimmed, page: 1 });
     }, SEARCH_DEBOUNCE_MS);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [searchInput, listing.search, replaceListing]);
 
-  // Charger les produits selon les filtres + recherche stabilisée + tri
+  // Charger les produits selon l’URL
   useEffect(() => {
     const filtersToApply: ProductFilters = {
-      ...filters,
-      brandId: urlBrandId,
-      brandName: urlBrandId ? urlBrandName : undefined,
+      ...catalogListingToProductFilters(listing),
     };
-    if (debouncedSearch) {
-      filtersToApply.search = debouncedSearch;
+    delete filtersToApply.search;
+    if (listing.search) {
+      filtersToApply.search = listing.search;
     }
-    const { sort, order } = sortValueToApiParams(sortValue);
+    const { sort, order } = sortValueToApiParams(listing.sort);
     filtersToApply.sort = sort;
     filtersToApply.order = order;
-    void loadProducts(currentPage, limit, filtersToApply);
-  }, [
-    currentPage,
-    filters,
-    urlBrandId,
-    urlBrandName,
-    debouncedSearch,
-    sortValue,
-    loadProducts,
-  ]);
+    void loadProducts(listing.page, LIMIT, filtersToApply);
+  }, [listing, loadProducts]);
 
   // Suggestions pour compléter la comparaison (1 ou 2 produits déjà choisis)
   useEffect(() => {
@@ -165,8 +165,21 @@ export function ComparisonPage({
   }, [selectedProducts]);
 
   const handleSortChange = (next: ProductSortValue) => {
-    setCurrentPage(1);
-    syncSortToUrl(next);
+    replaceListing({ sort: next, page: 1 });
+  };
+
+  const handleFiltersChange = (nextFilters: ProductFilters) => {
+    const patch = filtersToListingPatch(nextFilters);
+    if (typeof patch.search === "string") {
+      setSearchInput(patch.search);
+    }
+    // Remplace les filtres (les clés absentes / undefined effacent l’URL),
+    // en conservant le tri courant.
+    replaceListing({
+      ...EMPTY_CATALOG_LISTING,
+      sort: listing.sort,
+      ...patch,
+    });
   };
 
   const toggleProductSelection = (id: string) => {
@@ -198,6 +211,7 @@ export function ComparisonPage({
   const isInitialLoad = loading && products.length === 0;
   const totalLabel =
     loading && pagination.total === 0 ? "…" : pagination.total.toLocaleString("fr-FR");
+  const currentPage = listing.page;
 
   return (
     <div className="min-h-screen bg-background">
@@ -210,19 +224,19 @@ export function ComparisonPage({
             <Input
               type="search"
               placeholder="Rechercher un produit, une marque, une catégorie..."
-              value={searchQuery}
+              value={searchInput}
               onChange={(e) => {
-                setCurrentPage(1);
-                setSearchQuery(e.target.value);
+                setSearchInput(e.target.value);
               }}
               className="pl-12 pr-10 h-12 text-base bg-background border-2 focus:border-primary transition-colors"
               aria-label="Rechercher un produit, une marque ou une catégorie"
             />
-            {searchQuery && (
+            {searchInput && (
               <button
+                type="button"
                 onClick={() => {
-                  setCurrentPage(1);
-                  setSearchQuery("");
+                  setSearchInput("");
+                  replaceListing({ search: "", page: 1 });
                 }}
                 className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted transition-colors"
                 aria-label="Effacer la recherche"
@@ -239,13 +253,9 @@ export function ComparisonPage({
       <main className="container mx-auto px-4 py-8">
         {/* Filtres */}
         <ProductFiltersComponent
-          filters={filtersWithUrl}
+          filters={filtersFromUrl}
           initialOptions={filterOptions}
-          onFiltersChange={(nextFilters) => {
-            setCurrentPage(1);
-            setFilters(nextFilters);
-            syncBrandToUrl(nextFilters.brandId, nextFilters.brandName);
-          }}
+          onFiltersChange={handleFiltersChange}
         />
         {/* Results Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
@@ -277,7 +287,7 @@ export function ComparisonPage({
               <span className="whitespace-nowrap">Trier par</span>
               <select
                 id={sortSelectId}
-                value={sortValue}
+                value={listing.sort}
                 onChange={(e) =>
                   handleSortChange(parseProductSortValue(e.target.value))
                 }
@@ -360,11 +370,11 @@ export function ComparisonPage({
               <div className="text-sm text-muted-foreground text-center px-1">
                 Affichage de{" "}
                 <span className="font-semibold text-foreground">
-                  {(currentPage - 1) * limit + 1}
+                  {(currentPage - 1) * LIMIT + 1}
                 </span>{" "}
                 à{" "}
                 <span className="font-semibold text-foreground">
-                  {Math.min(currentPage * limit, pagination.total)}
+                  {Math.min(currentPage * LIMIT, pagination.total)}
                 </span>{" "}
                 sur{" "}
                 <span className="font-semibold text-foreground">
@@ -377,7 +387,9 @@ export function ComparisonPage({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  onClick={() =>
+                    replaceListing({ page: Math.max(1, currentPage - 1) })
+                  }
                   disabled={currentPage === 1}
                   className="shrink-0 gap-1 px-2.5 sm:gap-2 sm:px-3"
                   aria-label="Page précédente"
@@ -393,7 +405,7 @@ export function ComparisonPage({
                         key={`m-${pageNum}`}
                         variant={currentPage === pageNum ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setCurrentPage(pageNum)}
+                        onClick={() => replaceListing({ page: pageNum })}
                         className={cn(
                           "min-w-9 px-2",
                           currentPage === pageNum &&
@@ -413,7 +425,7 @@ export function ComparisonPage({
                         key={`d-${pageNum}`}
                         variant={currentPage === pageNum ? "default" : "outline"}
                         size="sm"
-                        onClick={() => setCurrentPage(pageNum)}
+                        onClick={() => replaceListing({ page: pageNum })}
                         className={cn(
                           "min-w-10",
                           currentPage === pageNum &&
@@ -430,9 +442,9 @@ export function ComparisonPage({
                   variant="outline"
                   size="sm"
                   onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(pagination.totalPages, prev + 1)
-                    )
+                    replaceListing({
+                      page: Math.min(pagination.totalPages, currentPage + 1),
+                    })
                   }
                   disabled={currentPage === pagination.totalPages}
                   className="shrink-0 gap-1 px-2.5 sm:gap-2 sm:px-3"
@@ -456,15 +468,7 @@ export function ComparisonPage({
               Essayez de modifier vos critères de recherche ou de changer de catégorie
             </p>
             <div className="flex flex-wrap gap-2 justify-center">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setCurrentPage(1);
-                  setSearchQuery("");
-                  setFilters({});
-                  syncBrandToUrl(undefined);
-                }}
-              >
+              <Button variant="outline" onClick={resetListing}>
                 Réinitialiser les filtres
               </Button>
             </div>
