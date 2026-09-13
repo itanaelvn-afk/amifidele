@@ -4,7 +4,7 @@ import { LegalPageShell, LegalSection } from "@/components/LegalPageShell";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Gestion des cookies | AmiFidele",
+  title: "Gestion des cookies",
   description:
     "Information sur les cookies utilisés par AmiFidele et gestion de vos préférences.",
   path: "/cookies",

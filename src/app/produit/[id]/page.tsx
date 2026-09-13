@@ -10,7 +10,7 @@ import { ProductDetailView } from "@/components/ProductDetailView";
 import { parseProductDescription } from "@/lib/format-description";
 import { sanitizeDescriptionHtml } from "@/lib/sanitize-description-html";
 import { productPath, stripHtml, truncate } from "@/lib/product-path";
-import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo";
+import { DEFAULT_OG_IMAGE, SITE_NAME, formatPageTitle, productTitleSegment } from "@/lib/seo";
 
 function collectExtraImages(product: {
   images?: { main?: string; thumb?: string };
@@ -41,7 +41,7 @@ export async function generateMetadata({
   const raw = await fetchProductById(decodeURIComponent(id));
   if (!raw) {
     return {
-      title: "Produit introuvable | AmiFidele",
+      title: "Produit introuvable",
       robots: { index: false, follow: false },
     };
   }
@@ -56,14 +56,15 @@ export async function generateMetadata({
       `${offerHint} ${display.name} sur AmiFidele, comparateur de produits pour animaux.`,
     160
   );
-  const title = `${display.name} | AmiFidele`;
+  const titleSegment = productTitleSegment(display.name);
+  const title = formatPageTitle(titleSegment);
   const image =
     display.image.startsWith("http://") || display.image.startsWith("https://")
       ? display.image
       : DEFAULT_OG_IMAGE;
 
   return {
-    title,
+    title: titleSegment,
     description,
     alternates: { canonical: productPath(display) },
     openGraph: {

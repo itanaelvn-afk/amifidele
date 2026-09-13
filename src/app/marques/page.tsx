@@ -5,7 +5,7 @@ import { productsByBrandHref } from "@/lib/brand-path";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Marques | AmiFidele",
+  title: "Marques pour chiens et chats",
   description:
     "Parcourez les marques du catalogue AmiFidele et filtrez les produits par marque.",
   path: "/marques",

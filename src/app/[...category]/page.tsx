@@ -11,7 +11,7 @@ import {
   categoryPath,
   slugFromSegments,
 } from "@/lib/category-path";
-import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo";
+import { DEFAULT_OG_IMAGE, SITE_NAME, categoryTitleSegment, formatPageTitle } from "@/lib/seo";
 
 type RouteParams = { category: string[] };
 
@@ -46,12 +46,13 @@ export async function generateMetadata({
   const categories = await fetchCategories();
   const cat = findCategory(categories, slug);
   if (!cat) {
-    return { title: "Catégorie introuvable | AmiFidele", robots: { index: false, follow: false } };
+    return { title: "Catégorie introuvable", robots: { index: false, follow: false } };
   }
-  const title = `${cat.name} | AmiFidele`;
+  const titleSegment = categoryTitleSegment(cat.name);
+  const title = formatPageTitle(titleSegment);
   const description = `Comparez les produits ${cat.name.toLowerCase()} pour animaux sur AmiFidele.`;
   return {
-    title,
+    title: titleSegment,
     description,
     alternates: { canonical: categoryPath(slug) },
     openGraph: {
