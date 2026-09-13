@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import { fetchCategories, type Category } from "@/lib/api";
 import { SiteChrome } from "@/components/SiteChrome";
 import { CategoryProductGrid } from "@/components/CategoryProductGrid";
+import { ProductGridSkeleton } from "@/components/ProductGridSkeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   NAV_ROOT_CATEGORIES,
@@ -11,6 +13,7 @@ import {
   categoryPath,
   slugFromSegments,
 } from "@/lib/category-path";
+import { getCatalogFilterOptions } from "@/lib/get-catalog-filter-options";
 import { DEFAULT_OG_IMAGE, SITE_NAME, categoryTitleSegment, formatPageTitle } from "@/lib/seo";
 
 type RouteParams = { category: string[] };
@@ -73,6 +76,17 @@ export async function generateMetadata({
   };
 }
 
+function CategoryGridFallback() {
+  return (
+    <div>
+      <div className="h-12 rounded-md bg-muted animate-pulse mb-6" aria-hidden="true" />
+      <div className="h-40 rounded-xl bg-muted animate-pulse mb-6" aria-hidden="true" />
+      <ProductGridSkeleton count={8} />
+      <p className="sr-only">Chargement des produits…</p>
+    </div>
+  );
+}
+
 export default async function CategoryPage({
   params,
 }: {
@@ -88,7 +102,10 @@ export default async function CategoryPage({
   }
 
   const slug = slugFromSegments(parts);
-  const categories = await fetchCategories();
+  const [categories, filterOptions] = await Promise.all([
+    fetchCategories(),
+    getCatalogFilterOptions().catch(() => null),
+  ]);
   const cat = findCategory(categories, slug);
   if (!cat) {
     notFound();
@@ -96,6 +113,7 @@ export default async function CategoryPage({
 
   const children = categories.filter((c) => c.parentId === (cat.slug || cat.id));
   const parent = cat.parentId ? findCategory(categories, cat.parentId) : undefined;
+  const categoryId = cat.slug || cat.id || slug;
 
   return (
     <SiteChrome current="other">
@@ -144,10 +162,13 @@ export default async function CategoryPage({
           </section>
         )}
 
-        <CategoryProductGrid
-          key={cat.slug || cat.id || slug}
-          categoryId={cat.slug || cat.id || slug}
-        />
+        <Suspense fallback={<CategoryGridFallback />}>
+          <CategoryProductGrid
+            key={categoryId}
+            categoryId={categoryId}
+            filterOptions={filterOptions}
+          />
+        </Suspense>
       </main>
     </SiteChrome>
   );
