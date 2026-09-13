@@ -58,6 +58,16 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
     onFiltersChange(newFilters);
   };
 
+  /** Met à jour min/max en un seul appel (évite que le 2ᵉ setState écrase le 1ᵉ). */
+  const applyPriceRange = (minPrice?: number, maxPrice?: number) => {
+    const next = { ...filters };
+    if (minPrice === undefined) delete next.minPrice;
+    else next.minPrice = minPrice;
+    if (maxPrice === undefined) delete next.maxPrice;
+    else next.maxPrice = maxPrice;
+    onFiltersChange(next);
+  };
+
   const handleReset = () => {
     onFiltersChange({});
   };
@@ -353,24 +363,20 @@ export function ProductFiltersComponent({ filters, onFiltersChange }: ProductFil
             onChange={(e) => {
               const value = e.target.value;
               if (value === "") {
-                handleFilterChange("minPrice", undefined);
-                handleFilterChange("maxPrice", undefined);
-              } else if (value.endsWith("+")) {
+                applyPriceRange(undefined, undefined);
+                return;
+              }
+              if (value.endsWith("+")) {
                 const min = parseFloat(value.replace("+", ""));
-                handleFilterChange("minPrice", min);
-                handleFilterChange("maxPrice", undefined);
-              } else {
-                const parts = value.split("-");
-                if (parts.length === 2) {
-                  const min = parseFloat(parts[0]);
-                  const max = parseFloat(parts[1]);
-                  if (!isNaN(min) && !isNaN(max) && min >= 0 && max > 0) {
-                    // Appeler handleFilterChange deux fois pour mettre à jour les deux valeurs
-                    const currentFilters = { ...filters };
-                    currentFilters.minPrice = min;
-                    currentFilters.maxPrice = max;
-                    onFiltersChange(currentFilters);
-                  }
+                if (!Number.isNaN(min)) applyPriceRange(min, undefined);
+                return;
+              }
+              const parts = value.split("-");
+              if (parts.length === 2) {
+                const min = parseFloat(parts[0]);
+                const max = parseFloat(parts[1]);
+                if (!Number.isNaN(min) && !Number.isNaN(max) && min >= 0 && max > min) {
+                  applyPriceRange(min, max);
                 }
               }
             }}
