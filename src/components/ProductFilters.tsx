@@ -43,36 +43,26 @@ export function ProductFiltersComponent({
   const priceId = useId();
 
   const seeded = resolveInitialOptions(initialOptions);
+  const hasSeed = hasUsableFilterOptions(seeded);
   const [merchants, setMerchants] = useState<Advertiser[]>(seeded?.merchants ?? []);
   const [brands, setBrands] = useState<CatalogFilterOptions["brands"]>(
     seeded?.brands ?? []
   );
   const [categories, setCategories] = useState<Category[]>(seeded?.categories ?? []);
-  const [loading, setLoading] = useState(!hasUsableFilterOptions(seeded));
+  const [loading, setLoading] = useState(!hasSeed);
 
   useEffect(() => {
     if (hasUsableFilterOptions(initialOptions)) {
       writeClientFilterOptionsCache(initialOptions!);
-      setMerchants(initialOptions!.merchants);
-      setCategories(initialOptions!.categories);
-      setBrands(initialOptions!.brands);
-      setLoading(false);
-      return;
     }
+  }, [initialOptions]);
 
-    const cached = readClientFilterOptionsCache();
-    if (cached) {
-      setMerchants(cached.merchants);
-      setCategories(cached.categories);
-      setBrands(cached.brands);
-      setLoading(false);
-      return;
-    }
+  useEffect(() => {
+    if (hasSeed) return;
 
     let cancelled = false;
     async function loadFilterOptionsFallback() {
       try {
-        setLoading(true);
         const next = await loadCatalogFilterOptions();
         if (cancelled) return;
         writeClientFilterOptionsCache(next);
@@ -89,7 +79,7 @@ export function ProductFiltersComponent({
     return () => {
       cancelled = true;
     };
-  }, [initialOptions]);
+  }, [hasSeed]);
 
   const handleFilterChange = (key: keyof ProductFilters, value: string | number | boolean | undefined) => {
     // Normaliser les valeurs vides
