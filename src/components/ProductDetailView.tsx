@@ -10,6 +10,7 @@ import type { DisplayProduct } from "@/lib/types";
 import type { DescriptionBlock } from "@/lib/format-description";
 import { formatDeliveryLabel, truncate } from "@/lib/product-path";
 import { categorySegmentHref } from "@/lib/category-breadcrumb";
+import { resolveDetailImageUrl, resolveGalleryThumbUrl } from "@/lib/product-image";
 import { ProductDescription } from "@/components/ProductDescription";
 import { AwinAdSlot } from "@/components/AwinAdSlot";
 import { SimilarProductsSection } from "@/components/SimilarProductsSection";
@@ -37,9 +38,12 @@ export function ProductDetailView({
   similarProducts?: DisplayProduct[];
 }) {
   const pathname = usePathname();
-  const gallery = [product.image, ...extraImages].filter(
-    (url, index, all) => url && url !== "/images/placeholder.jpg" && all.indexOf(url) === index
-  );
+  const gallery = [product.image, ...extraImages]
+    .map((url) => resolveDetailImageUrl(url) || url)
+    .filter(
+      (url, index, all) =>
+        url && url !== "/images/placeholder.jpg" && all.indexOf(url) === index
+    );
   const mainImage = gallery[0] || product.image;
   const thumbs = gallery.slice(1);
 
@@ -88,7 +92,7 @@ export function ProductDetailView({
                   className="rounded-lg overflow-hidden border border-border bg-white"
                 >
                   <ImageWithFallback
-                    src={src}
+                    src={resolveGalleryThumbUrl(src) || src}
                     alt={`${product.name} — vue ${index + 2}`}
                     className="w-full h-24 aspect-square"
                     imageClassName="object-contain"

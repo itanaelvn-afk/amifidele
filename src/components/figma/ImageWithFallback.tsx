@@ -65,6 +65,8 @@ export function ImageWithFallback({
         fill
         sizes={sizes}
         priority={priority}
+        fetchPriority={priority ? "high" : "auto"}
+        decoding="async"
         unoptimized
         className={cn("object-cover", imageClassName)}
         onError={() => setDidError(true)}
