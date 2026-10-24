@@ -160,7 +160,8 @@ npm start
 ```
 
 Déploiement **Vercel + domaine** `amifidele.fr` : voir [`docs/DEPLOY_VERCEL.md`](docs/DEPLOY_VERCEL.md).  
-API NAS : repo `api-amifidele` → `docs/NAS_DEPLOY.md`.
+Infra complète (local) : `../INFRASTRUCTURE.local.md`.  
+API NAS + Cloudflare Tunnel : `api-amifidele` → `docs/NAS_DEPLOY.md` · `docs/CLOUDFLARE_TUNNEL.md`.
 
 ## 🔧 Technologies utilisées
 
