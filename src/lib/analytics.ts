@@ -36,7 +36,24 @@ function gtag(...args: unknown[]) {
 export function trackPageView(path: string): void {
   const measurementId = getGaMeasurementId();
   if (!measurementId) return;
-  gtag("config", measurementId, { page_path: path });
+  gtag("config", measurementId, {
+    page_path: path,
+    anonymize_ip: true,
+    send_page_view: true,
+  });
+}
+
+/**
+ * Met à jour Consent Mode si gtag est déjà chargé (ex. retrait du consentement).
+ * Sans effet si les scripts n'ont jamais été injectés.
+ */
+export function updateGaConsent(analyticsGranted: boolean): void {
+  gtag("consent", "update", {
+    analytics_storage: analyticsGranted ? "granted" : "denied",
+    ad_storage: "denied",
+    ad_user_data: "denied",
+    ad_personalization: "denied",
+  });
 }
 
 export function trackAffiliateClick({

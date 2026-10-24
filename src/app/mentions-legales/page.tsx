@@ -3,7 +3,7 @@ import { LEGAL_HOSTING, LEGAL_PUBLISHER } from "@/lib/legal-publisher";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Mentions légales | AmiFidele",
+  title: "Mentions légales",
   description:
     "Mentions légales du site AmiFidele, comparateur de produits pour animaux de compagnie.",
   path: "/mentions-legales",

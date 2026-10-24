@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "À propos | AmiFidele",
+  title: "À propos",
   description:
     "Découvrez AmiFidele : un comparateur indépendant pour choisir les meilleurs produits pour chiens et chats.",
   path: "/a-propos",

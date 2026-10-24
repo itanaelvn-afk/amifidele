@@ -62,6 +62,7 @@ async function categoryEntries(base: string): Promise<MetadataRoute.Sitemap> {
 
 async function productEntries(base: string): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
+  const seenCanonicalIds = new Set<string>();
   try {
     let page = 1;
     let totalPages = 1;
@@ -69,8 +70,9 @@ async function productEntries(base: string): Promise<MetadataRoute.Sitemap> {
       const response = await fetchProducts(page, PRODUCT_PAGE_SIZE);
       totalPages = Math.max(1, response.totalPages || 1);
       for (const product of response.products) {
-        const id = product._id || product.id;
-        if (!id) continue;
+        const id = String(product.canonicalId || product._id || product.id || "");
+        if (!id || seenCanonicalIds.has(id)) continue;
+        seenCanonicalIds.add(id);
         const lastModified =
           parseDate(product.updatedAt) || parseDate(product.lastSeenAt);
         entries.push({

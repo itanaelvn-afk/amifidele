@@ -3,7 +3,7 @@ import { ContactForm } from "@/components/ContactForm";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Contact | AmiFidele",
+  title: "Contact",
   description:
     "Contactez AmiFidele pour une question, un bug, une idée ou un retour sur le comparateur.",
   path: "/contact",

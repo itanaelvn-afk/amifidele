@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { JsonLd } from "@/components/JsonLd";
 import { fetchProductById } from "@/lib/api";
 import { breadcrumbJsonLd, productJsonLd } from "@/lib/json-ld";
@@ -10,7 +10,7 @@ import { ProductDetailView } from "@/components/ProductDetailView";
 import { parseProductDescription } from "@/lib/format-description";
 import { sanitizeDescriptionHtml } from "@/lib/sanitize-description-html";
 import { productPath, stripHtml, truncate } from "@/lib/product-path";
-import { DEFAULT_OG_IMAGE, SITE_NAME } from "@/lib/seo";
+import { DEFAULT_OG_IMAGE, SITE_NAME, formatPageTitle, productTitleSegment } from "@/lib/seo";
 
 function collectExtraImages(product: {
   images?: { main?: string; thumb?: string };
@@ -41,27 +41,32 @@ export async function generateMetadata({
   const raw = await fetchProductById(decodeURIComponent(id));
   if (!raw) {
     return {
-      title: "Produit introuvable | AmiFidele",
+      title: "Produit introuvable",
       robots: { index: false, follow: false },
     };
   }
 
   const display = mapApiProductToDisplayProduct(raw);
+  const offerHint =
+    display.priceFrom && display.offerCount
+      ? `Comparez ${display.offerCount} offres`
+      : "Comparez";
   const description = truncate(
     stripHtml(display.description) ||
-      `Comparez ${display.name} sur AmiFidele, comparateur de produits pour animaux.`,
+      `${offerHint} ${display.name} sur AmiFidele, comparateur de produits pour animaux.`,
     160
   );
-  const title = `${display.name} | AmiFidele`;
+  const titleSegment = productTitleSegment(display.name);
+  const title = formatPageTitle(titleSegment);
   const image =
     display.image.startsWith("http://") || display.image.startsWith("https://")
       ? display.image
       : DEFAULT_OG_IMAGE;
 
   return {
-    title,
+    title: titleSegment,
     description,
-    alternates: { canonical: productPath(display.id) },
+    alternates: { canonical: productPath(display) },
     openGraph: {
       title,
       description,
@@ -85,12 +90,17 @@ export default async function ProduitPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const raw = await fetchProductById(decodeURIComponent(id));
+  const requestedId = decodeURIComponent(id);
+  const raw = await fetchProductById(requestedId);
   if (!raw) {
     notFound();
   }
 
   const display = mapApiProductToDisplayProduct(raw);
+  if (display.canonicalId && display.canonicalId !== requestedId) {
+    permanentRedirect(productPath(display.canonicalId));
+  }
+
   const extraImages = collectExtraImages(raw).filter((url) => url !== display.image);
   const isHtmlDescription = display.descriptionFormat === "html";
   const descriptionHtml = isHtmlDescription

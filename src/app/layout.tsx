@@ -13,7 +13,10 @@ import {
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
-  title: DEFAULT_TITLE,
+  title: {
+    default: DEFAULT_TITLE,
+    template: `%s | ${SITE_NAME}`,
+  },
   description: DEFAULT_DESCRIPTION,
   openGraph: {
     type: "website",

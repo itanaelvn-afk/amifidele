@@ -4,7 +4,7 @@ import { LEGAL_PUBLISHER } from "@/lib/legal-publisher";
 import { pageMetadata } from "@/lib/seo";
 
 export const metadata = pageMetadata({
-  title: "Politique de confidentialité | AmiFidele",
+  title: "Politique de confidentialité",
   description:
     "Politique de confidentialité et protection des données personnelles sur AmiFidele.",
   path: "/confidentialite",

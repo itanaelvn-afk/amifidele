@@ -86,7 +86,7 @@ export function ComparisonTable({
                     </p>
                     <h4 className="text-lg font-bold mb-3 line-clamp-3 min-h-[4.5rem]">
                       <Link
-                        href={productPath(product.id)}
+                        href={productPath(product)}
                         className="hover:text-primary transition-colors"
                       >
                         {product.name}
@@ -164,7 +164,7 @@ export function ComparisonTable({
                   )}
 
                   <Button asChild size="lg" variant="outline" className="w-full mt-2">
-                    <Link href={productPath(product.id)}>Voir la fiche</Link>
+                    <Link href={productPath(product)}>Voir la fiche</Link>
                   </Button>
                   {product.bestAffiliateLink && (
                     <Button

@@ -26,7 +26,10 @@ export function ConsentScripts() {
       ad_user_data: 'denied',
       ad_personalization: 'denied'
     });
-    gtag('config', '${measurementId}', { anonymize_ip: true });
+    gtag('config', '${measurementId}', {
+      anonymize_ip: true,
+      send_page_view: false
+    });
   `;
 
   return (

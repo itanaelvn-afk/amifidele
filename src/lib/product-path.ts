@@ -1,5 +1,11 @@
-/** Chemin public d’une fiche produit. */
-export function productPath(id: string): string {
+/** Chemin public d’une fiche produit (utilise l’ID canonique si fourni). */
+export function productPath(
+  idOrProduct: string | { id: string; canonicalId?: string }
+): string {
+  const id =
+    typeof idOrProduct === "string"
+      ? idOrProduct
+      : idOrProduct.canonicalId || idOrProduct.id;
   return `/produit/${encodeURIComponent(id)}`;
 }
 

@@ -34,8 +34,10 @@ yarn-error.log*
 .env*
 !.env.example
 
-# docs locales (ops / IP — ne pas committer)
-docs/*.local.md
+# Documentation (non versionnée)
+docs/
+INFRASTRUCTURE.md
+INFRASTRUCTURE.local.md
 
 # rapports Lighthouse locaux (scores détaillés, non versionnés)
 /reports/lighthouse/
