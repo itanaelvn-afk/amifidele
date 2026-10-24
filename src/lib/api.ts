@@ -13,11 +13,23 @@ function apiUrl(path: string, params?: URLSearchParams): string {
   return qs ? `${base}${path}?${qs}` : `${base}${path}`;
 }
 
-function apiFetchInit(): RequestInit & { next?: { revalidate: number } } {
+function apiFetchInit(options?: {
+  /** Override du revalidate listing (défaut API_CONFIG.cacheRevalidate). */
+  revalidate?: number;
+  /** Désactive le Data Cache Next (PDP multi-offres, prix frais). */
+  noStore?: boolean;
+}): RequestInit & { next?: { revalidate: number } } {
+  if (options?.noStore) {
+    return {
+      method: "GET",
+      headers: getAuthHeaders(),
+      cache: "no-store",
+    };
+  }
   return {
-    method: 'GET',
+    method: "GET",
     headers: getAuthHeaders(),
-    next: { revalidate: API_CONFIG.cacheRevalidate },
+    next: { revalidate: options?.revalidate ?? API_CONFIG.cacheRevalidate },
   };
 }
 
@@ -175,7 +187,11 @@ export async function fetchProductById(id: number | string): Promise<ApiProduct 
     const params = new URLSearchParams();
     appendPublicVisibility(params);
 
-    const response = await fetch(apiUrl(`/products/${id}`, params), apiFetchInit());
+    // PDP : pas de Data Cache 1h — sinon offers[]/offerCount restent figés après un rebuild API.
+    const response = await fetch(
+      apiUrl(`/products/${id}`, params),
+      apiFetchInit({ noStore: true })
+    );
 
     if (response.status === 404) {
       return null;
