@@ -67,7 +67,7 @@ export function Header({ current = "other" }: HeaderProps) {
           </nav>
 
           <button
-            className="lg:hidden p-2 rounded-lg hover:bg-muted transition-colors"
+            className="lg:hidden p-2 min-h-11 min-w-11 inline-flex items-center justify-center rounded-lg hover:bg-muted transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Menu"
           >

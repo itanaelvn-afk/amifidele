@@ -42,11 +42,11 @@ export function Footer() {
 
           <div>
             <h4 className="mb-4">Catalogue</h4>
-            <ul className="space-y-3">
+            <ul className="space-y-1">
               <li>
                 <Link
                   href="/produits"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   Tous les produits
                 </Link>
@@ -54,7 +54,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/marques"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   Marques
                 </Link>
@@ -63,7 +63,7 @@ export function Footer() {
                 <li key={item.slug}>
                   <Link
                     href={categoryPath(item.slug)}
-                    className="text-muted-foreground hover:text-primary transition-colors"
+                    className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                   >
                     {item.label}
                   </Link>
@@ -74,11 +74,11 @@ export function Footer() {
 
           <div>
             <h4 className="mb-4">Informations</h4>
-            <ul className="space-y-3">
+            <ul className="space-y-1">
               <li>
                 <Link
                   href="/a-propos"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   À propos
                 </Link>
@@ -86,7 +86,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   Contact
                 </Link>
@@ -94,7 +94,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/contact?sujet=idee"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   Donner un avis
                 </Link>
@@ -102,7 +102,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/mentions-legales"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   Mentions légales
                 </Link>
@@ -110,7 +110,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/confidentialite"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   Confidentialité
                 </Link>
@@ -118,7 +118,7 @@ export function Footer() {
               <li>
                 <Link
                   href="/cgu"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   CGU
                 </Link>
@@ -126,13 +126,13 @@ export function Footer() {
               <li>
                 <Link
                   href="/cookies"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors"
                 >
                   Cookies
                 </Link>
               </li>
               <li>
-                <CookieSettingsButton className="text-muted-foreground hover:text-primary transition-colors text-left" />
+                <CookieSettingsButton className="inline-flex items-center min-h-11 py-2 text-muted-foreground hover:text-primary transition-colors text-left" />
               </li>
             </ul>
           </div>

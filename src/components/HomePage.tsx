@@ -64,7 +64,7 @@ export function HomePage() {
               <Badge className="bg-primary/20 text-primary border-primary/30">
                 ✨ Nouveau sur AmiFidele
               </Badge>
-              <h1 className="text-5xl">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl leading-tight">
                 Trouvez les meilleurs produits pour vos animaux
               </h1>
               <p className="text-muted-foreground text-xl">
@@ -134,18 +134,18 @@ export function HomePage() {
                 return (
                   <Card key={slug} className="hover:shadow-md transition-shadow">
                     <CardContent className="p-6">
-                      <Link href={categoryPath(slug)} className="block mb-4">
+                      <Link href={categoryPath(slug)} className="block mb-4 min-h-11 py-1">
                         <h3 className="text-xl font-semibold hover:text-primary">{root.name}</h3>
                       </Link>
                       {kids.length > 0 && (
-                        <ul className="space-y-2">
+                        <ul className="space-y-1">
                           {kids.map((child) => {
                             const childSlug = child.slug || child.id || "";
                             return (
                               <li key={childSlug}>
                                 <Link
                                   href={categoryPath(childSlug)}
-                                  className="text-sm text-muted-foreground hover:text-primary"
+                                  className="inline-flex items-center min-h-11 py-2 text-sm text-muted-foreground hover:text-primary"
                                 >
                                   {child.name}
                                 </Link>
@@ -154,7 +154,7 @@ export function HomePage() {
                           })}
                         </ul>
                       )}
-                      <Button asChild variant="outline" size="sm" className="mt-6">
+                      <Button asChild variant="outline" className="mt-6 min-h-11">
                         <Link href={categoryPath(slug)}>
                           Voir {root.name}
                           <ArrowRight className="ml-2 w-4 h-4" />

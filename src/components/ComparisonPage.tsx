@@ -216,8 +216,8 @@ export function ComparisonPage({
   return (
     <div className="min-h-screen bg-background">
       {/* Search and Filters */}
-      <div className="sticky top-0 z-40 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
-        <div className="container mx-auto px-4 py-6">
+      <div className="sticky top-20 z-40 bg-card/95 backdrop-blur-md border-b border-border shadow-sm">
+        <div className="container mx-auto px-4 py-4 sm:py-6">
           {/* Search Bar */}
           <div className="relative mb-6">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -391,7 +391,7 @@ export function ComparisonPage({
                     replaceListing({ page: Math.max(1, currentPage - 1) })
                   }
                   disabled={currentPage === 1}
-                  className="shrink-0 gap-1 px-2.5 sm:gap-2 sm:px-3"
+                  className="shrink-0 gap-1 min-h-10 min-w-10 px-2.5 sm:gap-2 sm:px-3"
                   aria-label="Page précédente"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -407,7 +407,7 @@ export function ComparisonPage({
                         size="sm"
                         onClick={() => replaceListing({ page: pageNum })}
                         className={cn(
-                          "min-w-9 px-2",
+                          "min-h-10 min-w-10 px-2",
                           currentPage === pageNum &&
                             "bg-primary text-primary-foreground shadow-md"
                         )}
@@ -447,7 +447,7 @@ export function ComparisonPage({
                     })
                   }
                   disabled={currentPage === pagination.totalPages}
-                  className="shrink-0 gap-1 px-2.5 sm:gap-2 sm:px-3"
+                  className="shrink-0 gap-1 min-h-10 min-w-10 px-2.5 sm:gap-2 sm:px-3"
                   aria-label="Page suivante"
                 >
                   <span className="hidden sm:inline">Suivant</span>
@@ -497,10 +497,10 @@ export function ComparisonPage({
 
       {/* Floating Comparison Button */}
       {selectedProducts.length > 0 && (
-        <div className="fixed bottom-6 right-6 z-20 animate-in slide-in-from-bottom-5">
+        <div className="fixed inset-x-4 bottom-4 z-20 sm:inset-x-auto sm:right-6 sm:bottom-6 animate-in slide-in-from-bottom-5">
           <Button
             size="lg"
-            className="shadow-2xl rounded-full px-6 py-6 bg-primary hover:bg-primary/90 text-primary-foreground hover:scale-105 transition-transform"
+            className="w-full sm:w-auto shadow-2xl rounded-full px-6 py-6 min-h-12 bg-primary hover:bg-primary/90 text-primary-foreground hover:scale-105 transition-transform"
             onClick={() => setShowComparison(true)}
           >
             <PawPrint className="w-5 h-5 mr-2" />

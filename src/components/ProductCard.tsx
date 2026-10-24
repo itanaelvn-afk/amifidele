@@ -105,30 +105,34 @@ export function ProductCard({ product, isSelected, onToggleSelect, priority = fa
         )}
 
         <div className="mt-auto">
-          <div className="flex flex-wrap gap-2">
-            <Button asChild variant="outline" className={onToggleSelect ? "flex-1" : "w-full"}>
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+            <Button
+              asChild
+              variant="outline"
+              className={onToggleSelect ? "w-full sm:flex-1 min-h-11" : "w-full min-h-11"}
+            >
               <Link href={href}>Voir la fiche</Link>
             </Button>
             {onToggleSelect && (
-            <Button
-              variant={isSelected ? "default" : "outline"}
-              className="flex-1"
-              onClick={() => onToggleSelect(product.id)}
-            >
-              {isSelected ? (
-                <>
-                  <Check className="w-4 h-4 mr-2" />
-                  Sélectionné
-                </>
-              ) : (
-                "Comparer"
-              )}
-            </Button>
+              <Button
+                variant={isSelected ? "default" : "outline"}
+                className="w-full sm:flex-1 min-h-11"
+                onClick={() => onToggleSelect(product.id)}
+              >
+                {isSelected ? (
+                  <>
+                    <Check className="w-4 h-4 mr-2" />
+                    Sélectionné
+                  </>
+                ) : (
+                  "Comparer"
+                )}
+              </Button>
             )}
             {product.bestAffiliateLink && (
               <Button
                 variant="default"
-                className="bg-primary hover:bg-primary/90"
+                className="w-full sm:w-auto min-h-11 bg-primary hover:bg-primary/90"
                 onClick={handleAffiliateClick}
               >
                 <ShoppingCart className="w-4 h-4 mr-2" />
