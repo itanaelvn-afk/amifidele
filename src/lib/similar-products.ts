@@ -18,7 +18,7 @@ const FETCH_BUFFER = 4;
 
 export type SimilarProductSeed = Pick<
   DisplayProduct,
-  "id" | "categoryId" | "price" | "categoryTrail"
+  "id" | "categoryId" | "price" | "categoryTrail" | "ean"
 >;
 
 function priceBand(price: number): { minPrice: number; maxPrice: number } | null {
@@ -38,11 +38,14 @@ function rootCategoryId(seed: SimilarProductSeed): string | undefined {
 function dedupeExclude(
   products: DisplayProduct[],
   excludeIds: Set<string>,
-  limit: number
+  limit: number,
+  excludeEan?: string
 ): DisplayProduct[] {
   const out: DisplayProduct[] = [];
   for (const p of products) {
     if (excludeIds.has(p.id)) continue;
+    // Même EAN = autre offre du même produit (ex. Amazon) — pas un « similaire »
+    if (excludeEan && p.ean && p.ean === excludeEan) continue;
     out.push(p);
     if (out.length >= limit) break;
   }
@@ -82,15 +85,16 @@ export async function fetchSimilarProducts(
 
   try {
     const band = priceBand(seed.price);
+    const excludeEan = seed.ean?.replace(/\D/g, "") || undefined;
     let candidates = await loadByCategory(seed.categoryId, limit, band);
-    const similar = dedupeExclude(candidates, excludeIds, limit);
+    const similar = dedupeExclude(candidates, excludeIds, limit, excludeEan);
 
     if (similar.length < Math.min(4, limit)) {
       const root = rootCategoryId(seed);
       if (root) {
         candidates = await loadByCategory(root, limit, null);
         const seen = new Set(similar.map((p) => p.id));
-        for (const p of dedupeExclude(candidates, excludeIds, limit)) {
+        for (const p of dedupeExclude(candidates, excludeIds, limit, excludeEan)) {
           if (seen.has(p.id)) continue;
           similar.push(p);
           seen.add(p.id);
